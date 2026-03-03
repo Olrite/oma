@@ -1,3 +1,5 @@
+### This project has been archived. I haven't been on 2b2t for a while now and no longer have motivation to continue this project due to some recent personal events. You can see some other Meteor Client addons [here](https://anticope.pages.dev/addons/?). Thank you everyone for downloading and showing support for this addon! <3
+
 # cozisAddon
 A 2b2t Meteor Client utility based addon.
 
