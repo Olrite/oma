@@ -146,7 +146,7 @@ public class DecorESP extends Module {
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public DecorESP() {
-        super(Main.RENDER, "DecorESP", "Highlights vanity items like item frames and banners.");
+        super(Main.RENDER, "Decor ESP", "Highlights vanity items like item frames and banners.");
     }
 
     @Override

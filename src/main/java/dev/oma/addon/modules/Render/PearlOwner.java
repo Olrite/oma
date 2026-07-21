@@ -74,7 +74,7 @@ public class PearlOwner extends Module {
     private final List<PearlInfo> pearlsToRender = new ArrayList<>();
 
     public PearlOwner() {
-        super(Main.RENDER, "pearl-owner", "Displays the name of the player who threw an ender pearl.");
+        super(Main.RENDER, "Pearl Owner", "Displays the name of the player who threw an ender pearl.");
     }
 
     @EventHandler

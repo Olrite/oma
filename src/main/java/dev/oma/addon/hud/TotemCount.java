@@ -13,7 +13,7 @@ import net.minecraft.item.Items;
 public class TotemCount extends HudElement {
     public static final HudElementInfo<TotemCount> INFO = new HudElementInfo<>(
         Main.HUD_GROUP,
-        "totem-count",
+        "Totem Count",
         "Displays a count of totems in inventory.",
         TotemCount::new
     );

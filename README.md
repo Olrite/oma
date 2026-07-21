@@ -48,19 +48,19 @@ The built JAR is in `build/libs/`.
 
 # Modules
 ### Utility
-- Better Auto Log, Auto Shulker, Elytra Swap, Chat Tracker, Player History, DiscordNotifications, PortalMaker, AntiSpam, Dub Counter, GrimAirPlace, Map Exporter
+- Better Auto Log, Auto Shulker, Elytra Swap, Chat Tracker, Player History, Discord Notifications, Portal Maker, Anti Spam, Dub Counter, Grim Air Place, Map Exporter
 
 ### Renders
-- SignRender, ChestESP, DecorESP, MobItemESP, PearlOwner
+- Sign Render, Chest ESP, Decor ESP, Mob Item ESP, Pearl Owner
 
 ### Movement
-- Auto eFly, Auto Pitch40, SearchArea, Smart eFly, GrimScaffold
+- Auto eFly, Auto Pitch40, Search Area, Smart eFly, Grim Scaffold
 
 ### Hunting
-- Better Stash Finder, Better New Chunks, TrailFollower (requires Baritone)
+- Better Stash Finder, Better New Chunks, Trail Follower (requires Baritone)
 
 ### HUD
-- TotemCount, CrystalCount, Dub Count, Sign Display, ETA, Lag Detector, EntityList
+- Totem Count, Crystal Count, Dub Count, Sign Display, ETA, Lag Detector, Entity List
 
 ## Credits
 Credit to [xqyet](https://github.com/xqyet), [Asteroide](https://github.com/asteroide-development), [miles352](https://github.com/miles352), [dekrom](https://github.com/dekrom), and [etianl](https://github.com/etianl) for some of the modules that I built upon.

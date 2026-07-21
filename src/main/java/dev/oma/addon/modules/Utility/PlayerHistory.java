@@ -85,7 +85,7 @@ public class PlayerHistory extends Module {
     private int delayTimer = 0;
 
     public PlayerHistory() {
-        super(Main.UTILS, "Player-History", "Logs player information when they are spotted.");
+        super(Main.UTILS, "Player History", "Logs player information when they are spotted.");
     }
 
     @Override

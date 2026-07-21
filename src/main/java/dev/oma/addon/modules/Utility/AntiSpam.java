@@ -23,7 +23,7 @@ public class AntiSpam extends Module {
     );
 
     public AntiSpam() {
-        super(Main.UTILS, "Anti-Spam", "Prevents the chat from being flooded from automated messages");
+        super(Main.UTILS, "Anti Spam", "Prevents the chat from being flooded from automated messages");
     }
 
     @EventHandler

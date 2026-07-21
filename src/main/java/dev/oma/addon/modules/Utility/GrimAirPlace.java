@@ -77,7 +77,7 @@ public class GrimAirPlace extends Module {
     private int delay = 0;
 
     public GrimAirPlace() {
-        super(Main.UTILS, "grim-air-place", "Places a block where your crosshair is pointing at.");
+        super(Main.UTILS, "Grim Air Place", "Places a block where your crosshair is pointing at.");
     }
 
     @Override

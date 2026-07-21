@@ -13,7 +13,7 @@ import net.minecraft.item.Items;
 public class CrystalCount extends HudElement {
     public static final HudElementInfo<CrystalCount> INFO = new HudElementInfo<>(
         Main.HUD_GROUP,
-        "crystal-count",
+        "Crystal Count",
         "Displays a count of crystals in inventory.",
         CrystalCount::new
     );
