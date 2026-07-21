@@ -21,7 +21,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-public class MapExporter extends Module {
+public class MapArchiver extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgNaming = settings.createGroup("Naming");
 
@@ -73,8 +73,8 @@ public class MapExporter extends Module {
     private int checkDelay = 0;
     private boolean hasShownMessage = false;
 
-    public MapExporter() {
-        super(Main.UTILS, "Map Exporter", "Exports map art as PNG images");
+    public MapArchiver() {
+        super(Main.MOD, "Map Archiver", "Archives map art as PNG images");
     }
 
     @Override

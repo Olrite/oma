@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 
-public class ChatTracker extends Module {
+public class LeakLogger extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgFilters = settings.createGroup("Filters");
     private final SettingGroup sgFile = settings.createGroup("File Settings");
@@ -51,10 +51,17 @@ public class ChatTracker extends Module {
     );
 
     // Filter Settings
+    private final Setting<Boolean> filterUrls = sgFilters.add(new BoolSetting.Builder()
+        .name("filter-urls")
+        .description("Log messages containing URLs.")
+        .defaultValue(true)
+        .build()
+    );
+
     private final Setting<Boolean> filterCoordinates = sgFilters.add(new BoolSetting.Builder()
         .name("filter-coordinates")
-        .description("Only log messages containing coordinates.")
-        .defaultValue(false)
+        .description("Log messages containing coordinates.")
+        .defaultValue(true)
         .build()
     );
 
@@ -99,7 +106,7 @@ public class ChatTracker extends Module {
     private final Setting<String> fileName = sgFile.add(new StringSetting.Builder()
         .name("file-name")
         .description("Name of the log file.")
-        .defaultValue("chat_log")
+        .defaultValue("leak_log")
         .build()
     );
 
@@ -130,8 +137,8 @@ public class ChatTracker extends Module {
     private int messageCount = 0;
     private LocalDateTime sessionStart;
 
-    public ChatTracker() {
-        super(Main.UTILS, "Chat Tracker", "Logs chat messages to file with optional filtering.");
+    public LeakLogger() {
+        super(Main.MOD, "Leak Logger", "Logs chat messages that look like leaks (URLs and coordinates).");
     }
 
     @Override
@@ -154,13 +161,13 @@ public class ChatTracker extends Module {
         // Initialize log file
         initializeLogFile();
         
-        info("Chat tracking started. Log file: " + currentLogFile.getName());
+        info("Leak logging started. Log file: " + currentLogFile.getName());
     }
 
     @Override
     public void onDeactivate() {
         if (currentLogFile != null) {
-            info("Chat tracking stopped. Total messages logged: " + messageCount);
+            info("Leak logging stopped. Total messages logged: " + messageCount);
         }
         currentLogFile = null;
         compiledRegex = null;
@@ -184,9 +191,14 @@ public class ChatTracker extends Module {
     }
 
     private boolean shouldLogMessage(String message) {
-        // Filter by coordinates
-        if (filterCoordinates.get() && !containsCoordinates(message)) {
-            return false;
+        // Leak filters: if either is enabled, require at least one match (OR).
+        // If both are disabled, log all messages (full chat mode).
+        if (filterUrls.get() || filterCoordinates.get()) {
+            boolean urlMatch = filterUrls.get() && containsUrl(message);
+            boolean coordMatch = filterCoordinates.get() && containsCoordinates(message);
+            if (!urlMatch && !coordMatch) {
+                return false;
+            }
         }
 
         // Filter by player names
@@ -205,10 +217,32 @@ public class ChatTracker extends Module {
         return true;
     }
 
+    private boolean containsUrl(String message) {
+        Pattern urlPattern = Pattern.compile(
+            "(?i)(https?://\\S+|www\\.\\S+|\\b[a-z0-9.-]+\\.(com|net|org|gg|io|me|co|xyz|info|ru|tk)\\b\\S*)"
+        );
+        return urlPattern.matcher(message).find();
+    }
+
+    // Matches an int or decimal, optionally negative. \b doesn't work here since it
+    // requires a word-char boundary and fails right before a leading '-' preceded by
+    // whitespace, so plain lookaround on non-digit/non-dot characters is used instead.
+    private static final String NUM = "-?\\d{1,7}(?:\\.\\d+)?";
+    private static final String LEFT_BOUND = "(?<![\\w.-])";
+    private static final String RIGHT_BOUND = "(?![\\w.])";
+
+    private static final Pattern COORD_PATTERN = Pattern.compile(
+        "\\[\\s*" + NUM + "\\s*,\\s*" + NUM + "\\s*,\\s*" + NUM + "\\s*\\]" +
+        "|\\(\\s*" + NUM + "\\s*,\\s*" + NUM + "\\s*,\\s*" + NUM + "\\s*\\)" +
+        "|" + LEFT_BOUND + NUM + "\\s*,\\s*" + NUM + "\\s*,\\s*" + NUM + RIGHT_BOUND +
+        "|" + LEFT_BOUND + NUM + "\\s*/\\s*" + NUM + "\\s*/\\s*" + NUM + RIGHT_BOUND +
+        "|" + LEFT_BOUND + NUM + "\\s+" + NUM + "\\s+" + NUM + RIGHT_BOUND
+    );
+
     private boolean containsCoordinates(String message) {
-        // Look for coordinate patterns like [123, 45, 678] or (123, 45, 678)
-        Pattern coordPattern = Pattern.compile("\\[\\s*-?\\d+\\s*,\\s*-?\\d+\\s*,\\s*-?\\d+\\s*\\]|\\(\\s*-?\\d+\\s*,\\s*-?\\d+\\s*,\\s*-?\\d+\\s*\\)");
-        return coordPattern.matcher(message).find();
+        // Bracketed / parenthesized coords, or comma-, slash-, or space-separated x y z
+        // triples. Supports negative and decimal values.
+        return COORD_PATTERN.matcher(message).find();
     }
 
     private boolean containsPlayerName(String message) {

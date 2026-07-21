@@ -15,7 +15,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class PlayerHistory extends Module {
+public class RenderNotifications extends Module {
     private final SettingGroup sgFilter = settings.createGroup("Filter");
     private final SettingGroup sgLogging = settings.createGroup("Logging");
 
@@ -84,8 +84,8 @@ public class PlayerHistory extends Module {
     private final Set<PlayerEntity> loggedPlayers = ConcurrentHashMap.newKeySet();
     private int delayTimer = 0;
 
-    public PlayerHistory() {
-        super(Main.UTILS, "Player History", "Logs player information when they are spotted.");
+    public RenderNotifications() {
+        super(Main.MOD, "Render Notifications", "Logs player information when they are spotted.");
     }
 
     @Override
@@ -143,7 +143,7 @@ public class PlayerHistory extends Module {
         }
 
         if (logToConsole.get()) {
-            Main.LOG.info("[PlayerHistory] " + logMessage);
+            Main.LOG.info("[RenderNotifications] " + logMessage);
         }
     }
 

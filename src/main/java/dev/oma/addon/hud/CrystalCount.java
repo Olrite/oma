@@ -1,12 +1,14 @@
 package dev.oma.addon.hud;
 
 import dev.oma.addon.Main;
+import dev.oma.addon.util.HudFont;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.hud.HudElement;
 import meteordevelopment.meteorclient.systems.hud.HudElementInfo;
 import meteordevelopment.meteorclient.systems.hud.HudRenderer;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
+import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
@@ -45,6 +47,20 @@ public class CrystalCount extends HudElement {
         .build()
     );
 
+    private final Setting<Boolean> customFont = sgGeneral.add(new BoolSetting.Builder()
+        .name("custom-font")
+        .description("Use Meteor's custom font for the count. Off uses the default Minecraft / resource pack font.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<SettingColor> countColor = sgGeneral.add(new ColorSetting.Builder()
+        .name("count-color")
+        .description("Color of the count text.")
+        .defaultValue(new SettingColor(255, 255, 255, 255))
+        .build()
+    );
+
     public CrystalCount() {
         super(INFO);
         calculateSize();
@@ -56,57 +72,38 @@ public class CrystalCount extends HudElement {
     }
 
     private void calculateSize() {
-        setSize(17 * scale.get(), 17 * scale.get());
+        setSize(17 * scale.get() + 36, 17 * scale.get());
     }
 
     @Override
     public void render(HudRenderer renderer) {
         int crystalCount = InvUtils.find(stack -> stack.getItem() == Items.END_CRYSTAL).count();
-        ItemStack crystalStack = new ItemStack(Items.END_CRYSTAL, crystalCount);
+        ItemStack crystalStack = new ItemStack(Items.END_CRYSTAL, Math.max(crystalCount, 1));
+        boolean empty = crystalCount <= 0;
 
-        if (shouldHideInEditor(crystalStack)) {
+        if (mode.get() == Mode.HideItem && empty && !isInEditor()) {
             renderEditorPlaceholder(renderer);
-        } else {
-            renderer.post(() -> {
-                double xPos = this.x + border.get();
-                double yPos = this.y + border.get();
-                renderItem(renderer, crystalStack, (int) xPos, (int) yPos);
-            });
+            return;
         }
-    }
 
-    private boolean shouldHideInEditor(ItemStack itemStack) {
-        return mode.get() == Mode.HideItem && itemStack.isEmpty() && !isInEditor();
+        double xPos = this.x + border.get();
+        double yPos = this.y + border.get();
+        renderer.post(() -> renderer.item(crystalStack, (int) xPos, (int) yPos, scale.get().floatValue(), false));
+
+        if (mode.get() != Mode.HideCount || !empty || isInEditor()) {
+            String text = empty ? (mode.get() == Mode.ShowCount || isInEditor() ? "0" : "") : String.valueOf(crystalCount);
+            if (!text.isEmpty()) {
+                double textX = xPos + 17 * scale.get() + 2;
+                double textY = yPos + (17 * scale.get() - HudFont.textHeight(renderer, customFont.get(), false, scale.get() * 0.5)) / 2.0;
+                HudFont.text(renderer, text, textX, textY, countColor.get(), customFont.get(), false, scale.get() * 0.5);
+            }
+        }
     }
 
     private void renderEditorPlaceholder(HudRenderer renderer) {
         if (isInEditor()) {
             renderer.line(x, y, x + getWidth(), y + getHeight(), Color.GRAY);
             renderer.line(x, y + getHeight(), x + getWidth(), y, Color.GRAY);
-        }
-    }
-
-    private void renderItem(HudRenderer renderer, ItemStack itemStack, int x, int y) {
-        if (mode.get() == Mode.HideItem) {
-            renderer.item(itemStack, x, y, scale.get().floatValue(), true);
-            return;
-        }
-
-        String countOverride = null;
-        boolean needsReset = false;
-
-        if (itemStack.isEmpty()) {
-            if (mode.get() == Mode.ShowCount) {
-                countOverride = "0";
-            }
-            itemStack.setCount(1);
-            needsReset = true;
-        }
-
-        renderer.item(itemStack, x, y, scale.get().floatValue(), true, countOverride);
-
-        if (needsReset) {
-            itemStack.setCount(0);
         }
     }
 

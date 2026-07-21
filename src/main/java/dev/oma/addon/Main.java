@@ -11,27 +11,28 @@ import dev.oma.addon.hud.LagDetector;
 import dev.oma.addon.modules.Hunting.BetterNewChunks;
 import dev.oma.addon.modules.Movement.SmartEFly;
 import dev.oma.addon.modules.Movement.AutoLiftoff;
-import dev.oma.addon.modules.Movement.GrimScaffold;
-import dev.oma.addon.modules.Utility.GrimAirPlace;
 import dev.oma.addon.modules.Hunting.BetterStashFinder;
 import dev.oma.addon.modules.Hunting.TrailFollower;
 import dev.oma.addon.modules.Movement.AutoPitch40;
 import dev.oma.addon.modules.Movement.searcharea.SearchArea;
 import dev.oma.addon.modules.Render.ChestESP;
-import dev.oma.addon.modules.Render.MobItemESP;
+import dev.oma.addon.modules.Render.MobDimension;
 import dev.oma.addon.modules.Render.PearlOwner;
 import dev.oma.addon.modules.Render.SignRender;
 import dev.oma.addon.modules.Render.DecorESP;
+import dev.oma.addon.modules.Render.WeirdBlockESP;
 import dev.oma.addon.modules.Utility.AntiSpam;
 import dev.oma.addon.modules.Utility.BetterAutoLog;
 import dev.oma.addon.modules.Utility.AutoShulker;
 import dev.oma.addon.modules.Utility.DiscordNotifications;
 import dev.oma.addon.modules.Utility.DubCount;
 import dev.oma.addon.modules.Utility.PortalMaker;
-import dev.oma.addon.modules.Utility.PlayerHistory;
-import dev.oma.addon.modules.Utility.ChatTracker;
-import dev.oma.addon.modules.Utility.MapExporter;
+import dev.oma.addon.modules.Utility.RenderNotifications;
+import dev.oma.addon.modules.Utility.LeakLogger;
+import dev.oma.addon.modules.Utility.MapArchiver;
 import dev.oma.addon.modules.Utility.ElytraSwap;
+import dev.oma.addon.modules.Utility.ItemFinder;
+import dev.oma.addon.modules.Utility.FpsLimiter;
 import meteordevelopment.meteorclient.addons.GithubRepo;
 import meteordevelopment.meteorclient.addons.MeteorAddon;
 import meteordevelopment.meteorclient.systems.hud.Hud;
@@ -42,16 +43,14 @@ import org.slf4j.Logger;
 
 public class Main extends MeteorAddon {
     public static final Logger LOG = LogUtils.getLogger();
-    public static final Category UTILS = new Category("omaUtil");
-    public static final Category RENDER = new Category("omaRender");
-    public static final Category MOVEMENT = new Category("omaMovement");
-    public static final Category HUNTING = new Category("omaHunting");
+    public static final Category MOD = new Category("omaUtil");
+    public static final Category HUNT = new Category("omaHunt");
     public static final HudGroup HUD_GROUP = new HudGroup("oma");
 
 
     @Override
     public void onInitialize() {
-        LOG.info("Initializing o.m.a.");
+        LOG.info("Initializing oma.");
 
         // Modules
          Modules.get().add(new PortalMaker());
@@ -60,10 +59,11 @@ public class Main extends MeteorAddon {
          Modules.get().add(new AutoPitch40());
          Modules.get().add(new BetterNewChunks());
          Modules.get().add(new ChestESP());
-         Modules.get().add(new MobItemESP());
+         Modules.get().add(new MobDimension());
          Modules.get().add(new PearlOwner());
          Modules.get().add(new SignRender());
          Modules.get().add(new DecorESP());
+         Modules.get().add(new WeirdBlockESP());
          Modules.get().add(new SearchArea());
          Modules.get().add(new AntiSpam());
          Modules.get().add(new BetterAutoLog());
@@ -71,12 +71,12 @@ public class Main extends MeteorAddon {
          Modules.get().add(new AutoShulker());
          Modules.get().add(new AutoLiftoff());
          Modules.get().add(new DubCount());
-         Modules.get().add(new GrimScaffold());
-         Modules.get().add(new GrimAirPlace());
-         Modules.get().add(new PlayerHistory());
-         Modules.get().add(new ChatTracker());
-         Modules.get().add(new MapExporter());
+         Modules.get().add(new RenderNotifications());
+         Modules.get().add(new LeakLogger());
+         Modules.get().add(new MapArchiver());
          Modules.get().add(new ElytraSwap());
+         Modules.get().add(new ItemFinder());
+         Modules.get().add(new FpsLimiter());
          
          // Only add modules that require Baritone if Baritone is available
          try {
@@ -102,10 +102,8 @@ public class Main extends MeteorAddon {
 
     @Override
     public void onRegisterCategories() {
-        Modules.registerCategory(UTILS);
-        Modules.registerCategory(RENDER);
-        Modules.registerCategory(MOVEMENT);
-        Modules.registerCategory(HUNTING);
+        Modules.registerCategory(MOD);
+        Modules.registerCategory(HUNT);
     }
 
     @Override

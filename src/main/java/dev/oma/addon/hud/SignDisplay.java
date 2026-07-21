@@ -12,6 +12,8 @@ import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 
 import java.util.List;
 
+import dev.oma.addon.util.HudFont;
+
 public class SignDisplay extends HudElement {
     public static final HudElementInfo<SignDisplay> INFO = new HudElementInfo<>(Main.HUD_GROUP, "Sign Display", "Displays nearby sign text.", SignDisplay::new);
 
@@ -54,6 +56,13 @@ public class SignDisplay extends HudElement {
         .build()
     );
 
+    private final Setting<Boolean> customFont = sgGeneral.add(new BoolSetting.Builder()
+        .name("custom-font")
+        .description("Use Meteor's custom font. Off uses the default Minecraft / resource pack font.")
+        .defaultValue(true)
+        .build()
+    );
+
     private final Setting<SettingColor> titleColor = sgGeneral.add(new ColorSetting.Builder()
         .name("title-color")
         .description("Color for the title.")
@@ -75,6 +84,10 @@ public class SignDisplay extends HudElement {
 
     @Override
     public void render(HudRenderer renderer) {
+        boolean font = customFont.get();
+        boolean shadow = textShadow.get();
+        double scale = textScale.get();
+
         // Automatically enable SignRender module when SignDisplay HUD is active
         if (this.isActive()) {
             SignRender signRenderModule = Modules.get().get(SignRender.class);
@@ -85,8 +98,8 @@ public class SignDisplay extends HudElement {
         
         if (MeteorClient.mc.world == null || MeteorClient.mc.player == null) {
             if (isInEditor()) {
-                renderer.text("SignDisplay", x, y, titleColor.get(), textShadow.get(), textScale.get());
-                setSize(renderer.textWidth("Sign Display", textShadow.get(), textScale.get()), renderer.textHeight(textShadow.get(), textScale.get()));
+                HudFont.text(renderer, "Sign Display", x, y, titleColor.get(), font, shadow, scale);
+                setSize(HudFont.textWidth(renderer, "Sign Display", font, shadow, scale), HudFont.textHeight(renderer, font, shadow, scale));
             }
             return;
         }
@@ -94,8 +107,8 @@ public class SignDisplay extends HudElement {
         List<SignRender.SignInfo> signInfos = SignRender.signInfos;
         if (signInfos.isEmpty()) {
             if (isInEditor()) {
-                renderer.text("Sign Display", x, y, titleColor.get(), textShadow.get(), textScale.get());
-                setSize(renderer.textWidth("Sign Display", textShadow.get(), textScale.get()), renderer.textHeight(textShadow.get(), textScale.get()));
+                HudFont.text(renderer, "Sign Display", x, y, titleColor.get(), font, shadow, scale);
+                setSize(HudFont.textWidth(renderer, "Sign Display", font, shadow, scale), HudFont.textHeight(renderer, font, shadow, scale));
             }
             return;
         }
@@ -104,13 +117,13 @@ public class SignDisplay extends HudElement {
         double curY = y;
         double maxWidth = 0;
         double height = 0;
-        double textHeight = renderer.textHeight(textShadow.get(), textScale.get());
+        double textHeight = HudFont.textHeight(renderer, font, shadow, scale);
         double spacing = 2;
 
         if (showTitle.get()) {
             String title = "Sign Display";
-            double titleWidth = renderer.textWidth(title, textShadow.get(), textScale.get());
-            renderer.text(title, curX, curY, titleColor.get(), textShadow.get(), textScale.get());
+            double titleWidth = HudFont.textWidth(renderer, title, font, shadow, scale);
+            HudFont.text(renderer, title, curX, curY, titleColor.get(), font, shadow, scale);
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, titleWidth);
@@ -143,16 +156,16 @@ public class SignDisplay extends HudElement {
                 displayText += " (" + (int) signInfo.distance + "m)";
             }
             
-            double textWidth = renderer.textWidth(displayText, textShadow.get(), textScale.get());
+            double textWidth = HudFont.textWidth(renderer, displayText, font, shadow, scale);
             
             // Render the sign text with appropriate colors
-            renderer.text(displayText, curX, curY, signColor.get(), textShadow.get(), textScale.get());
+            HudFont.text(renderer, displayText, curX, curY, signColor.get(), font, shadow, scale);
             
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, textWidth);
         }
 
-        setSize(maxWidth, height - spacing);  // Subtract last spacing
+        setSize(maxWidth, Math.max(0, height - spacing));
     }
 }

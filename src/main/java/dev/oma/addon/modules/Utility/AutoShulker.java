@@ -124,7 +124,7 @@ public class AutoShulker extends Module {
     private int previousSlot = -1;
 
     public AutoShulker() {
-        super(Main.UTILS, "Auto Shulker", "Automatically places and fills shulker boxes when inventory is full.");
+        super(Main.MOD, "Auto Shulker", "Automatically places and fills shulker boxes when inventory is full.");
     }
 
     @Override
