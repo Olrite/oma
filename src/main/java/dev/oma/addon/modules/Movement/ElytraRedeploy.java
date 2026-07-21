@@ -9,9 +9,9 @@ import meteordevelopment.meteorclient.settings.Setting;
 import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.Items;
+import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 
 public class ElytraRedeploy extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -65,17 +65,17 @@ public class ElytraRedeploy extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
         // Check if player has elytra equipped
-        boolean hasElytra = mc.player.getEquippedStack(EquipmentSlot.CHEST).getItem() == Items.ELYTRA;
+        boolean hasElytra = mc.player.getItemBySlot(EquipmentSlot.CHEST).getItem() == Items.ELYTRA;
         
         if (requireElytra.get() && !hasElytra) {
             wasFlying = false;
             return;
         }
 
-        boolean isCurrentlyFlying = mc.player.isGliding();
+        boolean isCurrentlyFlying = mc.player.isFallFlying();
         boolean isOnGround = mc.player.isOnGround();
 
         // Track if player was flying
@@ -93,8 +93,8 @@ public class ElytraRedeploy extends Module {
 
         // If waiting to activate and now in the air, send the activation packet
         if (waitingToActivate && !isOnGround && hasElytra) {
-            mc.player.networkHandler.sendPacket(
-                new ClientCommandC2SPacket(mc.player, ClientCommandC2SPacket.Mode.START_FALL_FLYING)
+            mc.player.connection.send(
+                new ServerboundPlayerCommandPacket(mc.player, ServerboundPlayerCommandPacket.Action.START_FALL_FLYING)
             );
             waitingToActivate = false;
             wasFlying = false;

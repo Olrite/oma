@@ -8,9 +8,9 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.render.NametagUtils;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import dev.oma.addon.Main;
 import java.util.ArrayList;
@@ -79,26 +79,26 @@ public class PearlOwner extends Module {
 
     @EventHandler
     private void onRender2D(Render2DEvent event) {
-        if (mc.world == null || mc.player == null) return;
+        if (mc.level == null || mc.player == null) return;
 
         // Clear list for this frame
         pearlsToRender.clear();
 
         // Collect pearls to render
-        for (Entity entity : mc.world.getEntities()) {
-            if (!(entity instanceof EnderPearlEntity pearl)) continue;
+        for (Entity entity : mc.level.entitiesForRendering()) {
+            if (!(entity instanceof ThrownEnderpearl pearl)) continue;
 
             double distance = mc.player.distanceTo(pearl);
             if (distance > maxDistance.get()) continue;
 
             // Culling check
             if (culling.get()) {
-                Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
-                Vec3d pearlPos = pearl.getPos();
-                Vec3d cameraToEntity = pearlPos.subtract(cameraPos).normalize();
-                Vec3d cameraDirection = Vec3d.fromPolar(mc.gameRenderer.getCamera().getPitch(), mc.gameRenderer.getCamera().getYaw()).normalize();
+                Vec3 cameraPos = mc.gameRenderer.getCamera().getCameraPos();
+                Vec3 pearlPos = pearl.position();
+                Vec3 cameraToEntity = pearlPos.subtract(cameraPos).normalize();
+                Vec3 cameraDirection = Vec3.fromPolar(mc.gameRenderer.getCamera().getXRot(), mc.gameRenderer.getCamera().getYRot()).normalize();
 
-                double dot = cameraDirection.dotProduct(cameraToEntity);
+                double dot = cameraDirection.dot(cameraToEntity);
                 if (dot < cullingDotValue.get()) continue;
             }
 

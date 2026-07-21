@@ -3,9 +3,9 @@ package dev.oma.addon.modules.Movement.searcharea.modes;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.misc.AutoReconnect;
 import meteordevelopment.meteorclient.utils.player.Rotations;
-import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
-import net.minecraft.text.Text;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
+import net.minecraft.network.chat.Component;
+import net.minecraft.core.BlockPos;
 
 import java.io.*;
 
@@ -88,14 +88,14 @@ public class Rectangle extends SearchAreaMode
             }
             else
             {
-                mc.player.setYaw((float) Rotations.getYaw(pd.currPos.toCenterPos()));
+                mc.player.setYRot((float) Rotations.getYaw(pd.currPos.toCenterPos()));
                 setPressed(mc.options.forwardKey, true);
             }
             return;
         }
 
         setPressed(mc.options.forwardKey, true);
-        mc.player.setYaw(pd.yawDirection);
+        mc.player.setYRot(pd.yawDirection);
         if (Math.sqrt(mc.player.getBlockPos().getSquaredDistance(pd.targetPos.getX(), mc.player.getY(), pd.targetPos.getZ())) < 20) // end of rectangle
         {
             setPressed(mc.options.forwardKey, false);
@@ -105,7 +105,7 @@ public class Rectangle extends SearchAreaMode
             {
                 var autoReconnect = Modules.get().get(AutoReconnect.class);
                 if (autoReconnect.isActive()) autoReconnect.toggle();
-                mc.player.networkHandler.onDisconnect(new DisconnectS2CPacket(Text.literal("[Search Area] Path is complete")));
+                mc.player.connection.onDisconnect(new ClientboundDisconnectPacket(Component.literal("[Search Area] Path is complete")));
             }
         }//                                                                      if going in +X and currPos > the greater of the two sides of the rectangle
         else if (pd.mainPath && ((pd.yawDirection == -90.0f && mc.player.getX() >= (Math.max(pd.initialPos.getX(), pd.targetPos.getX())))) ||

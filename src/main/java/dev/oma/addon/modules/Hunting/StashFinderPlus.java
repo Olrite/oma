@@ -8,10 +8,10 @@ import dev.oma.addon.Main;
 import meteordevelopment.meteorclient.events.entity.player.PlayerMoveEvent;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
 import meteordevelopment.orbit.EventPriority;
-import net.minecraft.block.Block;
-import net.minecraft.block.Blocks;
-import net.minecraft.client.gui.screen.DeathScreen;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.client.gui.screens.DeathScreen;
+import net.minecraft.world.phys.Vec3;
 import xaero.common.minimap.waypoints.Waypoint;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.gui.GuiTheme;
@@ -28,16 +28,16 @@ import meteordevelopment.meteorclient.utils.Utils;
 import meteordevelopment.meteorclient.utils.render.MeteorToast;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.config.Config;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
-import net.minecraft.util.Formatting;
-import net.minecraft.client.network.ClientPlayNetworkHandler;
-import net.minecraft.block.entity.*;
-import net.minecraft.item.Items;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
+import net.minecraft.ChatFormatting;
+import net.minecraft.client.multiplayer.ClientPacketListener;
+import net.minecraft.world.level.block.entity.*;
+import net.minecraft.world.item.Items;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.Level;
 import xaero.hud.minimap.BuiltInHudModules;
 import xaero.hud.minimap.module.MinimapSession;
 import xaero.hud.minimap.waypoint.set.WaypointSet;
@@ -201,7 +201,7 @@ public class StashFinderPlus extends Module
         super(Main.HUNTING, "stash-finder-plus", "Jefff mod's BetterStashFinder but with more features.");
     }
 
-    private Vec3d lastPosition = null;
+    private Vec3 lastPosition = null;
 
     @Override
     public void onActivate() {
@@ -225,7 +225,7 @@ public class StashFinderPlus extends Module
 
         Chunk chunk = new Chunk(event.chunk().getPos());
 
-        RegistryKey<World> currentDimension = mc.world.getRegistryKey();
+        ResourceKey<Level> currentDimension = mc.level.dimension();
 
         ChunkPos chunkPos = chunk.chunkPos;
         PaletteNewChunks paletteNewChunks = ModuleManager.getModule(PaletteNewChunks.class);
@@ -249,7 +249,7 @@ public class StashFinderPlus extends Module
         for (BlockEntity blockEntity : event.chunk().getBlockEntities().values()) {
             if (!storageBlocks.get().contains(blockEntity.getType())) continue;
 
-            Block blockUnder = mc.world.getBlockState(blockEntity.getPos().down()).getBlock();
+            Block blockUnder = mc.level.getBlockState(blockEntity.getBlockPos().down()).getBlock();
             if (ignoreTrialChambers.get() && blockUnder.equals(Blocks.WAXED_OXIDIZED_CUT_COPPER) ||
                 blockUnder.equals(Blocks.TUFF_BRICKS) || blockUnder.equals(Blocks.WAXED_COPPER_BLOCK) ||
                 blockUnder.equals(Blocks.WAXED_OXIDIZED_COPPER))
@@ -283,10 +283,10 @@ public class StashFinderPlus extends Module
                     switch (notificationMode.get())
                     {
                         case Chat -> info("Found stash at (highlight)%s(default), (highlight)%s(default).", chunk.x, chunk.z);
-                        case Toast -> mc.getToastManager().add(new MeteorToast(Items.CHEST, "Stash Found!", "Found stash at " + chunk.x + ", " + chunk.z));
+                        case Toast -> mc.getToastManager().addToast(new MeteorToast.Builder("Stash Found!").text("Found stash at " + chunk.x + ", " + chunk.z).icon(Items.CHEST).build());
                         case Both -> {
                             info("Found stash at (highlight)%s(default), (highlight)%s(default).", chunk.x, chunk.z);
-                            mc.getToastManager().add(new MeteorToast(Items.CHEST, "Stash Found!", "Found stash at " + chunk.x + ", " + chunk.z));
+                            mc.getToastManager().addToast(new MeteorToast.Builder("Stash Found!").text("Found stash at " + chunk.x + ", " + chunk.z).icon(Items.CHEST).build());
                         }
                     }
                 }
@@ -353,7 +353,7 @@ public class StashFinderPlus extends Module
                     else
                     {
                         String message = "Found stash at " + chunk.x + ", " + chunk.z + ".";
-                        new Thread(() -> sendWebhook(webhookLink.get(), "Stash Found!", message, ping.get() ? discordId.get() : null, mc.player.getGameProfile().getName())).start();
+                        new Thread(() -> sendWebhook(webhookLink.get(), "Stash Found!", message, ping.get() ? discordId.get() : null, mc.player.getGameProfile().name())).start();
                     }
                 }
 
@@ -374,13 +374,13 @@ public class StashFinderPlus extends Module
                     }
 
                     String prefix = Config.get().prefix.get();
-                    MutableText text = Text.literal(String.format("%s%s%s%s %s", Formatting.GRAY, Formatting.BLUE, prefix.substring(0, prefix.length() - 1), Formatting.GRAY, Formatting.RED) + String.format("Found stash at %s, %s.", chunk.x, chunk.z)).append("\n");
+                    MutableComponent text = Component.literal(String.format("%s%s%s%s %s", ChatFormatting.GRAY, ChatFormatting.BLUE, prefix.substring(0, prefix.length() - 1), ChatFormatting.GRAY, ChatFormatting.RED) + String.format("Found stash at %s, %s.", chunk.x, chunk.z)).append("\n");
 
                     disconnectOnStashFound.set(false); // Disable the setting to prevent infinite disconnects
 
-                    ClientPlayNetworkHandler networkHandler = mc.getNetworkHandler();
-                    if (networkHandler != null) {
-                        networkHandler.getConnection().disconnect(text);
+                    ClientPacketListener connection = mc.getConnection();
+                    if (connection != null) {
+                        connection.getConnection().disconnect(text);
                     }
                 }
             }
@@ -775,9 +775,9 @@ public class StashFinderPlus extends Module
     private void onPlayerMove(PlayerMoveEvent event) {
         if (lastPosition != null)
         {
-            if (disableOnTeleport.get() && mc.player.squaredDistanceTo(lastPosition) > 16 * 16) this.toggle();
+            if (disableOnTeleport.get() && mc.player.distanceToSqr(lastPosition) > 16 * 16) this.toggle();
         }
-        lastPosition = mc.player.getPos();
+        lastPosition = mc.player.position();
     }
 }
 

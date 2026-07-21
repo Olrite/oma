@@ -8,8 +8,8 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.world.Dimension;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
@@ -81,7 +81,7 @@ public class PlayerHistory extends Module {
             .sliderMax(200)
             .build());
 
-    private final Set<PlayerEntity> loggedPlayers = ConcurrentHashMap.newKeySet();
+    private final Set<Player> loggedPlayers = ConcurrentHashMap.newKeySet();
     private int delayTimer = 0;
 
     public PlayerHistory() {
@@ -96,7 +96,7 @@ public class PlayerHistory extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        if (mc == null || mc.world == null || mc.player == null)
+        if (mc == null || mc.level == null || mc.player == null)
             return;
 
         if (delayTimer > 0) {
@@ -104,8 +104,8 @@ public class PlayerHistory extends Module {
             return;
         }
 
-        for (Entity entity : mc.world.getEntities()) {
-            if (entity instanceof PlayerEntity player) {
+        for (Entity entity : mc.level.entitiesForRendering()) {
+            if (entity instanceof Player player) {
                 // Skip self if not logging self
                 if (player == mc.player && !logSelf.get()) {
                     continue;
@@ -135,7 +135,7 @@ public class PlayerHistory extends Module {
         }
     }
 
-    private void logPlayer(PlayerEntity player) {
+    private void logPlayer(Player player) {
         String logMessage = buildLogMessage(player);
 
         if (logToChat.get()) {
@@ -147,7 +147,7 @@ public class PlayerHistory extends Module {
         }
     }
 
-    private String buildLogMessage(PlayerEntity player) {
+    private String buildLogMessage(Player player) {
         StringBuilder message = new StringBuilder();
         
         // Player name and type

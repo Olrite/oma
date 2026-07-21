@@ -2,26 +2,24 @@
 mod-version = "1.0"
 
 # Fabric (https://fabricmc.net/develop)
-minecraft = "1.21.4"
-yarn-mappings = "1.21.4+build.8"
-fabric-loader = "0.16.9"
-fabric-api = "0.119.4+1.21.4"
+minecraft = "26.1.2"
+fabric-loader = "0.19.2"
+fabric-api = "0.146.1+26.1.2"
 
 # Loom (https://github.com/FabricMC/fabric-loom)
-loom = "1.17-SNAPSHOT"
+loom = "1.16-SNAPSHOT"
 
 # Meteor (https://github.com/MeteorDevelopment/meteor-client/)
-meteor = "1.21.4-SNAPSHOT"
-baritone = "1.21.4-SNAPSHOT"
+meteor = "26.1.2-SNAPSHOT"
+baritone = "26.1-SNAPSHOT"
 
 # Xaero (Modrinth)
-xaeroplus = "2.34.5+fabric-1.21.4"
-xaeros-worldmap = "fabric-1.21.4-1.44.2"
-xaeros-minimap = "fabric-1.21.4-26.4.2"
+xaeroplus = "2.34.5+fabric-26.1.2"
+xaeros-worldmap = "fabric-26.1.2-1.44.2"
+xaeros-minimap = "fabric-26.1.2-26.4.2"
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
-yarn = { module = "net.fabricmc:yarn", version.ref = "yarn-mappings" }
 fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
 fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api" }
 meteor-client = { module = "meteordevelopment:meteor-client", version.ref = "meteor" }
@@ -33,4 +31,4 @@ caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version = "3.2.2
 lambda-events = { module = "net.lenni0451:LambdaEvents", version = "2.4.2" }
 
 [plugins]
-fabric-loom = { id = "fabric-loom", version.ref = "loom" }
+fabric-loom = { id = "net.fabricmc.fabric-loom", version.ref = "loom" }

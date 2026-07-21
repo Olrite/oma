@@ -9,11 +9,11 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.play.SubtitleS2CPacket;
-import net.minecraft.text.Text;
-import net.minecraft.text.TextColor;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TextColor;
 import static dev.oma.addon.util.Utils.sendWebhook;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -161,18 +161,18 @@ public class DiscordNotifications extends Module {
         Set<UUID> uuidsCurrentlyInRange = new HashSet<>();
 
         // Check for players entering range
-        if (playerRange.get() && mc.world != null)
+        if (playerRange.get() && mc.level != null)
         {
-            for (Entity entity : mc.world.getEntities())
+            for (Entity entity : mc.level.entitiesForRendering())
             {
                 if (entity.getUuid().equals(mc.player.getUuid())) continue;
-                if (entity instanceof PlayerEntity playerEntity)
+                if (entity instanceof Player playerEntity)
                 {
                     uuidsCurrentlyInRange.add(playerEntity.getUuid());
                     if (!playersInRange.contains(playerEntity.getGameProfile()))
                     {
                         playersInRange.add(playerEntity.getGameProfile());
-                        handleMessage(playerEntity.getGameProfile().getName() + " has entered visual range!", MessageType.PLAYER_RANGE);
+                        handleMessage(playerEntity.getGameProfile().name() + " has entered visual range!", MessageType.PLAYER_RANGE);
                     }
                 }
             }
@@ -181,10 +181,10 @@ public class DiscordNotifications extends Module {
         // Check for players leaving range
         for (GameProfile profile : playersInRange)
         {
-            if (!uuidsCurrentlyInRange.contains(profile.getId()))
+            if (!uuidsCurrentlyInRange.contains(profile.id()))
             {
                 playersInRange.remove(profile);
-                handleMessage(profile.getName() + " has left visual range!", MessageType.PLAYER_RANGE);
+                handleMessage(profile.name() + " has left visual range!", MessageType.PLAYER_RANGE);
             }
         }
     }
@@ -192,8 +192,8 @@ public class DiscordNotifications extends Module {
     // For getting the queue position
     @EventHandler(priority = 999)
     private void onReceivePacket(PacketEvent.Receive event) {
-        if (event.packet instanceof SubtitleS2CPacket) {
-            SubtitleS2CPacket packet = (SubtitleS2CPacket) event.packet;
+        if (event.packet instanceof ClientboundSetSubtitleTextPacket) {
+            ClientboundSetSubtitleTextPacket packet = (ClientboundSetSubtitleTextPacket) event.packet;
             // Position in queue: 287
             String message = packet.text().getString();
             int queueIndex = message.indexOf("Position in queue: ");
@@ -213,8 +213,8 @@ public class DiscordNotifications extends Module {
     @EventHandler(priority = 999)
     private void onMessageReceive(ReceiveMessageEvent event)
     {
-        Text message = event.getMessage();
-        for (Text sibling : message.getSiblings())
+        Component message = event.getMessage();
+        for (Component sibling : message.getSiblings())
         {
             TextColor color = sibling.getStyle().getColor();
             if (color != null && color.getRgb() == 43690)

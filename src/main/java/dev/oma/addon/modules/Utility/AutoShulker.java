@@ -6,18 +6,18 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.Block;
-import net.minecraft.block.ShulkerBoxBlock;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.ItemStack;
-import net.minecraft.screen.ScreenHandler;
-import net.minecraft.screen.slot.SlotActionType;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickAction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 
 public class AutoShulker extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -156,7 +156,7 @@ public class AutoShulker extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
 
         delayCounter++;
 
@@ -239,7 +239,7 @@ public class AutoShulker extends Module {
     private boolean shouldActivate() {
         int freeSlots = 0;
         for (int i = 9; i < 36; i++) { // Only check main inventory, not hotbar
-            if (mc.player.getInventory().getStack(i).isEmpty()) {
+            if (mc.player.getInventory().getItem(i).isEmpty()) {
                 freeSlots++;
             }
         }
@@ -249,14 +249,14 @@ public class AutoShulker extends Module {
     private int findShulkerBox() {
         // First check hotbar
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = mc.player.getInventory().getStack(i);
+            ItemStack stack = mc.player.getInventory().getItem(i);
             if (isShulkerBox(stack)) {
                 return i;
             }
         }
         // Then check main inventory
         for (int i = 9; i < 36; i++) {
-            ItemStack stack = mc.player.getInventory().getStack(i);
+            ItemStack stack = mc.player.getInventory().getItem(i);
             if (isShulkerBox(stack)) {
                 return i;
             }
@@ -299,7 +299,7 @@ public class AutoShulker extends Module {
         };
 
         // Check if position is valid
-        if (!mc.world.getBlockState(placePos).isReplaceable()) {
+        if (!mc.level.getBlockState(placePos).isReplaceable()) {
             error("Cannot place shulker - position blocked!");
             return false;
         }
@@ -307,15 +307,15 @@ public class AutoShulker extends Module {
         // Place the shulker
         shulkerPos = placePos;
         BlockHitResult hitResult = new BlockHitResult(
-            Vec3d.ofCenter(placePos),
+            Vec3.ofCenter(placePos),
             Direction.UP,
             placePos,
             false
         );
 
-        if (mc.interactionManager != null) {
-            mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
-            mc.player.swingHand(Hand.MAIN_HAND);
+        if (mc.gameMode != null) {
+            mc.gameMode.interactBlock(mc.player, InteractionHand.MAIN_HAND, hitResult);
+            mc.player.swing(InteractionHand.MAIN_HAND);
             return true;
         }
 
@@ -324,7 +324,7 @@ public class AutoShulker extends Module {
 
     private int findEmptyHotbarSlot() {
         for (int i = 0; i < 9; i++) {
-            if (mc.player.getInventory().getStack(i).isEmpty()) {
+            if (mc.player.getInventory().getItem(i).isEmpty()) {
                 return i;
             }
         }
@@ -332,57 +332,57 @@ public class AutoShulker extends Module {
     }
 
     private void swapSlots(int slot1, int slot2) {
-        if (mc.interactionManager == null) return;
+        if (mc.gameMode == null) return;
         
-        ScreenHandler handler = mc.player.currentScreenHandler;
+        AbstractContainerMenu handler = mc.player.currentScreenHandler;
         
-        mc.interactionManager.clickSlot(
+        mc.gameMode.clickSlot(
             handler.syncId,
             slot1,
             0,
-            SlotActionType.PICKUP,
+            ClickAction.PICKUP,
             mc.player
         );
         
-        mc.interactionManager.clickSlot(
+        mc.gameMode.clickSlot(
             handler.syncId,
             slot2,
             0,
-            SlotActionType.PICKUP,
+            ClickAction.PICKUP,
             mc.player
         );
         
-        mc.interactionManager.clickSlot(
+        mc.gameMode.clickSlot(
             handler.syncId,
             slot1,
             0,
-            SlotActionType.PICKUP,
+            ClickAction.PICKUP,
             mc.player
         );
     }
 
     private boolean openShulker() {
-        if (shulkerPos == null || mc.interactionManager == null) return false;
+        if (shulkerPos == null || mc.gameMode == null) return false;
 
         // Verify shulker is still there
-        if (!(mc.world.getBlockState(shulkerPos).getBlock() instanceof ShulkerBoxBlock)) {
+        if (!(mc.level.getBlockState(shulkerPos).getBlock() instanceof ShulkerBoxBlock)) {
             error("Shulker box not found at placement position!");
             return false;
         }
 
         BlockHitResult hitResult = new BlockHitResult(
-            Vec3d.ofCenter(shulkerPos),
+            Vec3.ofCenter(shulkerPos),
             Direction.UP,
             shulkerPos,
             false
         );
 
-        mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, hitResult);
+        mc.gameMode.interactBlock(mc.player, InteractionHand.MAIN_HAND, hitResult);
         return true;
     }
 
     private boolean fillShulker() {
-        ScreenHandler handler = mc.player.currentScreenHandler;
+        AbstractContainerMenu handler = mc.player.currentScreenHandler;
         if (handler == mc.player.playerScreenHandler) return true; // No shulker open
 
         int moved = 0;
@@ -394,19 +394,19 @@ public class AutoShulker extends Module {
             if (keepHotbar.get() && i < 9) continue;
 
             int slotIndex = playerInvStart + i;
-            ItemStack stack = handler.getSlot(slotIndex).getStack();
+            ItemStack stack = handler.getSlot(slotIndex).getItem();
 
             if (stack.isEmpty() || shouldKeepItem(stack)) continue;
 
             // Find empty slot in shulker (slots 0-26)
             for (int j = 0; j < 27; j++) {
-                if (handler.getSlot(j).getStack().isEmpty()) {
-                    if (mc.interactionManager != null) {
-                        mc.interactionManager.clickSlot(
+                if (handler.getSlot(j).getItem().isEmpty()) {
+                    if (mc.gameMode != null) {
+                        mc.gameMode.clickSlot(
                             handler.syncId,
                             slotIndex,
                             0,
-                            SlotActionType.QUICK_MOVE,
+                            ClickAction.QUICK_MOVE,
                             mc.player
                         );
                         moved++;
@@ -423,7 +423,7 @@ public class AutoShulker extends Module {
             if (keepHotbar.get() && i < 9) continue;
             
             int slotIndex = playerInvStart + i;
-            ItemStack stack = handler.getSlot(slotIndex).getStack();
+            ItemStack stack = handler.getSlot(slotIndex).getItem();
             
             if (!stack.isEmpty() && !shouldKeepItem(stack)) {
                 hasItemsToMove = true;
@@ -434,7 +434,7 @@ public class AutoShulker extends Module {
         // Check if shulker is full
         boolean shulkerFull = true;
         for (int j = 0; j < 27; j++) {
-            if (handler.getSlot(j).getStack().isEmpty()) {
+            if (handler.getSlot(j).getItem().isEmpty()) {
                 shulkerFull = false;
                 break;
             }
@@ -459,7 +459,7 @@ public class AutoShulker extends Module {
         if (keepWeapons.get() && isWeapon(stack)) return true;
 
         // Keep food
-        if (keepFood.get() && stack.contains(DataComponentTypes.FOOD)) return true;
+        if (keepFood.get() && stack.contains(DataComponents.FOOD)) return true;
 
         return false;
     }

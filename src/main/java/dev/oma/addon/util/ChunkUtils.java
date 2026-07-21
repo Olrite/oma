@@ -1,27 +1,27 @@
 package dev.oma.addon.util;
 
-import net.minecraft.block.Block;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.block.entity.ShulkerBoxBlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.chunk.WorldChunk;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.ShulkerBoxBlockEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.ChunkPos;
+import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 public class ChunkUtils {
-    protected static final MinecraftClient mc = MinecraftClient.getInstance();
+    protected static final Minecraft mc = Minecraft.getInstance();
 
-    public static List<Chunk> getLoadedChunks() {
-        assert mc.world != null;
+    public static List<LevelChunk> getLoadedChunks() {
+        assert mc.level != null;
         assert mc.player != null;
 
-        List<Chunk> loadedChunks = new ArrayList<>();
-        BlockPos bPos = mc.player.getBlockPos();
+        List<LevelChunk> loadedChunks = new ArrayList<>();
+        BlockPos bPos = mc.player.blockPosition();
         int playerX = bPos.getX();
         int playerZ = bPos.getZ();
         int renderDistance = mc.options.getViewDistance().getValue() * 16;
@@ -29,8 +29,8 @@ public class ChunkUtils {
         for (int x = playerX - renderDistance; x <= playerX + renderDistance; x += 16) {
             for (int z = playerZ - renderDistance; z <= playerZ + renderDistance; z += 16) {
                 ChunkPos chunkPos = new ChunkPos(x >> 4, z >> 4);
-                if (mc.world.isChunkLoaded(chunkPos.x, chunkPos.z)) {
-                    loadedChunks.add(mc.world.getChunk(chunkPos.getStartPos()));
+                if (mc.level.isChunkLoaded(chunkPos.x, chunkPos.z)) {
+                    loadedChunks.add(mc.level.getChunk(chunkPos.getWorldPosition()));
                 }
             }
         }
@@ -38,7 +38,7 @@ public class ChunkUtils {
         return loadedChunks;
     }
 
-    public static int getChestCount(WorldChunk chunk) {
+    public static int getChestCount(LevelChunk chunk) {
         int count = 0;
 
         Map<BlockPos, BlockEntity> map = chunk.getBlockEntities();
@@ -50,7 +50,7 @@ public class ChunkUtils {
     }
 
 
-    public static int getShulkerCount(Chunk chunk) {
+    public static int getShulkerCount(LevelChunk chunk) {
         int count = 0;
 
         for (BlockPos pos : chunk.getBlockEntityPositions()) {
@@ -62,10 +62,10 @@ public class ChunkUtils {
     }
 
     public static int getChestCount() {
-        List<Chunk> chunks = getLoadedChunks();
+        List<LevelChunk> chunks = getLoadedChunks();
         int count = 0;
 
-        for (Chunk chunk : chunks) {
+        for (LevelChunk chunk : chunks) {
             for (BlockPos pos : chunk.getBlockEntityPositions()) {
                 BlockEntity block = chunk.getBlockEntity(pos);
                 if (block instanceof ChestBlockEntity) count++;
@@ -78,10 +78,10 @@ public class ChunkUtils {
 
 
     public static int getShulkerCount() {
-        List<Chunk> chunks = getLoadedChunks();
+        List<LevelChunk> chunks = getLoadedChunks();
         int count = 0;
 
-        for (Chunk chunk : chunks) {
+        for (LevelChunk chunk : chunks) {
             for (BlockPos pos : chunk.getBlockEntityPositions()) {
                 BlockEntity block = chunk.getBlockEntity(pos);
                 if (block instanceof ShulkerBoxBlockEntity) count++;
@@ -93,9 +93,9 @@ public class ChunkUtils {
 
     public static int getBlockCount(Block block) {
         int count = 0;
-        List<Chunk> loadedChunks = getLoadedChunks();
+        List<LevelChunk> loadedChunks = getLoadedChunks();
 
-        for (Chunk chunk : loadedChunks) {
+        for (LevelChunk chunk : loadedChunks) {
             ChunkPos chunkPos = chunk.getPos();
             for (int x = 0; x < 16; x++) {
                 for (int y = -64; y < 320; y++) {

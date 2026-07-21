@@ -1,7 +1,7 @@
 package dev.oma.addon.modules.Movement.searcharea.modes;
 
 import meteordevelopment.meteorclient.utils.player.Rotations;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.core.BlockPos;
 
 import java.io.*;
 
@@ -83,14 +83,14 @@ public class Spiral extends SearchAreaMode
             }
             else
             {
-                mc.player.setYaw((float) Rotations.getYaw(pd.currPos.toCenterPos()));
+                mc.player.setYRot((float) Rotations.getYaw(pd.currPos.toCenterPos()));
                 setPressed(mc.options.forwardKey, true);
             }
             return;
         }
 
         setPressed(mc.options.forwardKey, true);
-        mc.player.setYaw(pd.yawDirection);
+        mc.player.setYRot(pd.yawDirection);
         int blockGap = 16 * searchArea.rowGap.get();
         if (pd.mainPath && Math.abs(mc.player.getX() - pd.initialPos.getX()) >= (blockGap + pd.spiralWidth))
         {

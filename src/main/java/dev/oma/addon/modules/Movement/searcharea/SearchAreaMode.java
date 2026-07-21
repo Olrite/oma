@@ -4,8 +4,8 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.systems.modules.Modules;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.client.Minecraft;
+import net.minecraft.core.BlockPos;
 
 import static dev.oma.addon.util.Utils.*;
 
@@ -17,13 +17,13 @@ public class SearchAreaMode
     protected static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     protected final SearchArea searchArea;
-    protected final MinecraftClient mc;
+    protected final Minecraft mc;
     private final SearchAreaModes type;
     protected long paused = 0;
 
     public SearchAreaMode(SearchAreaModes type) {
         this.searchArea = Modules.get().get(SearchArea.class);
-        this.mc = MinecraftClient.getInstance();
+        this.mc = Minecraft.getInstance();
         this.type = type;
     }
 

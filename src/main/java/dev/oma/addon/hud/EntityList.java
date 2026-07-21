@@ -6,14 +6,14 @@ import meteordevelopment.meteorclient.systems.hud.HudElement;
 import meteordevelopment.meteorclient.systems.hud.HudElementInfo;
 import meteordevelopment.meteorclient.systems.hud.HudRenderer;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.ItemEntity;
-import net.minecraft.entity.mob.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.projectile.thrown.EnderPearlEntity;
-import net.minecraft.entity.projectile.ProjectileEntity;
-import net.minecraft.entity.projectile.FireworkRocketEntity;
-import net.minecraft.entity.projectile.TridentEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnderpearl;
+import net.minecraft.world.entity.projectile.Projectile;
+import net.minecraft.world.entity.projectile.FireworkRocketEntity;
+import net.minecraft.world.entity.projectile.arrow.ThrownTrident;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -157,7 +157,7 @@ public class EntityList extends HudElement {
 
     @Override
     public void render(HudRenderer renderer) {
-        if (MeteorClient.mc.world == null || MeteorClient.mc.player == null) {
+        if (MeteorClient.mc.level == null || MeteorClient.mc.player == null) {
             if (isInEditor()) {
                 renderer.text("Entity List", x, y, playerColor.get(), textShadow.get(), textScale.get());
                 setSize(renderer.textWidth("Entity List", textShadow.get(), textScale.get()), renderer.textHeight(textShadow.get(), textScale.get()));
@@ -166,7 +166,7 @@ public class EntityList extends HudElement {
         }
 
         Map<String, Aggregated> map = new HashMap<>();
-        for (Entity entity : MeteorClient.mc.world.getEntities()) {
+        for (Entity entity : MeteorClient.mc.level.entitiesForRendering()) {
             if (entity == MeteorClient.mc.player) continue;
 
             // Calculate distance based on settings
@@ -190,11 +190,11 @@ public class EntityList extends HudElement {
             if (isRocket && !showRockets.get()) continue;
 
             boolean isItem = entity instanceof ItemEntity && showItems.get();
-            boolean isMob = entity instanceof MobEntity && showMobs.get();
-            boolean isPlayer = entity instanceof PlayerEntity && showPlayers.get();
+            boolean isMob = entity instanceof Mob && showMobs.get();
+            boolean isPlayer = entity instanceof Player && showPlayers.get();
 
             // Show projectiles but exclude FireworkRocketEntity from normal projectiles
-            boolean isProjectile = !isRocket && (entity instanceof ProjectileEntity || entity instanceof EnderPearlEntity) && showProjectiles.get();
+            boolean isProjectile = !isRocket && (entity instanceof Projectile || entity instanceof ThrownEnderpearl) && showProjectiles.get();
 
             if (!isItem && !isMob && !isPlayer && !isProjectile && !isRocket) continue;
 
@@ -208,7 +208,7 @@ public class EntityList extends HudElement {
                 agg.color = color;
                 agg.minDist = distance;
                 if (isItem) {
-                    agg.count = ((ItemEntity) entity).getStack().getCount();
+                    agg.count = ((ItemEntity) entity).getItem().getCount();
                 } else {
                     agg.count = 1;
                 }
@@ -216,7 +216,7 @@ public class EntityList extends HudElement {
             } else {
                 agg.minDist = Math.min(agg.minDist, distance);
                 if (isItem) {
-                    agg.count += ((ItemEntity) entity).getStack().getCount();
+                    agg.count += ((ItemEntity) entity).getItem().getCount();
                 } else {
                     agg.count++;
                 }
@@ -266,16 +266,16 @@ public class EntityList extends HudElement {
 
     private String getEntityName(Entity entity) {
         if (entity instanceof ItemEntity item) {
-            return item.getStack().getName().getString();
-        } else if (entity instanceof PlayerEntity player) {
+            return item.getItem().getName().getString();
+        } else if (entity instanceof Player player) {
             return player.getName().getString();
         } else if (entity instanceof FireworkRocketEntity) {
             return "Firework Rocket";
-        } else if (entity instanceof EnderPearlEntity) {
+        } else if (entity instanceof ThrownEnderpearl) {
             return "Ender Pearl";
-        } else if (entity instanceof TridentEntity) {
+        } else if (entity instanceof ThrownTrident) {
             return "Trident";
-        } else if (entity instanceof ProjectileEntity) {
+        } else if (entity instanceof Projectile) {
             // Get simple name for projectiles
             String className = entity.getClass().getSimpleName();
             return className.replace("Entity", "").replaceAll("([A-Z])", " $1").trim();
@@ -287,13 +287,13 @@ public class EntityList extends HudElement {
     private SettingColor getEntityColor(Entity entity) {
         if (entity instanceof ItemEntity) {
             return itemColor.get();
-        } else if (entity instanceof MobEntity) {
+        } else if (entity instanceof Mob) {
             return mobColor.get();
-        } else if (entity instanceof PlayerEntity) {
+        } else if (entity instanceof Player) {
             return playerColor.get();
         } else if (entity instanceof FireworkRocketEntity) {
             return rocketColor.get();
-        } else if (entity instanceof ProjectileEntity || entity instanceof EnderPearlEntity) {
+        } else if (entity instanceof Projectile || entity instanceof ThrownEnderpearl) {
             return projectileColor.get();
         }
         return new SettingColor(255, 255, 255, 255);  // Fallback

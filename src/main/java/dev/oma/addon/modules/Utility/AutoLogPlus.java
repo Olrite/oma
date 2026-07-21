@@ -10,12 +10,12 @@ import meteordevelopment.meteorclient.systems.modules.misc.AutoReconnect;
 import meteordevelopment.meteorclient.utils.player.PlayerUtils;
 import meteordevelopment.meteorclient.utils.world.Dimension;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.network.packet.s2c.common.DisconnectS2CPacket;
-import net.minecraft.text.Text;
-import net.minecraft.client.network.PlayerListEntry;
-import net.minecraft.entity.EntityType;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.network.protocol.common.ClientboundDisconnectPacket;
+import net.minecraft.network.chat.Component;
+import net.minecraft.client.multiplayer.PlayerInfo;
+import net.minecraft.world.entity.EntityType;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Set;
@@ -198,7 +198,7 @@ public class AutoLogPlus extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        if (mc == null || mc.world == null || mc.player == null)
+        if (mc == null || mc.level == null || mc.player == null)
             return;
 
         playerLog();
@@ -210,10 +210,10 @@ public class AutoLogPlus extends Module {
     }
 
     private void playerLog() {
-        for (Entity entity : mc.world.getEntities()) {
-            if (entity instanceof PlayerEntity && entity.getUuid() != mc.player.getUuid()) {
-                if (onlyTrusted.get() && entity != mc.player && !Friends.get().isFriend((PlayerEntity) entity)) {
-                    disconnect(Text.of("[AutoLogout] A non trusted player [" + entity.getName().getString()
+        for (Entity entity : mc.level.entitiesForRendering()) {
+            if (entity instanceof Player && entity.getUuid() != mc.player.getUuid()) {
+                if (onlyTrusted.get() && entity != mc.player && !Friends.get().isFriend((Player) entity)) {
+                    disconnect(Component.literal("[AutoLogout] A non trusted player [" + entity.getName().getString()
                             + "] has entered your render distance."));
                 }
             }
@@ -226,7 +226,7 @@ public class AutoLogPlus extends Module {
             int totalEntities = 0;
             entityCounts.clear();
 
-            for (Entity entity : mc.world.getEntities()) {
+            for (Entity entity : mc.level.entitiesForRendering()) {
                 if (PlayerUtils.isWithin(entity, range.get()) && entities.get().contains(entity.getType())) {
                     totalEntities++;
                     if (!useTotalCount.get()) {
@@ -236,13 +236,13 @@ public class AutoLogPlus extends Module {
             }
 
             if (useTotalCount.get() && totalEntities >= combinedEntityThreshold.get()) {
-                disconnect(Text.of("[AutoLogout] Total number of selected entities within range exceeded the limit."));
+                disconnect(Component.literal("[AutoLogout] Total number of selected entities within range exceeded the limit."));
                 if (toggleOff.get())
                     this.toggle();
             } else if (!useTotalCount.get()) {
                 for (Object2IntMap.Entry<EntityType<?>> entry : entityCounts.object2IntEntrySet()) {
                     if (entry.getIntValue() >= individualEntityThreshold.get()) {
-                        disconnect(Text.of("[AutoLogout] Number of " + entry.getKey().getName().getString()
+                        disconnect(Component.literal("[AutoLogout] Number of " + entry.getKey().getName().getString()
                                 + " within range exceeded the limit."));
                         if (toggleOff.get())
                             this.toggle();
@@ -257,13 +257,13 @@ public class AutoLogPlus extends Module {
         if (!proximityDetection.get() || proximityEntities.get().isEmpty())
             return;
 
-        for (Entity entity : mc.world.getEntities()) {
+        for (Entity entity : mc.level.entitiesForRendering()) {
             if (entity.getUuid().equals(mc.player.getUuid()))
                 continue;
 
             if (proximityEntities.get().contains(entity.getType())
                     && PlayerUtils.isWithin(entity, proximityRange.get())) {
-                disconnect(Text.of("[AutoLogout] " + entity.getType().getName().getString()
+                disconnect(Component.literal("[AutoLogout] " + entity.getType().getName().getString()
                         + " detected within close range (" + proximityRange.get() + " blocks)."));
                 if (toggleOff.get())
                     this.toggle();
@@ -277,7 +277,7 @@ public class AutoLogPlus extends Module {
             DateTimeFormatter dtf = DateTimeFormatter.ofPattern("HH:mm");
             LocalDateTime now = LocalDateTime.now();
             if (dtf.format(now).equals(logTime.get())) {
-                disconnect(Text.of("[AutoLogout] Log time has been reached " + logTime.get() + "."));
+                disconnect(Component.literal("[AutoLogout] Log time has been reached " + logTime.get() + "."));
             }
         }
     }
@@ -285,12 +285,12 @@ public class AutoLogPlus extends Module {
     private void locationLog() {
         if (locationLog.get() && PlayerUtils.getDimension() == dimension.get()) {
             if (xCoordsMatch() && zCoordsMatch()) {
-                disconnect(Text.of("[AutoLogout] You have reached your destination."));
+                disconnect(Component.literal("[AutoLogout] You have reached your destination."));
             } else if (oneAxis.get()) {
                 if (selectAxis.get() == axisOptions.X && xCoordsMatch()) {
-                    disconnect(Text.of("[AutoLogout] You have reached your destination."));
+                    disconnect(Component.literal("[AutoLogout] You have reached your destination."));
                 } else if (selectAxis.get() == axisOptions.Z && zCoordsMatch()) {
-                    disconnect(Text.of("[AutoLogout] You have reached your destination."));
+                    disconnect(Component.literal("[AutoLogout] You have reached your destination."));
                 }
             }
         }
@@ -299,14 +299,14 @@ public class AutoLogPlus extends Module {
     private void disconnectOnHighPing() {
         if (!pingLog.get())
             return;
-        if (mc.getNetworkHandler() == null || mc.player == null)
+        if (mc.getConnection() == null || mc.player == null)
             return;
-        PlayerListEntry playerListEntry = mc.getNetworkHandler().getPlayerListEntry(mc.player.getUuid());
+        PlayerInfo playerListEntry = mc.getConnection().getPlayerListEntry(mc.player.getUuid());
 
         int ping = playerListEntry.getLatency();
 
         if (ping >= pingValue.get())
-            disconnect(Text.of("[AutoLogout] High ping [" + ping + "]"));
+            disconnect(Component.literal("[AutoLogout] High ping [" + ping + "]"));
     }
 
     private boolean xCoordsMatch() {
@@ -317,10 +317,10 @@ public class AutoLogPlus extends Module {
         return (mc.player.getZ() <= zCoords.get() + radius.get() && mc.player.getZ() >= zCoords.get() - radius.get());
     }
 
-    private void disconnect(Text text) {
-        if (mc.getNetworkHandler() == null)
+    private void disconnect(Component text) {
+        if (mc.getConnection() == null)
             return;
-        mc.player.networkHandler.onDisconnect(new DisconnectS2CPacket(text));
+        mc.player.connection.onDisconnect(new ClientboundDisconnectPacket(text));
 
         if (toggleOff.get())
             toggle();

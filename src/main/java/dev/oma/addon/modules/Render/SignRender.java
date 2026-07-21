@@ -12,13 +12,13 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.SignBlockEntity;
-import net.minecraft.block.entity.SignText;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -156,7 +156,7 @@ public class SignRender extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        if (mc.world == null || mc.player == null) return;
+        if (mc.level == null || mc.player == null) return;
 
         tickCounter++;
         if (tickCounter < updateInterval.get()) return;
@@ -167,7 +167,7 @@ public class SignRender extends Module {
 
     @EventHandler
     private void onRender3D(Render3DEvent event) {
-        if (!render3D.get() || mc.world == null || mc.player == null) return;
+        if (!render3D.get() || mc.level == null || mc.player == null) return;
 
         // Clear list for this frame
         signsToRender.clear();
@@ -178,7 +178,7 @@ public class SignRender extends Module {
             if (signInfo.distance > maxDist) continue;
 
             BlockPos pos = signInfo.pos;
-            Vec3d renderPos = Vec3d.ofCenter(pos).add(0, 1.5, 0);
+            Vec3 renderPos = Vec3.ofCenter(pos).add(0, 1.5, 0);
 
             // Build the text to display (keep as 4 lines)
             StringBuilder displayText = new StringBuilder();
@@ -240,7 +240,7 @@ public class SignRender extends Module {
                 // Render background using Renderer2D
                 Renderer2D.COLOR.begin();
                 Renderer2D.COLOR.quad(bgX, bgY, bgWidth, bgHeight, backgroundColor.get());
-                Renderer2D.COLOR.render(event.drawContext.getMatrices());
+                Renderer2D.COLOR.render();
             }
 
             // Render each line separately
@@ -272,7 +272,7 @@ public class SignRender extends Module {
                 BlockEntity blockEntity = chunk.getBlockEntity(pos);
                 
                 if (blockEntity instanceof SignBlockEntity signEntity) {
-                    double distance = mc.player.getPos().distanceTo(Vec3d.ofCenter(pos));
+                    double distance = mc.player.position().distanceTo(Vec3.ofCenter(pos));
                     
                     if (distance <= maxDist) {
                         SignText frontText = signEntity.getFrontText();
@@ -351,8 +351,8 @@ public class SignRender extends Module {
                 int chunkX = (playerPos.getX() >> 4) + x;
                 int chunkZ = (playerPos.getZ() >> 4) + z;
                 
-                if (mc.world.isChunkLoaded(chunkX, chunkZ)) {
-                    chunks.add(mc.world.getChunk(chunkX, chunkZ));
+                if (mc.level.isChunkLoaded(chunkX, chunkZ)) {
+                    chunks.add(mc.level.getChunk(chunkX, chunkZ));
                 }
             }
         }

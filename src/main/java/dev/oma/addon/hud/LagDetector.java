@@ -10,9 +10,9 @@ import meteordevelopment.meteorclient.systems.hud.HudElementInfo;
 import meteordevelopment.meteorclient.systems.hud.HudRenderer;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
-import net.minecraft.network.packet.s2c.play.PlayerPositionLookS2CPacket;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.network.protocol.game.ServerboundMovePlayerPacket;
+import net.minecraft.network.protocol.game.ClientboundPlayerPositionPacket;
+import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -154,7 +154,7 @@ public class LagDetector extends HudElement {
     // Tracking variables
     private final ConcurrentLinkedQueue<Long> packetTimings = new ConcurrentLinkedQueue<>();
     private final ConcurrentLinkedQueue<Long> tickTimings = new ConcurrentLinkedQueue<>();
-    private final List<Vec3d> positionHistory = new ArrayList<>();
+    private final List<Vec3> positionHistory = new ArrayList<>();
     private final List<Long> positionTimestamps = new ArrayList<>();
     
     private long lastPacketTime = 0;
@@ -162,7 +162,7 @@ public class LagDetector extends HudElement {
     private double estimatedTPS = 20.0;
     private boolean lagbackDetected = false;
     private int lagbackAlertTicks = 0;
-    private Vec3d lastPosition = null;
+    private Vec3 lastPosition = null;
     private long lastPositionUpdate = 0;
 
     public LagDetector() {
@@ -172,7 +172,7 @@ public class LagDetector extends HudElement {
 
     @EventHandler
     private void onPacketSend(PacketEvent.Send event) {
-        if (event.packet instanceof PlayerMoveC2SPacket) {
+        if (event.packet instanceof ServerboundMovePlayerPacket) {
             long currentTime = System.currentTimeMillis();
             if (lastPacketTime != 0) {
                 long timing = currentTime - lastPacketTime;
@@ -189,7 +189,7 @@ public class LagDetector extends HudElement {
 
     @EventHandler
     private void onPacketReceive(PacketEvent.Receive event) {
-        if (event.packet instanceof PlayerPositionLookS2CPacket) {
+        if (event.packet instanceof ClientboundPlayerPositionPacket) {
             // This packet indicates the server is correcting our position (potential lagback)
             long currentTime = System.currentTimeMillis();
             if (lastPosition != null && lastPositionUpdate != 0) {
@@ -226,7 +226,7 @@ public class LagDetector extends HudElement {
 
         // Track player position for lagback detection
         if (MeteorClient.mc.player != null) {
-            Vec3d currentPos = MeteorClient.mc.player.getPos();
+            Vec3 currentPos = MeteorClient.mc.player.position();
             long currentPosTime = System.currentTimeMillis();
             
             if (lastPosition != null) {
@@ -269,7 +269,7 @@ public class LagDetector extends HudElement {
 
     @Override
     public void render(HudRenderer renderer) {
-        if (MeteorClient.mc.player == null || MeteorClient.mc.world == null) {
+        if (MeteorClient.mc.player == null || MeteorClient.mc.level == null) {
             if (isInEditor()) {
                 renderer.text("Lag Detector", x, y, titleColor.get(), true, textScale.get());
                 setSize(renderer.textWidth("Lag Detector", true, textScale.get()), renderer.textHeight(true, textScale.get()));

@@ -8,13 +8,13 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.block.entity.BannerBlockEntity;
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.decoration.ItemFrameEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.level.block.entity.BannerBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.decoration.ItemFrame;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.chunk.ChunkAccess;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -143,7 +143,7 @@ public class VanityESP extends Module {
     private int tickCounter = 0;
     private int lastPlayerChunkX = Integer.MIN_VALUE;
     private int lastPlayerChunkZ = Integer.MIN_VALUE;
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private final Minecraft mc = Minecraft.getInstance();
 
     public VanityESP() {
         super(Main.RENDER, "vanity-esp", "Highlights vanity items like item frames and banners.");
@@ -170,7 +170,7 @@ public class VanityESP extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        if (mc.world == null || mc.player == null) return;
+        if (mc.level == null || mc.player == null) return;
 
         tickCounter++;
         if (tickCounter < updateInterval.get()) return;
@@ -196,7 +196,7 @@ public class VanityESP extends Module {
 
     @EventHandler
     private void onRender3D(Render3DEvent event) {
-        if (!renderESP.get() || mc.world == null || mc.player == null) return;
+        if (!renderESP.get() || mc.level == null || mc.player == null) return;
 
         double maxDist = maxDistance.get() * maxDistance.get();
 
@@ -231,7 +231,7 @@ public class VanityESP extends Module {
     }
 
     private void detectVanityItems() {
-        if (mc.world == null || mc.player == null) return;
+        if (mc.level == null || mc.player == null) return;
 
         // Clear previous detections
         itemFrames.clear();
@@ -250,7 +250,7 @@ public class VanityESP extends Module {
 
         for (int chunkX = centerChunkX - chunkRadius; chunkX <= centerChunkX + chunkRadius; chunkX++) {
             for (int chunkZ = centerChunkZ - chunkRadius; chunkZ <= centerChunkZ + chunkRadius; chunkZ++) {
-                Chunk chunk = mc.world.getChunk(chunkX, chunkZ);
+                Chunk chunk = mc.level.getChunk(chunkX, chunkZ);
                 if (chunk == null) continue;
 
                 // Check block entities (banners) - much more efficient
@@ -285,11 +285,11 @@ public class VanityESP extends Module {
             int entityCount = 0;
             int maxEntities = performanceMode.get() ? 50 : 100; // Limit to prevent lag
             
-            for (Entity entity : mc.world.getEntities()) {
+            for (Entity entity : mc.level.entitiesForRendering()) {
                 if (entityCount >= maxEntities) break;
                 entityCount++;
                 
-                if (entity instanceof ItemFrameEntity) {
+                if (entity instanceof ItemFrame) {
                     BlockPos pos = entity.getBlockPos();
                     if (playerPos.getSquaredDistance(pos) <= maxDist * maxDist) {
                         itemFrames.add(pos);

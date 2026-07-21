@@ -11,8 +11,8 @@ import meteordevelopment.meteorclient.gui.GuiTheme;
 import meteordevelopment.meteorclient.gui.widgets.WWidget;
 import meteordevelopment.meteorclient.gui.widgets.containers.WVerticalList;
 import meteordevelopment.meteorclient.gui.widgets.pressable.WButton;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.phys.Vec3;
+import net.minecraft.core.BlockPos;
 import baritone.api.BaritoneAPI;
 import baritone.api.pathing.goals.GoalBlock;
 
@@ -183,7 +183,7 @@ public class ETA extends HudElement {
     );
 
     // Speed tracking variables
-    private Vec3d lastPosition = null;
+    private Vec3 lastPosition = null;
     private long lastUpdateTime = 0;
     private double currentSpeed = 0.0;
     
@@ -203,7 +203,7 @@ public class ETA extends HudElement {
         WButton setGoalButton = list.add(theme.button("Set Goal to Current Position")).expandX().widget();
         setGoalButton.action = () -> {
             if (MeteorClient.mc.player != null) {
-                Vec3d pos = MeteorClient.mc.player.getPos();
+                Vec3 pos = MeteorClient.mc.player.position();
                 customGoalX.set(pos.x);
                 customGoalY.set(pos.y);
                 customGoalZ.set(pos.z);
@@ -236,7 +236,7 @@ public class ETA extends HudElement {
 
     @Override
     public void render(HudRenderer renderer) {
-        if (MeteorClient.mc.player == null || MeteorClient.mc.world == null) {
+        if (MeteorClient.mc.player == null || MeteorClient.mc.level == null) {
             if (isInEditor()) {
                 renderer.text("ETA", x, y, titleColor.get(), true, textScale.get());
                 setSize(renderer.textWidth("ETA", true, textScale.get()), renderer.textHeight(true, textScale.get()));
@@ -255,13 +255,13 @@ public class ETA extends HudElement {
         // Calculate current speed
         updateSpeed();
 
-        Vec3d goalPos = null;
+        Vec3 goalPos = null;
         boolean usingCustomGoal = false;
         boolean usingElytraMode = false;
 
         // Check if we should use custom goal
         if (useCustomGoal.get()) {
-            goalPos = new Vec3d(customGoalX.get(), customGoalY.get(), customGoalZ.get());
+            goalPos = new Vec3(customGoalX.get(), customGoalY.get(), customGoalZ.get());
             usingCustomGoal = true;
         } else {
             // Get Baritone goal
@@ -280,7 +280,7 @@ public class ETA extends HudElement {
                         if (elytraProcess != null && elytraProcess.isActive()) {
                             var elytraDestination = elytraProcess.currentDestination();
                             if (elytraDestination != null) {
-                                goalPos = new Vec3d(elytraDestination.getX(), elytraDestination.getY(), elytraDestination.getZ());
+                                goalPos = new Vec3(elytraDestination.getX(), elytraDestination.getY(), elytraDestination.getZ());
                                 usingElytraMode = true;
                             }
                         }
@@ -299,7 +299,7 @@ public class ETA extends HudElement {
         }
 
         // Calculate distance
-        Vec3d playerPos = MeteorClient.mc.player.getPos();
+        Vec3 playerPos = MeteorClient.mc.player.position();
         double distance = playerPos.distanceTo(goalPos);
 
         // Calculate ETA
@@ -310,7 +310,7 @@ public class ETA extends HudElement {
     }
 
     private void updateSpeed() {
-        Vec3d currentPos = MeteorClient.mc.player.getPos();
+        Vec3 currentPos = MeteorClient.mc.player.position();
         long currentTime = System.currentTimeMillis();
 
         // Only update speed if enough time has passed since last update
@@ -348,13 +348,13 @@ public class ETA extends HudElement {
         }
     }
 
-    private Vec3d getGoalPosition(baritone.api.pathing.goals.Goal goal) {
+    private Vec3 getGoalPosition(baritone.api.pathing.goals.Goal goal) {
         if (goal instanceof baritone.api.pathing.goals.GoalXZ goalXZ) {
-            return new Vec3d(goalXZ.getX(), MeteorClient.mc.player.getY(), goalXZ.getZ());
+            return new Vec3(goalXZ.getX(), MeteorClient.mc.player.getY(), goalXZ.getZ());
         } else if (goal instanceof baritone.api.pathing.goals.GoalBlock goalBlock) {
-            return new Vec3d(goalBlock.getGoalPos().getX(), goalBlock.getGoalPos().getY(), goalBlock.getGoalPos().getZ());
+            return new Vec3(goalBlock.getGoalPos().getX(), goalBlock.getGoalPos().getY(), goalBlock.getGoalPos().getZ());
         } else if (goal instanceof baritone.api.pathing.goals.GoalNear goalNear) {
-            return new Vec3d(goalNear.getGoalPos().getX(), goalNear.getGoalPos().getY(), goalNear.getGoalPos().getZ());
+            return new Vec3(goalNear.getGoalPos().getX(), goalNear.getGoalPos().getY(), goalNear.getGoalPos().getZ());
         }
         return null;
     }

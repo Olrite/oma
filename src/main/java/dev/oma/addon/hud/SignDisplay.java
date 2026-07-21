@@ -83,7 +83,7 @@ public class SignDisplay extends HudElement {
             }
         }
         
-        if (MeteorClient.mc.world == null || MeteorClient.mc.player == null) {
+        if (MeteorClient.mc.level == null || MeteorClient.mc.player == null) {
             if (isInEditor()) {
                 renderer.text("SignDisplay", x, y, titleColor.get(), textShadow.get(), textScale.get());
                 setSize(renderer.textWidth("Sign Display", textShadow.get(), textScale.get()), renderer.textHeight(textShadow.get(), textScale.get()));

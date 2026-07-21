@@ -8,14 +8,14 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.mob.*;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.math.Box;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.monster.*;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.phys.AABB;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -150,7 +150,7 @@ public class ModItemESP extends Module {
     private final Set<Entity> mobsWithModifiedItems = new HashSet<>();
     private final Map<Entity, ItemStack> mobModifiedItems = new HashMap<>();
     private int tickCounter = 0;
-    private final MinecraftClient mc = MinecraftClient.getInstance();
+    private final Minecraft mc = Minecraft.getInstance();
 
     public ModItemESP() {
         super(Main.RENDER, "mod-item-esp", "Highlights mobs holding items they wouldn't normally spawn with.");
@@ -171,7 +171,7 @@ public class ModItemESP extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        if (mc.world == null || mc.player == null) return;
+        if (mc.level == null || mc.player == null) return;
 
         tickCounter++;
         if (tickCounter < updateInterval.get()) return;
@@ -182,15 +182,15 @@ public class ModItemESP extends Module {
 
     @EventHandler
     private void onRender3D(Render3DEvent event) {
-        if (!renderESP.get() || mc.world == null || mc.player == null) return;
+        if (!renderESP.get() || mc.level == null || mc.player == null) return;
 
         double maxDist = maxDistance.get() * maxDistance.get();
 
         for (Entity mob : mobsWithModifiedItems) {
             if (mob.isRemoved() || !mob.isAlive()) continue;
-            if (mc.player.getPos().squaredDistanceTo(mob.getPos()) > maxDist) continue;
+            if (mc.player.position().distanceToSqr(mob.position()) > maxDist) continue;
 
-            Box box = mob.getBoundingBox();
+            AABB box = mob.getBoundingBox();
             event.renderer.box(
                 box.minX, box.minY, box.minZ,
                 box.maxX, box.maxY, box.maxZ,
@@ -201,7 +201,7 @@ public class ModItemESP extends Module {
     }
 
     private void detectMobsWithModifiedItems() {
-        if (mc.world == null || mc.player == null) return;
+        if (mc.level == null || mc.player == null) return;
 
         mobsWithModifiedItems.clear();
         mobModifiedItems.clear();
@@ -209,19 +209,19 @@ public class ModItemESP extends Module {
         double maxDist = maxDistance.get();
         int mobCount = 0;
 
-        for (Entity entity : mc.world.getEntities()) {
+        for (Entity entity : mc.level.entitiesForRendering()) {
             if (mobCount >= 100) break; // Limit to prevent lag
             mobCount++;
 
             if (!isTargetMob(entity)) continue;
-            if (mc.player.getPos().squaredDistanceTo(entity.getPos()) > maxDist * maxDist) continue;
+            if (mc.player.position().distanceToSqr(entity.position()) > maxDist * maxDist) continue;
 
             ItemStack mainHand = ItemStack.EMPTY;
             ItemStack offHand = ItemStack.EMPTY;
             
             if (entity instanceof LivingEntity livingEntity) {
-                mainHand = livingEntity.getEquippedStack(EquipmentSlot.MAINHAND);
-                offHand = livingEntity.getEquippedStack(EquipmentSlot.OFFHAND);
+                mainHand = livingEntity.getItemBySlot(EquipmentSlot.MAINHAND);
+                offHand = livingEntity.getItemBySlot(EquipmentSlot.OFFHAND);
             }
 
             // Check if mob is holding modified items

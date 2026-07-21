@@ -1,17 +1,17 @@
 package dev.oma.addon.util;
 
 import meteordevelopment.meteorclient.mixininterface.IChatHud;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.text.MutableText;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.Component;
 
 public class LogUtils {
-    protected static MinecraftClient mc = MinecraftClient.getInstance();
+    protected static Minecraft mc = Minecraft.getInstance();
 
     public static void info(String txt) {
-        assert mc.world != null;
+        assert mc.level != null;
 
-        MutableText message = Text.literal("");
+        MutableComponent message = Component.literal("");
         message.append(txt);
 
         IChatHud chatHud = (IChatHud) mc.inGameHud.getChatHud();

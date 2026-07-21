@@ -8,7 +8,7 @@ import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.movement.elytrafly.ElytraFly;
 import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.util.Hand;
+import net.minecraft.world.InteractionHand;
 import meteordevelopment.meteorclient.systems.modules.movement.elytrafly.ElytraFlightModes;
 
 import static dev.oma.addon.util.Utils.firework;
@@ -114,7 +114,7 @@ public class Pitch40Util extends Module {
             if (elytraSwapSlot != -1)
             {
                 InvUtils.swap(elytraSwapSlot, true);
-                mc.interactionManager.interactItem(mc.player, Hand.MAIN_HAND);
+                mc.gameMode.useItem(mc.player, InteractionHand.MAIN_HAND);
                 InvUtils.swapBack();
                 elytraSwapSlot = -1;
             }
@@ -127,7 +127,7 @@ public class Pitch40Util extends Module {
             }
 
             // -40 pitch is facing upwards
-            if (mc.player.getPitch() == -40)
+            if (mc.player.getXRot() == -40)
             {
 //                info("Velocity less than target: " + (mc.player.getVelocity().y < velocityThreshold.get()));
 //                info("Y less than upper bounds: " + (mc.player.getY() < (double)elytraFlyModule.settings.get("pitch40-upper-bounds").get()));

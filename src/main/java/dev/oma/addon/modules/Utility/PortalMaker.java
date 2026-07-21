@@ -7,15 +7,15 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.BlockItem;
-import net.minecraft.item.Items;
-import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
-import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Items;
+import net.minecraft.network.protocol.game.ServerboundPlayerActionPacket;
+import net.minecraft.network.protocol.game.ServerboundUseItemOnPacket;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.phys.Vec3;
 import java.util.ArrayList;
 import java.util.List;
 import dev.oma.addon.Main;
@@ -78,8 +78,8 @@ public class PortalMaker extends Module {
     public void onActivate() {
         int obsidianCount = 0;
         for (int i = 0; i < 36; i++) {
-            if (mc.player.getInventory().getStack(i).getItem() == Items.OBSIDIAN) {
-                obsidianCount += mc.player.getInventory().getStack(i).getCount();
+            if (mc.player.getInventory().getItem(i).getItem() == Items.OBSIDIAN) {
+                obsidianCount += mc.player.getInventory().getItem(i).getCount();
             }
         }
 
@@ -97,7 +97,7 @@ public class PortalMaker extends Module {
         Direction right = forward.rotateYClockwise();
         BlockPos standingPos = mc.player.getBlockPos(); // temp mutable ref
         BlockPos blockBelow = standingPos.down();
-        double blockHeight = mc.world.getBlockState(blockBelow).getCollisionShape(mc.world, blockBelow).getMax(Direction.Axis.Y);
+        double blockHeight = mc.level.getBlockState(blockBelow).getCollisionShape(mc.level, blockBelow).getMax(Direction.Axis.Y);
         // (height < 1.0)
         if (blockHeight < 1.0) {
             standingPos = standingPos.up();
@@ -115,7 +115,7 @@ public class PortalMaker extends Module {
             base.offset(right, 1).up(4), base.offset(right, 2).up(4)
         );
         // block obstruction check (temporary until fixed)
-        boolean obstructed = checkPositions.stream().anyMatch(pos -> !mc.world.getBlockState(pos).isReplaceable());
+        boolean obstructed = checkPositions.stream().anyMatch(pos -> !mc.level.getBlockState(pos).isReplaceable());
         // will remove later once we fix portal block obstruction
         if (obstructed) {
             error("Portal area obstructed. Move and try again.");
@@ -126,7 +126,7 @@ public class PortalMaker extends Module {
         }
 
         for (BlockPos checkPos : checkPositions) {
-            if (mc.world.getBlockState(checkPos).getBlock().asItem() == Items.OBSIDIAN) {
+            if (mc.level.getBlockState(checkPos).getBlock().asItem() == Items.OBSIDIAN) {
                 obsidianCheck++;
             }
         }
@@ -152,7 +152,7 @@ public class PortalMaker extends Module {
         portalBlocks.add(base.offset(right, 2).up(4));
 
         for (int i = 0; i < 9; i++) {
-            if (mc.player.getInventory().getStack(i).getItem() == Items.OBSIDIAN) {
+            if (mc.player.getInventory().getItem(i).getItem() == Items.OBSIDIAN) {
                 mc.player.getInventory().setSelectedSlot(i);
                 break;
             }
@@ -168,7 +168,7 @@ public class PortalMaker extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        if (mc.player == null || mc.world == null) return;
+        if (mc.player == null || mc.level == null) return;
         if (!(mc.player.getMainHandStack().getItem() instanceof BlockItem blockItem)) return;
         if (blockItem.getBlock().asItem() != Items.OBSIDIAN) return;
 
@@ -182,11 +182,11 @@ public class PortalMaker extends Module {
         for (int i = 0; i < blocksPerTick.get() && index < portalBlocks.size(); i++, index++) {
             BlockPos pos = portalBlocks.get(index);
             // prevent faulty portal placements (not being used due to boolean obstruction check above, but will fix in the future)
-            if (!mc.world.getBlockState(pos).isReplaceable()) {
-                if (!waitingForBreak.contains(pos) && mc.world.getBlockState(pos).getBlock().asItem() != Items.OBSIDIAN) {
-                    if (mc.interactionManager != null) {
-                        mc.interactionManager.attackBlock(pos, Direction.UP);
-                        mc.player.swingHand(Hand.MAIN_HAND);
+            if (!mc.level.getBlockState(pos).isReplaceable()) {
+                if (!waitingForBreak.contains(pos) && mc.level.getBlockState(pos).getBlock().asItem() != Items.OBSIDIAN) {
+                    if (mc.gameMode != null) {
+                        mc.gameMode.attackBlock(pos, Direction.UP);
+                        mc.player.swing(InteractionHand.MAIN_HAND);
                         waitingForBreak.add(pos);
                     }
                 }
@@ -196,29 +196,29 @@ public class PortalMaker extends Module {
 
             waitingForBreak.remove(pos);
 
-            BlockHitResult bhr = new BlockHitResult(Vec3d.ofCenter(pos), Direction.UP, pos, false);
+            BlockHitResult bhr = new BlockHitResult(Vec3.ofCenter(pos), Direction.UP, pos, false);
 
-            mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(
-                PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(
-                Hand.OFF_HAND, bhr, mc.player.currentScreenHandler.getRevision() + 2));
-            mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(
-                PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
-            mc.player.swingHand(Hand.MAIN_HAND);
+            mc.player.connection.send(new ServerboundPlayerActionPacket(
+                ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+            mc.player.connection.send(new ServerboundUseItemOnPacket(
+                InteractionHand.OFF_HAND, bhr, mc.player.currentScreenHandler.getRevision() + 2));
+            mc.player.connection.send(new ServerboundPlayerActionPacket(
+                ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, BlockPos.ORIGIN, Direction.DOWN));
+            mc.player.swing(InteractionHand.MAIN_HAND);
         }
         delay = 0;
 
         if (index >= portalBlocks.size()) {
             // auto light
             for (int i = 0; i < 9; i++) {
-                if (mc.player.getInventory().getStack(i).getItem() == Items.FLINT_AND_STEEL) {
+                if (mc.player.getInventory().getItem(i).getItem() == Items.FLINT_AND_STEEL) {
                     mc.player.getInventory().setSelectedSlot(i);
 
                     BlockPos firePos = portalBlocks.get(0).up();
-                    BlockHitResult fireHit = new BlockHitResult(Vec3d.ofCenter(firePos), Direction.UP, firePos, false);
+                    BlockHitResult fireHit = new BlockHitResult(Vec3.ofCenter(firePos), Direction.UP, firePos, false);
 
-                    mc.interactionManager.interactBlock(mc.player, Hand.MAIN_HAND, fireHit);
-                    mc.player.swingHand(Hand.MAIN_HAND);
+                    mc.gameMode.interactBlock(mc.player, InteractionHand.MAIN_HAND, fireHit);
+                    mc.player.swing(InteractionHand.MAIN_HAND);
                     break;
                 }
             }

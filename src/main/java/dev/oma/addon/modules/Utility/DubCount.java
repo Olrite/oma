@@ -10,11 +10,11 @@ import meteordevelopment.meteorclient.settings.SettingGroup;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
 
-import net.minecraft.block.entity.BlockEntity;
-import net.minecraft.block.entity.ChestBlockEntity;
-import net.minecraft.block.entity.BlockEntityType;
-import net.minecraft.util.Formatting;
-import net.minecraft.util.math.BlockPos;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.ChestBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
+import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 
 import dev.oma.addon.Main;
 import dev.oma.addon.util.LogUtils;
@@ -86,11 +86,11 @@ public class DubCount extends Module {
         isFirstCount = true;
         
         if (autoUpdate.get()) {
-            LogUtils.info(Formatting.GRAY + "Dub Counter started. Auto-updating every " + Formatting.WHITE + updateInterval.get() + Formatting.GRAY + " second(s).");
+            LogUtils.info(ChatFormatting.GRAY + "Dub Counter started. Auto-updating every " + ChatFormatting.WHITE + updateInterval.get() + ChatFormatting.GRAY + " second(s).");
             updateCount();
         } else {
             if (countMode.get() == CountMode.Rendered) {
-                LogUtils.info(Formatting.GRAY + "Please wait " + Formatting.WHITE + loadTime.get() + Formatting.GRAY + " second(s)...");
+                LogUtils.info(ChatFormatting.GRAY + "Please wait " + ChatFormatting.WHITE + loadTime.get() + ChatFormatting.GRAY + " second(s)...");
             } else {
                 updateCount();
                 toggle();
@@ -106,7 +106,7 @@ public class DubCount extends Module {
             currentDubCount = dubs;
             
             if (showNotifications.get() || !autoUpdate.get() || isFirstCount) {
-                LogUtils.info(Formatting.GRAY + "There are roughly " + Formatting.WHITE + dubs + Formatting.GRAY + " (" + length + " normal chests)" + Formatting.GRAY + " loaded double chests.");
+                LogUtils.info(ChatFormatting.GRAY + "There are roughly " + ChatFormatting.WHITE + dubs + ChatFormatting.GRAY + " (" + length + " normal chests)" + ChatFormatting.GRAY + " loaded double chests.");
             }
             isFirstCount = false;
         }
@@ -124,7 +124,7 @@ public class DubCount extends Module {
     public void onDeactivate() {
         coords.clear();
         if (autoUpdate.get()) {
-            LogUtils.info(Formatting.GRAY + "Dub Counter stopped.");
+            LogUtils.info(ChatFormatting.GRAY + "Dub Counter stopped.");
         }
     }
 
@@ -138,7 +138,7 @@ public class DubCount extends Module {
                 currentDubCount = dubs;
                 
                 if (showNotifications.get() || !autoUpdate.get() || isFirstCount) {
-                    LogUtils.info(Formatting.GRAY + "There are roughly " + Formatting.WHITE + dubs + Formatting.GRAY + " (" + length + " normal chests)" + Formatting.GRAY + " rendered double chests.");
+                    LogUtils.info(ChatFormatting.GRAY + "There are roughly " + ChatFormatting.WHITE + dubs + ChatFormatting.GRAY + " (" + length + " normal chests)" + ChatFormatting.GRAY + " rendered double chests.");
                 }
                 isFirstCount = false;
 
@@ -161,8 +161,8 @@ public class DubCount extends Module {
     @EventHandler
     private void onRenderBlockEntity(RenderBlockEntityEvent event) {
         if (countMode.get() == CountMode.Rendered) {
-            if (event.blockEntity.getType() == BlockEntityType.CHEST || event.blockEntity.getType() == BlockEntityType.TRAPPED_CHEST) {
-                BlockPos pos = event.blockEntity.getPos();
+            if (event.blockEntityState.type == BlockEntityType.CHEST || event.blockEntityState.type == BlockEntityType.TRAPPED_CHEST) {
+                BlockPos pos = event.blockEntityState.pos;
                 if (coords.contains(pos)) return;
                 coords.add(pos);
             }

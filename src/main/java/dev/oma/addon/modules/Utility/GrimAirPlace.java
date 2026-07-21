@@ -1,7 +1,7 @@
 package dev.oma.addon.modules.Utility;
 
 import dev.oma.addon.Main;
-import net.minecraft.item.SpawnEggItem;
+import net.minecraft.world.item.SpawnEggItem;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
@@ -9,13 +9,13 @@ import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.item.BlockItem;
-import net.minecraft.network.packet.c2s.play.*;
-import net.minecraft.util.Hand;
-import net.minecraft.util.hit.BlockHitResult;
-import net.minecraft.util.hit.HitResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Direction;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.network.protocol.game.*;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 
 public class GrimAirPlace extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -98,13 +98,13 @@ public class GrimAirPlace extends Module {
         if (delay < placeDelay.get()) return;
 
         if (mc.options.useKey.isPressed()) {
-            mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, new BlockPos(0,0,0), Direction.DOWN));
+            mc.player.connection.send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, new BlockPos(0,0,0), Direction.DOWN));
 
-            mc.player.networkHandler.sendPacket(new PlayerInteractBlockC2SPacket(Hand.OFF_HAND, blockHitResult, mc.player.currentScreenHandler.getRevision() + 2));
+            mc.player.connection.send(new ServerboundUseItemOnPacket(InteractionHand.OFF_HAND, blockHitResult, mc.player.currentScreenHandler.getRevision() + 2));
 
-            mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.SWAP_ITEM_WITH_OFFHAND, new BlockPos(0,0,0), Direction.DOWN));
+            mc.player.connection.send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, new BlockPos(0,0,0), Direction.DOWN));
 
-            mc.player.swingHand(Hand.MAIN_HAND);
+            mc.player.swing(InteractionHand.MAIN_HAND);
             delay = 0;
         }
     }
@@ -112,7 +112,7 @@ public class GrimAirPlace extends Module {
     @EventHandler
     private void onRender(Render3DEvent event) {
         if (!(hitResult instanceof BlockHitResult blockHitResult)
-            || !mc.world.getBlockState(blockHitResult.getBlockPos()).isReplaceable()
+            || !mc.level.getBlockState(blockHitResult.getBlockPos()).isReplaceable()
             || !(mc.player.getMainHandStack().getItem() instanceof BlockItem) && !(mc.player.getMainHandStack().getItem() instanceof SpawnEggItem)
             || !render.get()) return;
 

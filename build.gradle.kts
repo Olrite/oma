@@ -1,5 +1,5 @@
 plugins {
-    alias(libs.plugins.fabric.loom)
+    id("net.fabricmc.fabric-loom") version "1.16-SNAPSHOT"
 }
 
 base {
@@ -36,18 +36,17 @@ repositories {
 
 dependencies {
     minecraft(libs.minecraft)
-    mappings(variantOf(libs.yarn) { classifier("v2") })
-    modImplementation(libs.fabric.loader)
-    modImplementation(libs.fabric.api)
+    implementation(libs.fabric.loader)
+    implementation(libs.fabric.api)
 
-    modImplementation(libs.meteor.client)
-    modImplementation(libs.xaeroplus)
-    modImplementation(libs.xaeros.worldmap)
-    modImplementation(libs.xaeros.minimap)
-    modImplementation(libs.lambda.events)
-    implementation(libs.caffeine)
+    compileOnly(libs.meteor.client)
 
-    modCompileOnly(libs.baritone)
+    compileOnly( libs.xaeroplus)
+    compileOnly( libs.xaeros.worldmap)
+    compileOnly( libs.xaeros.minimap)
+    compileOnly(libs.lambda.events)
+    compileOnly(libs.caffeine)
+    compileOnly( libs.baritone)
 }
 
 tasks {
@@ -76,13 +75,14 @@ tasks {
     }
 
     java {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(25))
+        }
     }
 
     withType<JavaCompile> {
         options.encoding = "UTF-8"
-        options.release.set(21)
+        options.release.set(25)
         options.compilerArgs.add("-Xlint:deprecation")
         options.compilerArgs.add("-Xlint:unchecked")
     }

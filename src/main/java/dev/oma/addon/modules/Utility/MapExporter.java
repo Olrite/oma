@@ -5,13 +5,13 @@ import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.orbit.EventHandler;
-import net.minecraft.client.MinecraftClient;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.item.map.MapState;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.MapIdComponent;
-import net.minecraft.text.Text;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.level.saveddata.maps.MapItemSavedData;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.world.level.saveddata.maps.MapId;
+import net.minecraft.network.chat.Component;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -85,7 +85,7 @@ public class MapExporter extends Module {
 
     @EventHandler
     private void onTick(TickEvent.Post event) {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
         if (mc.player == null || !autoSave.get()) return;
 
         checkDelay++;
@@ -106,7 +106,7 @@ public class MapExporter extends Module {
 
         // Check hotbar
         for (int i = 0; i < 9; i++) {
-            ItemStack stack = mc.player.getInventory().getStack(i);
+            ItemStack stack = mc.player.getInventory().getItem(i);
             if (stack.getItem() == Items.FILLED_MAP) {
                 saveMapImage(stack);
             }
@@ -114,10 +114,10 @@ public class MapExporter extends Module {
     }
 
     private void saveMapImage(ItemStack mapStack) {
-        MinecraftClient mc = MinecraftClient.getInstance();
+        Minecraft mc = Minecraft.getInstance();
 
         // Get the map ID from the item
-        MapIdComponent mapId = mapStack.get(DataComponentTypes.MAP_ID);
+        MapId mapId = mapStack.get(DataComponents.MAP_ID);
         if (mapId == null) return;
 
         int id = mapId.id();
@@ -126,7 +126,7 @@ public class MapExporter extends Module {
         if (savedMaps.contains(id)) return;
 
         // Get the map state from the world
-        MapState mapState = mc.world.getMapState(mapId);
+        MapItemSavedData mapState = mc.level.getMapState(mapId);
         if (mapState == null || mapState.colors == null) return;
 
         try {
@@ -184,7 +184,7 @@ public class MapExporter extends Module {
         switch (nameFormat.get()) {
             case MapName -> {
                 // Try to get custom map name from item
-                Text customName = mapStack.getName();
+                Component customName = mapStack.getName();
                 String mapName = customName.getString();
 
                 // Clean the name for filename
@@ -236,7 +236,7 @@ public class MapExporter extends Module {
 
         // Try to get RGB from map color palette
         try {
-            net.minecraft.block.MapColor mapColor = net.minecraft.block.MapColor.get(baseIndex);
+            net.minecraft.world.level.block.MapColor mapColor = net.minecraft.world.level.block.MapColor.get(baseIndex);
             if (mapColor != null) {
                 // MapColor stores color as int, access it via reflection if needed
                 // But first try the render color method with different shade calculation

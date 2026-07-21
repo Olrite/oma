@@ -1,7 +1,7 @@
 {
     "required": false,
     "package": "dev.oma.mixin.meteor",
-    "compatibilityLevel": "JAVA_21",
+    "compatibilityLevel": "JAVA_25",
     "client": [
     ],
     "injectors": {
