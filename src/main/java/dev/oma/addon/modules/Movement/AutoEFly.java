@@ -13,7 +13,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.Items;
 import net.minecraft.network.protocol.game.ServerboundPlayerCommandPacket;
 
-public class ElytraRedeploy extends Module {
+public class AutoEFly extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Integer> tickDelay = sgGeneral.add(new IntSetting.Builder()
@@ -51,8 +51,8 @@ public class ElytraRedeploy extends Module {
     private boolean waitingToActivate = false;
     private boolean needsFirework = false;
 
-    public ElytraRedeploy() {
-        super(Main.MOVEMENT, "elytra-redeploy", "Automatically jumps and redeploys elytra when touching the ground.");
+    public AutoEFly() {
+        super(Main.MOVEMENT, "Auto eFly", "Automatically jumps and redeploys elytra when touching the ground.");
     }
 
     @Override

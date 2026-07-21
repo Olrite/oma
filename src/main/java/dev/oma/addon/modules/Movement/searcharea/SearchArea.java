@@ -69,7 +69,7 @@ public class SearchArea extends Module {
 
 
     public SearchArea() {
-        super(Main.HUNTING, "search-area", "Either loads chunks in a rectangle to a certain point from you, or spirals endlessly from you. Useful with StashFinderPlus or other map saving mods.");
+        super(Main.HUNTING, "search-area", "Either loads chunks in a rectangle to a certain point from you, or spirals endlessly from you. Useful with Better Stash Finder or other map saving mods.");
     }
 
     private SearchAreaMode currentMode = new Rectangle();

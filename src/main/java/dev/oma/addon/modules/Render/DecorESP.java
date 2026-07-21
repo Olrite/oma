@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class VanityESP extends Module {
+public class DecorESP extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgRender = settings.createGroup("Render");
     private final SettingGroup sgItems = settings.createGroup("Items");
@@ -146,8 +146,8 @@ public class VanityESP extends Module {
     private int lastPlayerChunkZ = Integer.MIN_VALUE;
     private final Minecraft mc = Minecraft.getInstance();
 
-    public VanityESP() {
-        super(Main.RENDER, "vanity-esp", "Highlights vanity items like item frames and banners.");
+    public DecorESP() {
+        super(Main.RENDER, "DecorESP", "Highlights decorative items like item frames and banners.");
     }
 
     @Override
