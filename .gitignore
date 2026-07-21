@@ -2,6 +2,11 @@ BRANCHING_GUIDE.md
 remappedSrc/
 docs/
 .editorconfig
+
+# local / IDE (do not upload)
+compile-errors.txt
+.cursor/
+
 # gradle
 
 .gradle/
