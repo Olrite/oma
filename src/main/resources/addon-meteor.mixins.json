@@ -1,6 +1,6 @@
 {
     "required": false,
-    "package": "dev.cozi.mixin.meteor",
+    "package": "dev.oma.mixin.meteor",
     "compatibilityLevel": "JAVA_21",
     "client": [
     ],

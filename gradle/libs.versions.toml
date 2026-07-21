@@ -1,0 +1,36 @@
+[versions]
+mod-version = "1.0"
+
+# Fabric (https://fabricmc.net/develop)
+minecraft = "1.21.11"
+yarn-mappings = "1.21.11+build.4"
+fabric-loader = "0.18.4"
+fabric-api = "0.141.3+1.21.11"
+
+# Loom (https://github.com/FabricMC/fabric-loom)
+loom = "1.17-SNAPSHOT"
+
+# Meteor (https://github.com/MeteorDevelopment/meteor-client/)
+meteor = "1.21.11-SNAPSHOT"
+baritone = "1.21.10-SNAPSHOT"
+
+# Xaero (Modrinth)
+xaeroplus = "2.34.5+fabric-1.21.11"
+xaeros-worldmap = "fabric-1.21.11-1.44.2"
+xaeros-minimap = "fabric-1.21.11-26.4.2"
+
+[libraries]
+minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
+yarn = { module = "net.fabricmc:yarn", version.ref = "yarn-mappings" }
+fabric-loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric-loader" }
+fabric-api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric-api" }
+meteor-client = { module = "meteordevelopment:meteor-client", version.ref = "meteor" }
+baritone = { module = "meteordevelopment:baritone", version.ref = "baritone" }
+xaeroplus = { module = "maven.modrinth:xaeroplus", version.ref = "xaeroplus" }
+xaeros-worldmap = { module = "maven.modrinth:xaeros-world-map", version.ref = "xaeros-worldmap" }
+xaeros-minimap = { module = "maven.modrinth:xaeros-minimap", version.ref = "xaeros-minimap" }
+caffeine = { module = "com.github.ben-manes.caffeine:caffeine", version = "3.2.2" }
+lambda-events = { module = "net.lenni0451:LambdaEvents", version = "2.4.2" }
+
+[plugins]
+fabric-loom = { id = "fabric-loom", version.ref = "loom" }

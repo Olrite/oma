@@ -1,64 +1,82 @@
-### This project has been archived. I haven't been on 2b2t for a while now and no longer have motivation to continue this project due to some recent personal events. You can see some other Meteor Client addons [here](https://anticope.pages.dev/addons/?). Thank you everyone for downloading and showing support for this addon! <3
+# o.m.a.
 
-# cozisAddon
-A 2b2t Meteor Client utility based addon.
+A 2b2t Meteor Client utility addon, ported and maintained from [cozisAddon](https://github.com/Olrite/cozisAddon).
 
-### Original Modules
-**<ins>Utility</ins>**
-+ AutoLog Plus - A module that disconnects the player according to specific parameters (Based off of [Numby-hack](https://github.com/cqb13/Numby-hack))
-+ Auto Shulker - When your inventory is full it places and opens a shulker box and then puts your items in the shulker box
-+ Elytra Swap - When your equipped elytra reaches a configurable durability threshold, it swaps to a new one
-+ Chat Tracker - Logs chat to a file with optional filtering
-+ Player History - Logs player information when they are spotted
+## Supported Minecraft versions
 
-**<ins>Renders</ins>**
-+ SignRender - Displays sign text above the sign and is visible through walls
-+ ChestESP - An ESP for chests/double chests that have shulkers inside them and has a memory of chests in render distance
-+ VanityESP - An ESP for vanity items such as banners and item frames
-+ Mob Item ESP - An ESP for mobs that spawn with items that they normally wouldn't spawn with
+| Branch | Minecraft | Meteor Client |
+|--------|-----------|---------------|
+| `master` | **26.1.2** | [Latest](https://meteorclient.com/) |
+| `legacy/1.21.11` | **1.21.11** | [Archive #85](https://meteorclient.com/api/download?version=1.21.11) |
+| `legacy/1.21.4` | **1.21.4** | [Archive #42](https://meteorclient.com/api/download?version=1.21.4) |
 
-**<ins>Movement</ins>**
-+ Elytra Redeploy - Jumps and flies away if you hit the ground with this enabled
+Check out the branch matching your Minecraft version before building.
 
-**<ins>HUD</ins>**
-+ TotemCount - A HUD module that shows the amount of totems in your inventory
-+ CrystalCount - A HUD module that shows the amount of end crystals in your inventory
-+ Dub Count - A HUD module that shows what is output from the Dub Counter module 
-+ Sign Display - A HUD module that displays all signs within render distance in a list
-+ ETA - Displays the estimated time left to reach the baritone goal/goal in GUI based on current speed
-+ Lag Detector - Displays the server's TPS and if there are lagbacks also shows a lag warning when lagging
+## Install (releases)
 
-### Ported Modules
-**<ins>Utility</ins>**
-+ DiscordNotifications - ported from [BepHaxAddon](https://github.com/dekrom/BepHaxAddon) - **I added the ability test the Discord webhook**
-+ PortalMaker - originally from [xqyet](https://github.com/xqyet)
-+ AntiSpam - ported from [Asteroide](https://github.com/asteroide-development/Asteroide)
-+ Dub Counter - ported from [IKEA](https://github.com/Nooniboi/Public-Ikea) - **I changed this module a bit to allow the HUD element to work properly**
-+ GrimAirPlace - ported from [Jeff Mod](https://github.com/miles352/meteor-stashhunting-addon)
-+ Map Exporter - originally from [VexTheIV](https://github.com/Vextheiv)
+Download the JAR for your Minecraft version from [GitHub Releases](https://github.com/Olrite/oma/releases):
 
-**<ins>Renders</ins>**
-+ PearlOwner - ported from [BepHaxAddon](https://github.com/dekrom/BepHaxAddon)
+- `oma-1.0-mc1.21.4.jar`
+- `oma-1.0-mc1.21.11.jar`
+- `oma-1.0-mc26.1.2.jar`
 
-**<ins>Hunting</ins>**
-+ StashFinderPlus - ported from [Jeff Mod](https://github.com/miles352/meteor-stashhunting-addon) - **I added the ability to bulk add potential stashes to waypoint, auto-disconnect when a stash is found and added more information when a Discord webhook is sent**
-+ NewChunksPlus - ported from [Trouser Streak](https://github.com/etianl/Trouser-Streak)
-+ TrailFollower - originally from [WarriorLost](https://github.com/WarriorLost) - **I added an option to auto disconnect depending on chunk loading speeds and a cardinal direction priority mode**
+Place the matching JAR in your `mods` folder alongside the correct Meteor Client version.
 
-**<ins>Movement</ins>**
-+ Pitch40Util - ported from [Jeff Mod](https://github.com/miles352/meteor-stashhunting-addon)
-+ SearchArea - ported from [BepHaxAddon](https://github.com/dekrom/BepHaxAddon)
-+ AFKVanillaFly - originally from [xqyet](https://github.com/xqyet)
-+ GrimScaffold - ported from [BepHaxAddon](https://github.com/dekrom/BepHaxAddon)
+## Build from source
 
-**<ins>HUD</ins>**
-+ EntityList - ported from [BepHaxAddon](https://github.com/dekrom/BepHaxAddon)
-
-#### Manual Build
 ```bash
-git clone https://github.com/CoziSoftware/cozisAddon/
-cd cozisAddon/
+git clone https://github.com/Olrite/oma.git
+cd oma
+git checkout <branch-for-your-mc-version>
 ./gradlew build
 ```
 
-**Disclaimer:** This code is safe however I wouldn't trust what you download from a 2b2t player so if you feel inclined, please look over the codebase to ensure your own security.
+On Windows:
+
+```powershell
+.\gradlew.bat build
+```
+
+The built JAR is in `build/libs/`.
+
+**Java requirements:**
+- `legacy/*` branches: Java **21**
+- `master` (26.1.2): Java **25**
+
+## Releases
+
+Releases use **two-part tags** only: `vX.Y` (e.g. `v1.0`).
+
+Pushing a tag triggers CI to build all three Minecraft versions and create a **draft** release containing:
+
+- `oma-X.Y-mc1.21.4.jar`
+- `oma-X.Y-mc1.21.11.jar`
+- `oma-X.Y-mc26.1.2.jar`
+
+Review the draft on GitHub and publish manually when ready.
+
+## Modules
+
+### Utility
+- AutoLog Plus, Auto Shulker, Elytra Swap, Chat Tracker, Player History
+- DiscordNotifications, PortalMaker, AntiSpam, Dub Counter, GrimAirPlace, Map Exporter
+
+### Renders
+- SignRender, ChestESP, VanityESP, Mob Item ESP, PearlOwner
+
+### Movement
+- Elytra Redeploy, Pitch40Util, SearchArea, AFKVanillaFly, GrimScaffold
+
+### Hunting
+- StashFinderPlus, NewChunksPlus, TrailFollower (requires Baritone)
+
+### HUD
+- TotemCount, CrystalCount, Dub Count, Sign Display, ETA, Lag Detector, EntityList
+
+## Attribution
+
+Based on [cozisAddon](https://github.com/Olrite/cozisAddon) by cozidev / CoziSoftware. Many modules were ported from community addons — see the original README for credits.
+
+## Disclaimer
+
+Review the code yourself before use. This is a utility addon for anarchy servers; use at your own risk.

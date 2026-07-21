@@ -1,20 +1,20 @@
 {
   "schemaVersion": 1,
-  "id": "cozisaddon",
+  "id": "oma",
   "version": "${version}",
-  "name": "cozisaddon",
-  "description": "An addon for Meteor Client",
+  "name": "o.m.a.",
+  "description": "A 2b2t Meteor Client utility addon",
   "authors": [
-    "cozidev"
+    "Olrite"
   ],
   "contact": {
-    "sources": "https://github.com/CoziSoftware/cozisAddon"
+    "sources": "https://github.com/Olrite/oma"
   },
   "icon": "assets/Main/icon.png",
   "environment": "client",
   "entrypoints": {
     "meteor": [
-      "dev.cozi.addon.Main"
+      "dev.oma.addon.Main"
     ]
   },
   "mixins": [
@@ -27,7 +27,7 @@
   },
   "depends": {
     "java": ">=21",
-    "minecraft": "~1.21.1",
+    "minecraft": "${mc_version}",
     "meteor-client": "*"
   }
 }

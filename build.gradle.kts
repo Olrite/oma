@@ -1,13 +1,12 @@
 plugins {
-    id("fabric-loom") version "1.10.1"
+    alias(libs.plugins.fabric.loom)
 }
 
 base {
-    archivesName.set(project.property("archives_base_name") as String)
+    archivesName.set(properties["archives_base_name"] as String)
+    version = libs.versions.mod.version.get()
+    group = properties["maven_group"] as String
 }
-
-version = project.property("mod_version") as String
-group = project.property("maven_group") as String
 
 repositories {
     exclusiveContent {
@@ -36,62 +35,63 @@ repositories {
 }
 
 dependencies {
-    // Fabric
-    minecraft("com.mojang:minecraft:${project.property("minecraft_version")}")
-    mappings("net.fabricmc:yarn:${project.property("yarn_mappings")}:v2")
-    modImplementation("net.fabricmc:fabric-loader:${project.property("loader_version")}")
-    modImplementation("net.fabricmc.fabric-api:fabric-api:${project.property("fabric_version")}")
+    minecraft(libs.minecraft)
+    mappings(variantOf(libs.yarn) { classifier("v2") })
+    modImplementation(libs.fabric.loader)
+    modImplementation(libs.fabric.api)
 
-    // Meteor
-    modImplementation("meteordevelopment:meteor-client:${project.property("meteor_version")}")
-    // XaeroPlus
-    modImplementation("maven.modrinth:xaeroplus:${project.property("xaeroplus_version")}")
-    // XaeroWorldMap
-    modImplementation("maven.modrinth:xaeros-world-map:${project.property("xaeros_worldmap_version")}")
-    // XaeroMinimap
-    modImplementation("maven.modrinth:xaeros-minimap:${project.property("xaeros_minimap_version")}")
-    // lenni
-    modImplementation("net.lenni0451:LambdaEvents:2.4.2")
-    implementation("com.github.ben-manes.caffeine:caffeine:3.2.2")
-    // Baritone - compile only (users should install as a mod jar)
-    modCompileOnly("meteordevelopment:baritone:${properties["baritone_version"] as String}")
+    modImplementation(libs.meteor.client)
+    modImplementation(libs.xaeroplus)
+    modImplementation(libs.xaeros.worldmap)
+    modImplementation(libs.xaeros.minimap)
+    modImplementation(libs.lambda.events)
+    implementation(libs.caffeine)
+
+    modCompileOnly(libs.baritone)
 }
 
-tasks.named<ProcessResources>("processResources") {
-    val props = mapOf(
-        "version" to project.version,
-        "mc_version" to project.property("minecraft_version"),
-        "xp_version" to project.property("xaeroplus_version"),
-        "xwm_version" to project.property("xaeros_worldmap_version"),
-        "xmm_version" to project.property("xaeros_minimap_version")
-    )
-    inputs.properties(props)
-    filesMatching("fabric.mod.json") {
-        expand(props)
+tasks {
+    processResources {
+        val propertyMap = mapOf(
+            "version" to project.version,
+            "mc_version" to libs.versions.minecraft.get()
+        )
+
+        inputs.properties(propertyMap)
+        filteringCharset = "UTF-8"
+
+        filesMatching("fabric.mod.json") {
+            expand(propertyMap)
+        }
+    }
+
+    jar {
+        inputs.property("archivesName", project.base.archivesName.get())
+
+        from("LICENSE") {
+            rename { "${it}_${inputs.properties["archivesName"]}" }
+        }
+
+        from(configurations.runtimeClasspath.get().filter { it.name.startsWith("caffeine") })
+    }
+
+    java {
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
+    }
+
+    withType<JavaCompile> {
+        options.encoding = "UTF-8"
+        options.release.set(21)
+        options.compilerArgs.add("-Xlint:deprecation")
+        options.compilerArgs.add("-Xlint:unchecked")
     }
 }
 
-tasks.withType<JavaCompile> {
-    options.encoding = "UTF-8"
-}
-
-java {
-    toolchain {
-        languageVersion.set(JavaLanguageVersion.of(21))
-    }
-}
-
-// Include Caffeine in the mod JAR
 loom {
     mods {
-        create("cozisaddon") {
+        create("oma") {
             sourceSet(sourceSets["main"])
         }
     }
 }
-
-// Configure the JAR to include Caffeine
-tasks.jar {
-    from(configurations.runtimeClasspath.get().filter { it.name.startsWith("caffeine") })
-}
-

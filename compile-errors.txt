@@ -1,0 +1,536 @@
+﻿To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.5.0/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Configure project :
+Fabric Loom: 1.17.16
+
+> Task :compileJava
+.\gradlew.bat : C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\NewChunksPlus.java:22: error: cannot 
+find symbol
+At C:\Users\cozid\AppData\Local\Temp\ps-script-fa102ffd-b3e5-4413-b338-e95ee42378c3.ps1:105 char:101
++ ... :\Users\cozid\oma; .\gradlew.bat compileJava --no-daemon 2>&1 | Out-F ...
++                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (C:\Users\cozid\...not find symbol:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
+                                      ^
+  symbol:   class DownloadingTerrainScreen
+  location: package net.minecraft.client.gui.screen
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Movement\searcharea\modes\Rectangle.java:6: error: cannot find 
+symbol
+import meteordevelopment.meteorclient.systems.modules.movement.BoatFly;
+                                                              ^
+  symbol:   class BoatFly
+  location: package meteordevelopment.meteorclient.systems.modules.movement
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\hud\ETA.java:206: error: cannot find symbol
+                Vec3d pos = MeteorClient.mc.player.getPos();
+                                                  ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\hud\ETA.java:302: error: cannot find symbol
+        Vec3d playerPos = MeteorClient.mc.player.getPos();
+                                                ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\hud\ETA.java:313: error: cannot find symbol
+        Vec3d currentPos = MeteorClient.mc.player.getPos();
+                                                 ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\hud\LagDetector.java:229: error: cannot find symbol
+            Vec3d currentPos = MeteorClient.mc.player.getPos();
+                                                     ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\NewChunksPlus.java:363: error: cannot find symbol
+		NEW_NETHER_BLOCKS.add(Blocks.CHAIN);
+		                            ^
+  symbol:   variable CHAIN
+  location: class Blocks
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\NewChunksPlus.java:465: error: cannot find symbol
+		if (event.screen instanceof DownloadingTerrainScreen) {
+		                            ^
+  symbol:   class DownloadingTerrainScreen
+  location: class NewChunksPlus
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\util\Utils.java:204: warning: [deprecation] URL(String) in URL has been 
+deprecated
+            URL url = new URL(webhookURL);
+                      ^
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\StashFinderPlus.java:286: error: constructor 
+MeteorToast in class MeteorToast cannot be applied to given types;
+                        case Toast -> mc.getToastManager().add(new MeteorToast(Items.CHEST, "Stash Found!", "Found 
+stash at " + chunk.x + ", " + chunk.z));
+                                                               ^
+  required: Builder
+  found:    Item,String,String
+  reason: actual and formal argument lists differ in length
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\StashFinderPlus.java:289: error: constructor 
+MeteorToast in class MeteorToast cannot be applied to given types;
+                            mc.getToastManager().add(new MeteorToast(Items.CHEST, "Stash Found!", "Found stash at " + 
+chunk.x + ", " + chunk.z));
+                                                     ^
+  required: Builder
+  found:    Item,String,String
+  reason: actual and formal argument lists differ in length
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\StashFinderPlus.java:356: error: cannot find symbol
+                        new Thread(() -> sendWebhook(webhookLink.get(), "Stash Found!", message, ping.get() ? 
+discordId.get() : null, mc.player.getGameProfile().getName())).start();
+                                                                                                                       
+                                         ^
+  symbol:   method getName()
+  location: class GameProfile
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\StashFinderPlus.java:616: warning: [deprecation] 
+Waypoint(int,int,int,String,String,int,int,boolean) in Waypoint has been deprecated
+        Waypoint waypoint = new Waypoint(
+                            ^
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\StashFinderPlus.java:780: error: cannot find symbol
+        lastPosition = mc.player.getPos();
+                                ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:406: error: cannot find symbol
+            Vec3d targetPos = mc.player.getPos().add(offset);
+                                       ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:563: error: cannot find symbol
+                                Vec3d directionVec = averagePos.subtract(mc.player.getPos()).normalize();
+                                                                                  ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:564: error: cannot find symbol
+                                Vec3d predictedPos = mc.player.getPos().add(directionVec.multiply(10));
+                                                              ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:566: error: cannot find symbol
+                                baritoneTarget = positionInDirection(mc.player.getPos(), targetYaw, 
+pathDistanceActual);
+                                                                              ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:577: error: cannot find symbol
+                        Vec3d targetPos = positionInDirection(mc.player.getPos(), targetYaw, pathDistanceActual);
+                                                                       ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:607: error: cannot find symbol
+        Vec3d targetPos = positionInDirection(mc.player.getPos(), targetYaw, 10);
+                                                       ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:696: error: cannot find symbol
+        boolean isCardinalPriority = isChunkInCardinalDirection(pos, mc.player.getPos());
+                                                                              ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:738: error: cannot find symbol
+                Vec3d positionVec = averagePos.subtract(mc.player.getPos()).normalize();
+                                                                 ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:739: error: cannot find symbol
+                Vec3d targetPos = mc.player.getPos().add(positionVec.multiply(10));
+                                           ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:818: error: cannot find symbol
+            sendWebhook(webhookLink.get(), "TrailFollower", message, null, mc.player.getGameProfile().getName());
+                                                                                                     ^
+  symbol:   method getName()
+  location: class GameProfile
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Movement\GrimScaffold.java:213: error: cannot find symbol
+        Vec3d playerPos = mc.player.getPos();
+                                   ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Movement\Pitch40Util.java:69: warning: [unchecked] unchecked 
+cast
+    private Setting<ElytraFlightModes> elytraFlyMode = (Setting<ElytraFlightModes>)elytraFly.settings.get("mode");
+                                                                                                         ^
+  required: Setting<ElytraFlightModes>
+  found:    Setting<CAP#1>
+  where CAP#1 is a fresh type-variable:
+    CAP#1 extends Object from capture of ?
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Movement\Pitch40Util.java:98: warning: [unchecked] unchecked 
+cast
+        Setting<Double> upperBounds = (Setting<Double>) elytraFly.settings.get("pitch40-upper-bounds");
+                                                                              ^
+  required: Setting<Double>
+  found:    Setting<CAP#1>
+  where CAP#1 is a fresh type-variable:
+    CAP#1 extends Object from capture of ?
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Movement\Pitch40Util.java:100: warning: [unchecked] unchecked 
+cast
+        Setting<Double> lowerBounds = (Setting<Double>) elytraFly.settings.get("pitch40-lower-bounds");
+                                                                              ^
+  required: Setting<Double>
+  found:    Setting<CAP#1>
+  where CAP#1 is a fresh type-variable:
+    CAP#1 extends Object from capture of ?
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Movement\searcharea\modes\Rectangle.java:62: error: cannot find 
+symbol
+        Class<? extends Module> boatFly = BoatFly.class;
+                                          ^
+  symbol:   class BoatFly
+  location: class Rectangle
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ChestESP.java:327: error: cannot find symbol
+                    double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
+                                               ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ChestESP.java:349: error: cannot find symbol
+            double distance = mc.player.getPos().distanceTo(rememberedChest.toCenterPos());
+                                       ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ChestESP.java:547: error: cannot find symbol
+                    double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
+                                               ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ChestESP.java:627: error: cannot find symbol
+                    double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
+                                               ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ChestESP.java:664: error: cannot find symbol
+                            double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
+                                                       ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ModItemESP.java:191: error: cannot find symbol
+            if (mc.player.getPos().squaredDistanceTo(mob.getPos()) > maxDist) continue;
+                         ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ModItemESP.java:191: error: cannot find symbol
+            if (mc.player.getPos().squaredDistanceTo(mob.getPos()) > maxDist) continue;
+                                                        ^
+  symbol:   method getPos()
+  location: variable mob of type Entity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ModItemESP.java:217: error: cannot find symbol
+            if (mc.player.getPos().squaredDistanceTo(entity.getPos()) > maxDist * maxDist) continue;
+                         ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ModItemESP.java:217: error: cannot find symbol
+            if (mc.player.getPos().squaredDistanceTo(entity.getPos()) > maxDist * maxDist) continue;
+                                                           ^
+  symbol:   method getPos()
+  location: variable entity of type Entity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\PearlOwner.java:96: error: cannot find symbol
+                Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+                                                             ^
+  symbol:   method getPos()
+  location: class Camera
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\PearlOwner.java:97: error: cannot find symbol
+                Vec3d pearlPos = pearl.getPos();
+                                      ^
+  symbol:   method getPos()
+  location: variable pearl of type EnderPearlEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\SignRender.java:275: error: cannot find symbol
+                    double distance = mc.player.getPos().distanceTo(Vec3d.ofCenter(pos));
+                                               ^
+  symbol:   method getPos()
+  location: variable player of type ClientPlayerEntity
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Utility\DiscordNotifications.java:175: error: cannot find symbol
+                        handleMessage(playerEntity.getGameProfile().getName() + " has entered visual range!", 
+MessageType.PLAYER_RANGE);
+                                                                   ^
+  symbol:   method getName()
+  location: class GameProfile
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Utility\DiscordNotifications.java:184: error: cannot find symbol
+            if (!uuidsCurrentlyInRange.contains(profile.getId()))
+                                                       ^
+  symbol:   method getId()
+  location: variable profile of type GameProfile
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Utility\DiscordNotifications.java:187: error: cannot find symbol
+                handleMessage(profile.getName() + " has left visual range!", MessageType.PLAYER_RANGE);
+                                     ^
+  symbol:   method getName()
+  location: variable profile of type GameProfile
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Utility\DubCount.java:163: error: cannot find symbol
+            BlockEntity block = event.blockEntity;
+                                     ^
+  symbol:   variable blockEntity
+  location: variable event of type RenderBlockEntityEvent
+C:\Users\cozid\oma\src\main\java\dev\oma\addon\util\RotationUtils.java:245: error: cannot find symbol
+        Vec3d feetPos = entity.getPos();
+                              ^
+  symbol:   method getPos()
+  location: variable entity of type Entity
+41 errors
+5 warnings
+
+> Task :compileJava FAILED
+
+[Incubating] Problems report is available at: file:///C:/Users/cozid/oma/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':compileJava' (registered by plugin class 'org.gradle.api.plugins.JavaBasePlugin').
+> Compilation failed; see the compiler output below.
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\StashFinderPlus.java:286: error: constructor 
+MeteorToast in class MeteorToast cannot be applied to given types;
+                          case Toast -> mc.getToastManager().add(new MeteorToast(Items.CHEST, "Stash Found!", "Found 
+stash at " + chunk.x + ", " + chunk.z));
+                                                                 ^
+    required: Builder
+    found:    Item,String,String
+    reason: actual and formal argument lists differ in length
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\StashFinderPlus.java:289: error: constructor 
+MeteorToast in class MeteorToast cannot be applied to given types;
+                              mc.getToastManager().add(new MeteorToast(Items.CHEST, "Stash Found!", "Found stash at " 
++ chunk.x + ", " + chunk.z));
+                                                       ^
+    required: Builder
+    found:    Item,String,String
+    reason: actual and formal argument lists differ in length
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\util\Utils.java:204: warning: [deprecation] URL(String) in URL has 
+been deprecated
+              URL url = new URL(webhookURL);
+                        ^
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\StashFinderPlus.java:616: warning: [deprecation] 
+Waypoint(int,int,int,String,String,int,int,boolean) in Waypoint has been deprecated
+          Waypoint waypoint = new Waypoint(
+                              ^
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\NewChunksPlus.java:22: error: cannot find symbol
+  import net.minecraft.client.gui.screen.DownloadingTerrainScreen;
+                                        ^
+    symbol:   class DownloadingTerrainScreen
+    location: package net.minecraft.client.gui.screen
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Movement\searcharea\modes\Rectangle.java:6: error: cannot 
+find symbol
+  import meteordevelopment.meteorclient.systems.modules.movement.BoatFly;
+                                                                ^
+    symbol:   class BoatFly
+    location: package meteordevelopment.meteorclient.systems.modules.movement
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\NewChunksPlus.java:363: error: cannot find symbol
+  		NEW_NETHER_BLOCKS.add(Blocks.CHAIN);
+  		                            ^
+    symbol:   variable CHAIN
+    location: class Blocks
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\NewChunksPlus.java:465: error: cannot find symbol
+  		if (event.screen instanceof DownloadingTerrainScreen) {
+  		                            ^
+    symbol:   class DownloadingTerrainScreen
+    location: class NewChunksPlus
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Movement\searcharea\modes\Rectangle.java:62: error: cannot 
+find symbol
+          Class<? extends Module> boatFly = BoatFly.class;
+                                            ^
+    symbol:   class BoatFly
+    location: class Rectangle
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Utility\DubCount.java:163: error: cannot find symbol
+              BlockEntity block = event.blockEntity;
+                                       ^
+    symbol:   variable blockEntity
+    location: variable event of type RenderBlockEntityEvent
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Movement\Pitch40Util.java:69: warning: [unchecked] unchecked 
+cast
+      private Setting<ElytraFlightModes> elytraFlyMode = (Setting<ElytraFlightModes>)elytraFly.settings.get("mode");
+                                                                                                           ^
+    required: Setting<ElytraFlightModes>
+    found:    Setting<CAP#1>
+    where CAP#1 is a fresh type-variable:
+      CAP#1 extends Object from capture of ?
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Movement\Pitch40Util.java:98: warning: [unchecked] unchecked 
+cast
+          Setting<Double> upperBounds = (Setting<Double>) elytraFly.settings.get("pitch40-upper-bounds");
+                                                                                ^
+    required: Setting<Double>
+    found:    Setting<CAP#1>
+    where CAP#1 is a fresh type-variable:
+      CAP#1 extends Object from capture of ?
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Movement\Pitch40Util.java:100: warning: [unchecked] unchecked 
+cast
+          Setting<Double> lowerBounds = (Setting<Double>) elytraFly.settings.get("pitch40-lower-bounds");
+                                                                                ^
+    required: Setting<Double>
+    found:    Setting<CAP#1>
+    where CAP#1 is a fresh type-variable:
+      CAP#1 extends Object from capture of ?
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\hud\ETA.java:206: error: cannot find symbol
+                  Vec3d pos = MeteorClient.mc.player.getPos();
+                                                    ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\hud\ETA.java:302: error: cannot find symbol
+          Vec3d playerPos = MeteorClient.mc.player.getPos();
+                                                  ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\hud\ETA.java:313: error: cannot find symbol
+          Vec3d currentPos = MeteorClient.mc.player.getPos();
+                                                   ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\hud\LagDetector.java:229: error: cannot find symbol
+              Vec3d currentPos = MeteorClient.mc.player.getPos();
+                                                       ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\StashFinderPlus.java:356: error: cannot find symbol
+                          new Thread(() -> sendWebhook(webhookLink.get(), "Stash Found!", message, ping.get() ? 
+discordId.get() : null, mc.player.getGameProfile().getName())).start();
+                                                                                                                       
+                                           ^
+    symbol:   method getName()
+    location: class GameProfile
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\StashFinderPlus.java:780: error: cannot find symbol
+          lastPosition = mc.player.getPos();
+                                  ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:406: error: cannot find symbol
+              Vec3d targetPos = mc.player.getPos().add(offset);
+                                         ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:563: error: cannot find symbol
+                                  Vec3d directionVec = averagePos.subtract(mc.player.getPos()).normalize();
+                                                                                    ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:564: error: cannot find symbol
+                                  Vec3d predictedPos = mc.player.getPos().add(directionVec.multiply(10));
+                                                                ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:566: error: cannot find symbol
+                                  baritoneTarget = positionInDirection(mc.player.getPos(), targetYaw, 
+pathDistanceActual);
+                                                                                ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:577: error: cannot find symbol
+                          Vec3d targetPos = positionInDirection(mc.player.getPos(), targetYaw, pathDistanceActual);
+                                                                         ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:607: error: cannot find symbol
+          Vec3d targetPos = positionInDirection(mc.player.getPos(), targetYaw, 10);
+                                                         ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:696: error: cannot find symbol
+          boolean isCardinalPriority = isChunkInCardinalDirection(pos, mc.player.getPos());
+                                                                                ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:738: error: cannot find symbol
+                  Vec3d positionVec = averagePos.subtract(mc.player.getPos()).normalize();
+                                                                   ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:739: error: cannot find symbol
+                  Vec3d targetPos = mc.player.getPos().add(positionVec.multiply(10));
+                                             ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Hunting\TrailFollower.java:818: error: cannot find symbol
+              sendWebhook(webhookLink.get(), "TrailFollower", message, null, mc.player.getGameProfile().getName());
+                                                                                                       ^
+    symbol:   method getName()
+    location: class GameProfile
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Movement\GrimScaffold.java:213: error: cannot find symbol
+          Vec3d playerPos = mc.player.getPos();
+                                     ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ChestESP.java:327: error: cannot find symbol
+                      double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
+                                                 ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ChestESP.java:349: error: cannot find symbol
+              double distance = mc.player.getPos().distanceTo(rememberedChest.toCenterPos());
+                                         ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ChestESP.java:547: error: cannot find symbol
+                      double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
+                                                 ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ChestESP.java:627: error: cannot find symbol
+                      double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
+                                                 ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ChestESP.java:664: error: cannot find symbol
+                              double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
+                                                         ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ModItemESP.java:191: error: cannot find symbol
+              if (mc.player.getPos().squaredDistanceTo(mob.getPos()) > maxDist) continue;
+1 actionable task: 1 executed
+                           ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ModItemESP.java:191: error: cannot find symbol
+              if (mc.player.getPos().squaredDistanceTo(mob.getPos()) > maxDist) continue;
+                                                          ^
+    symbol:   method getPos()
+    location: variable mob of type Entity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ModItemESP.java:217: error: cannot find symbol
+              if (mc.player.getPos().squaredDistanceTo(entity.getPos()) > maxDist * maxDist) continue;
+                           ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\ModItemESP.java:217: error: cannot find symbol
+              if (mc.player.getPos().squaredDistanceTo(entity.getPos()) > maxDist * maxDist) continue;
+                                                             ^
+    symbol:   method getPos()
+    location: variable entity of type Entity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\PearlOwner.java:96: error: cannot find symbol
+                  Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+                                                               ^
+    symbol:   method getPos()
+    location: class Camera
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\PearlOwner.java:97: error: cannot find symbol
+                  Vec3d pearlPos = pearl.getPos();
+                                        ^
+    symbol:   method getPos()
+    location: variable pearl of type EnderPearlEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Render\SignRender.java:275: error: cannot find symbol
+                      double distance = mc.player.getPos().distanceTo(Vec3d.ofCenter(pos));
+                                                 ^
+    symbol:   method getPos()
+    location: variable player of type ClientPlayerEntity
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Utility\DiscordNotifications.java:175: error: cannot find 
+symbol
+                          handleMessage(playerEntity.getGameProfile().getName() + " has entered visual range!", 
+MessageType.PLAYER_RANGE);
+                                                                     ^
+    symbol:   method getName()
+    location: class GameProfile
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Utility\DiscordNotifications.java:184: error: cannot find 
+symbol
+              if (!uuidsCurrentlyInRange.contains(profile.getId()))
+                                                         ^
+    symbol:   method getId()
+    location: variable profile of type GameProfile
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\modules\Utility\DiscordNotifications.java:187: error: cannot find 
+symbol
+                  handleMessage(profile.getName() + " has left visual range!", MessageType.PLAYER_RANGE);
+                                       ^
+    symbol:   method getName()
+    location: variable profile of type GameProfile
+  C:\Users\cozid\oma\src\main\java\dev\oma\addon\util\RotationUtils.java:245: error: cannot find symbol
+          Vec3d feetPos = entity.getPos();
+                                ^
+    symbol:   method getPos()
+    location: variable entity of type Entity
+  41 errors
+  5 warnings
+
+* Try:
+> Check your code and dependencies to fix the compilation error(s)
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+
+BUILD FAILED in 13s

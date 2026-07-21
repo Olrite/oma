@@ -1,6 +1,6 @@
 {
     "required": false,
-    "package": "dev.cozi.addon.mixin.xaero",
+    "package": "dev.oma.addon.mixin.xaero",
     "compatibilityLevel": "JAVA_21",
     "client": [],
     "injectors": {
