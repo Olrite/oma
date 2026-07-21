@@ -14,7 +14,7 @@ A 2b2t Meteor Client addon mainly for basehunting and quality of life improvemen
 
 Check out the branch matching your Minecraft version before building/installing.
 
-## Install (releases)
+## Install (Pre-Built JAR)
 
 Download the JAR for your Minecraft version from [GitHub Releases](https://github.com/Olrite/oma/releases) and place the matching JAR in your `mods` folder alongside the correct Meteor Client version.
 
@@ -40,52 +40,31 @@ On Windows:
 
 The built JAR is in `build/libs/`.
 
+
 **Java requirements:**
 
 - `legacy/*` branches: Java **21**
 - `master` (26.1.2): Java **25**
 
-
-
 # Modules
-
-
-
 ### Utility
-
 - AutoLog Plus, Auto Shulker, Elytra Swap, Chat Tracker, Player History
 - DiscordNotifications, PortalMaker, AntiSpam, Dub Counter, GrimAirPlace, Map Exporter
 
-
-
 ### Renders
-
 - SignRender, ChestESP, VanityESP, Mob Item ESP, PearlOwner
 
-
-
 ### Movement
-
 - Elytra Redeploy, Pitch40Util, SearchArea, AFKVanillaFly, GrimScaffold
 
-
-
 ### Hunting
-
 - StashFinderPlus, NewChunksPlus, TrailFollower (requires Baritone)
 
-
-
 ### HUD
-
 - TotemCount, CrystalCount, Dub Count, Sign Display, ETA, Lag Detector, EntityList
 
-
-
 ## Credits
-
 Credit to [xqyet](https://github.com/xqyet), [Asteroide](https://github.com/asteroide-development), [miles352](https://github.com/miles352), [dekrom](https://github.com/dekrom), and [etianl](https://github.com/etianl) for some of the modules that I built upon.
 
 ## Disclaimer
-
 Review the code yourself before use. This is a utility addon for anarchy servers; use at your own risk.
