@@ -10,6 +10,8 @@
   "contact": {
     "sources": "https://github.com/Olrite/oma"
   },
+  "license": "AGPL-3.0-only",
+
   "icon": "assets/Main/icon.png",
   "environment": "client",
   "entrypoints": {
