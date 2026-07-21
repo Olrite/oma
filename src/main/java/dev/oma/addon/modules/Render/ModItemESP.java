@@ -12,7 +12,16 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.monster.*;
+import net.minecraft.world.entity.monster.piglin.Piglin;
+import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
+import net.minecraft.world.entity.monster.zombie.Zombie;
+import net.minecraft.world.entity.monster.zombie.Husk;
+import net.minecraft.world.entity.monster.zombie.Drowned;
+import net.minecraft.world.entity.monster.zombie.ZombifiedPiglin;
+import net.minecraft.world.entity.monster.skeleton.Skeleton;
+import net.minecraft.world.entity.monster.skeleton.Stray;
+import net.minecraft.world.entity.monster.skeleton.WitherSkeleton;
+import net.minecraft.world.entity.monster.skeleton.Bogged;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.phys.AABB;
@@ -253,28 +262,28 @@ public class ModItemESP extends Module {
     }
 
     private boolean isTargetMob(Entity entity) {
-        if (entity instanceof ZombieEntity && showZombies.get()) return true;
-        if (entity instanceof SkeletonEntity && showSkeletons.get()) return true;
-        if (entity instanceof StrayEntity && showStrays.get()) return true;
-        if (entity instanceof WitherSkeletonEntity && showWitherSkeletons.get()) return true;
-        if (entity instanceof HuskEntity && showHusks.get()) return true;
-        if (entity instanceof ZombifiedPiglinEntity && showZombifiedPiglins.get()) return true;
-        if (entity instanceof PiglinEntity && showPiglins.get()) return true;
-        if (entity instanceof BoggedEntity && showBogged.get()) return true;
-        if (entity instanceof DrownedEntity && showDrowned.get()) return true;
+        if (entity instanceof Zombie && showZombies.get()) return true;
+        if (entity instanceof Skeleton && showSkeletons.get()) return true;
+        if (entity instanceof Stray && showStrays.get()) return true;
+        if (entity instanceof WitherSkeleton && showWitherSkeletons.get()) return true;
+        if (entity instanceof Husk && showHusks.get()) return true;
+        if (entity instanceof ZombifiedPiglin && showZombifiedPiglins.get()) return true;
+        if (entity instanceof Piglin && showPiglins.get()) return true;
+        if (entity instanceof Bogged && showBogged.get()) return true;
+        if (entity instanceof Drowned && showDrowned.get()) return true;
         return false;
     }
 
     private String getMobTypeName(Entity entity) {
-        if (entity instanceof ZombieEntity) return "Zombie";
-        if (entity instanceof SkeletonEntity) return "Skeleton";
-        if (entity instanceof StrayEntity) return "Stray";
-        if (entity instanceof WitherSkeletonEntity) return "Wither Skeleton";
-        if (entity instanceof HuskEntity) return "Husk";
-        if (entity instanceof ZombifiedPiglinEntity) return "Zombified Piglin";
-        if (entity instanceof PiglinEntity) return "Piglin";
-        if (entity instanceof BoggedEntity) return "Bogged";
-        if (entity instanceof DrownedEntity) return "Drowned";
+        if (entity instanceof Zombie) return "Zombie";
+        if (entity instanceof Skeleton) return "Skeleton";
+        if (entity instanceof Stray) return "Stray";
+        if (entity instanceof WitherSkeleton) return "Wither Skeleton";
+        if (entity instanceof Husk) return "Husk";
+        if (entity instanceof ZombifiedPiglin) return "Zombified Piglin";
+        if (entity instanceof Piglin) return "Piglin";
+        if (entity instanceof Bogged) return "Bogged";
+        if (entity instanceof Drowned) return "Drowned";
         return entity.getType().toString().replace("minecraft:", "").replace("_", " ");
     }
 
@@ -282,43 +291,43 @@ public class ModItemESP extends Module {
         if (item.isEmpty()) return false;
 
         // List of items that mobs wouldn't normally spawn with
-        return item.isOf(Items.SHULKER_BOX) ||
-               item.isOf(Items.ENDER_CHEST) ||
-               item.isOf(Items.ENDER_PEARL) ||
-               item.isOf(Items.ENDER_EYE) ||
-               item.isOf(Items.NETHER_STAR) ||
-               item.isOf(Items.BEACON) ||
-               item.isOf(Items.DRAGON_EGG) ||
-               item.isOf(Items.TOTEM_OF_UNDYING) ||
-               item.isOf(Items.ELYTRA) ||
-               item.isOf(Items.TRIDENT) ||
-               item.isOf(Items.CROSSBOW) ||
-               item.isOf(Items.SHIELD) ||
-               item.isOf(Items.ARROW) ||
-               item.isOf(Items.SPECTRAL_ARROW) ||
-               item.isOf(Items.TIPPED_ARROW) ||
-               item.isOf(Items.ENCHANTED_BOOK) ||
-               item.isOf(Items.NAME_TAG) ||
-               item.isOf(Items.SADDLE) ||
-               item.isOf(Items.DIAMOND_HORSE_ARMOR) ||
-               item.isOf(Items.GOLDEN_HORSE_ARMOR) ||
-               item.isOf(Items.IRON_HORSE_ARMOR) ||
-               item.isOf(Items.LEATHER_HORSE_ARMOR) ||
-               item.isOf(Items.MUSIC_DISC_11) ||
-               item.isOf(Items.MUSIC_DISC_13) ||
-               item.isOf(Items.MUSIC_DISC_BLOCKS) ||
-               item.isOf(Items.MUSIC_DISC_CAT) ||
-               item.isOf(Items.MUSIC_DISC_CHIRP) ||
-               item.isOf(Items.MUSIC_DISC_FAR) ||
-               item.isOf(Items.MUSIC_DISC_MALL) ||
-               item.isOf(Items.MUSIC_DISC_MELLOHI) ||
-               item.isOf(Items.MUSIC_DISC_PIGSTEP) ||
-               item.isOf(Items.MUSIC_DISC_STAL) ||
-               item.isOf(Items.MUSIC_DISC_STRAD) ||
-               item.isOf(Items.MUSIC_DISC_WAIT) ||
-               item.isOf(Items.MUSIC_DISC_WARD) ||
-               item.isOf(Items.MUSIC_DISC_5) ||
-               item.isOf(Items.MUSIC_DISC_OTHERSIDE) ||
-               item.isOf(Items.MUSIC_DISC_RELIC);
+        return item.getItem() == Items.SHULKER_BOX ||
+               item.getItem() == Items.ENDER_CHEST ||
+               item.getItem() == Items.ENDER_PEARL ||
+               item.getItem() == Items.ENDER_EYE ||
+               item.getItem() == Items.NETHER_STAR ||
+               item.getItem() == Items.BEACON ||
+               item.getItem() == Items.DRAGON_EGG ||
+               item.getItem() == Items.TOTEM_OF_UNDYING ||
+               item.getItem() == Items.ELYTRA ||
+               item.getItem() == Items.TRIDENT ||
+               item.getItem() == Items.CROSSBOW ||
+               item.getItem() == Items.SHIELD ||
+               item.getItem() == Items.ARROW ||
+               item.getItem() == Items.SPECTRAL_ARROW ||
+               item.getItem() == Items.TIPPED_ARROW ||
+               item.getItem() == Items.ENCHANTED_BOOK ||
+               item.getItem() == Items.NAME_TAG ||
+               item.getItem() == Items.SADDLE ||
+               item.getItem() == Items.DIAMOND_HORSE_ARMOR ||
+               item.getItem() == Items.GOLDEN_HORSE_ARMOR ||
+               item.getItem() == Items.IRON_HORSE_ARMOR ||
+               item.getItem() == Items.LEATHER_HORSE_ARMOR ||
+               item.getItem() == Items.MUSIC_DISC_11 ||
+               item.getItem() == Items.MUSIC_DISC_13 ||
+               item.getItem() == Items.MUSIC_DISC_BLOCKS ||
+               item.getItem() == Items.MUSIC_DISC_CAT ||
+               item.getItem() == Items.MUSIC_DISC_CHIRP ||
+               item.getItem() == Items.MUSIC_DISC_FAR ||
+               item.getItem() == Items.MUSIC_DISC_MALL ||
+               item.getItem() == Items.MUSIC_DISC_MELLOHI ||
+               item.getItem() == Items.MUSIC_DISC_PIGSTEP ||
+               item.getItem() == Items.MUSIC_DISC_STAL ||
+               item.getItem() == Items.MUSIC_DISC_STRAD ||
+               item.getItem() == Items.MUSIC_DISC_WAIT ||
+               item.getItem() == Items.MUSIC_DISC_WARD ||
+               item.getItem() == Items.MUSIC_DISC_5 ||
+               item.getItem() == Items.MUSIC_DISC_OTHERSIDE ||
+               item.getItem() == Items.MUSIC_DISC_RELIC;
     }
 }

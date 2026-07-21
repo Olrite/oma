@@ -93,13 +93,13 @@ public class MapExporter extends Module {
         checkDelay = 0;
 
         // Check held item
-        ItemStack held = mc.player.getMainHandStack();
+        ItemStack held = mc.player.getMainHandItem();
         if (held.getItem() == Items.FILLED_MAP) {
             saveMapImage(held);
         }
 
         // Check off-hand
-        ItemStack offHand = mc.player.getOffHandStack();
+        ItemStack offHand = mc.player.getOffhandItem();
         if (offHand.getItem() == Items.FILLED_MAP) {
             saveMapImage(offHand);
         }
@@ -126,7 +126,7 @@ public class MapExporter extends Module {
         if (savedMaps.contains(id)) return;
 
         // Get the map state from the world
-        MapItemSavedData mapState = mc.level.getMapState(mapId);
+        MapItemSavedData mapState = mc.level.getMapData(mapId);
         if (mapState == null || mapState.colors == null) return;
 
         try {
@@ -184,7 +184,7 @@ public class MapExporter extends Module {
         switch (nameFormat.get()) {
             case MapName -> {
                 // Try to get custom map name from item
-                Component customName = mapStack.getName();
+                Component customName = mapStack.getHoverName();
                 String mapName = customName.getString();
 
                 // Clean the name for filename
@@ -236,17 +236,17 @@ public class MapExporter extends Module {
 
         // Try to get RGB from map color palette
         try {
-            net.minecraft.world.level.block.MapColor mapColor = net.minecraft.world.level.block.MapColor.get(baseIndex);
+            net.minecraft.world.level.material.MapColor mapColor = net.minecraft.world.level.material.MapColor.byId(baseIndex);
             if (mapColor != null) {
                 // MapColor stores color as int, access it via reflection if needed
                 // But first try the render color method with different shade calculation
 
                 // Shade multipliers: 0 = 180/255, 1 = 220/255, 2 = 255/255, 3 = 135/255
-                int rgb = mapColor.getRenderColor(shade);
+                int rgb = mapColor.calculateARGBColor(net.minecraft.world.level.material.MapColor.Brightness.byId(shade));
 
                 // If getRenderColor returns 0, try getting the base color directly
-                if (rgb == 0 && mapColor.color != 0) {
-                    rgb = mapColor.color;
+                if (rgb == 0 && mapColor.id != 0) {
+                    rgb = mapColor.id;
 
                     // Apply shade manually
                     int r = (rgb >> 16) & 0xFF;

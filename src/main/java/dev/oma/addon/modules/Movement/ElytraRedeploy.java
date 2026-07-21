@@ -76,7 +76,7 @@ public class ElytraRedeploy extends Module {
         }
 
         boolean isCurrentlyFlying = mc.player.isFallFlying();
-        boolean isOnGround = mc.player.isOnGround();
+        boolean isOnGround = mc.player.onGround();
 
         // Track if player was flying
         if (isCurrentlyFlying) {
@@ -106,7 +106,7 @@ public class ElytraRedeploy extends Module {
         if (wasFlying && isOnGround && !isCurrentlyFlying && !waitingToActivate) {
             // Check forward movement requirement
             if (requireForwardMovement.get()) {
-                boolean isMovingForward = mc.options.forwardKey.isPressed();
+                boolean isMovingForward = mc.options.keyUp.isDown();
                 if (!isMovingForward) {
                     wasFlying = false;
                     return;
@@ -117,7 +117,7 @@ public class ElytraRedeploy extends Module {
             
             if (tickCounter >= tickDelay.get()) {
                 // Jump and mark as waiting to activate
-                mc.player.jump();
+                mc.player.jumpFromGround();
                 waitingToActivate = true;
                 tickCounter = 0;
             }

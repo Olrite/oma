@@ -93,10 +93,10 @@ public class PearlOwner extends Module {
 
             // Culling check
             if (culling.get()) {
-                Vec3 cameraPos = mc.gameRenderer.getCamera().getCameraPos();
+                Vec3 cameraPos = mc.getCameraEntity().getEyePosition();
                 Vec3 pearlPos = pearl.position();
                 Vec3 cameraToEntity = pearlPos.subtract(cameraPos).normalize();
-                Vec3 cameraDirection = Vec3.fromPolar(mc.gameRenderer.getCamera().getXRot(), mc.gameRenderer.getCamera().getYRot()).normalize();
+                Vec3 cameraDirection = Vec3.directionFromRotation(mc.getCameraEntity().getXRot(), mc.getCameraEntity().getYRot()).normalize();
 
                 double dot = cameraDirection.dot(cameraToEntity);
                 if (dot < cullingDotValue.get()) continue;
@@ -112,7 +112,7 @@ public class PearlOwner extends Module {
             }
 
             // Calculate render position above the pearl
-            pos.set(pearl.getX(), pearl.getY() + pearl.getHeight() + 0.5, pearl.getZ());
+            pos.set(pearl.getX(), pearl.getY() + pearl.getBbHeight() + 0.5, pearl.getZ());
 
             // Convert 3D position to 2D screen coordinates
             if (NametagUtils.to2D(pos, scale.get())) {

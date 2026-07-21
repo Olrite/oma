@@ -39,7 +39,7 @@ public class SearchAreaMode
 
     public void onDeactivate()
     {
-        setPressed(mc.options.forwardKey, false);
+        setPressed(mc.options.keyUp, false);
     }
 
     public void disable()
@@ -63,7 +63,7 @@ public class SearchAreaMode
         // Fix issue where "null" gets saved to the file creating crashes when it gets loaded next time.
         if (pd == null) return;
         // last pos doesn't matter if disconnecting while going to start
-        if (!goingToStart) pd.currPos = mc.player.getBlockPos();
+        if (!goingToStart) pd.currPos = mc.player.blockPosition();
         try {
             File file = getJsonFile(type.toString());
             if (file == null) return;

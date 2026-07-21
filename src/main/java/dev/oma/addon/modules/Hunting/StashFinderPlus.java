@@ -219,8 +219,8 @@ public class StashFinderPlus extends Module
     public void onChunkData(ChunkDataEvent event) {
         if (event.seenChunk()) return;
         // Check the distance.
-        double chunkXAbs = Math.abs(event.chunk().getPos().x * 16);
-        double chunkZAbs = Math.abs(event.chunk().getPos().z * 16);
+        double chunkXAbs = Math.abs(event.chunk().getPos().x() * 16);
+        double chunkZAbs = Math.abs(event.chunk().getPos().z() * 16);
         if (Math.sqrt(chunkXAbs * chunkXAbs + chunkZAbs * chunkZAbs) < minimumDistance.get()) return;
 
         Chunk chunk = new Chunk(event.chunk().getPos());
@@ -231,15 +231,15 @@ public class StashFinderPlus extends Module
         PaletteNewChunks paletteNewChunks = ModuleManager.getModule(PaletteNewChunks.class);
         boolean is119NewChunk = paletteNewChunks
             .isNewChunk(
-                chunkPos.x,
-                chunkPos.z,
+                chunkPos.x(),
+                chunkPos.z(),
                 currentDimension
             );
 
         boolean is112OldChunk = ModuleManager.getModule(OldChunks.class)
             .isOldChunk(
-                chunkPos.x,
-                chunkPos.z,
+                chunkPos.x(),
+                chunkPos.z(),
                 currentDimension
             );
 
@@ -249,7 +249,7 @@ public class StashFinderPlus extends Module
         for (BlockEntity blockEntity : event.chunk().getBlockEntities().values()) {
             if (!storageBlocks.get().contains(blockEntity.getType())) continue;
 
-            Block blockUnder = mc.level.getBlockState(blockEntity.getBlockPos().down()).getBlock();
+            Block blockUnder = mc.level.getBlockState(blockEntity.getBlockPos().below()).getBlock();
             if (ignoreTrialChambers.get() && blockUnder.equals(Blocks.WAXED_OXIDIZED_CUT_COPPER) ||
                 blockUnder.equals(Blocks.TUFF_BRICKS) || blockUnder.equals(Blocks.WAXED_COPPER_BLOCK) ||
                 blockUnder.equals(Blocks.WAXED_OXIDIZED_COPPER))
@@ -303,7 +303,7 @@ public class StashFinderPlus extends Module
                         String json = "{\"embeds\": [{" +
                             "\"title\": \"Stash Found!\"," +
                             "\"color\": 2154012," +
-                            "\"description\": \"Coordinates: || X: " + chunk.x + " Z: " + chunk.z + "|| in " + chunkType + " chunks in the" + currentDimension.getValue().getPath() + "\"," +
+                            "\"description\": \"Coordinates: || X: " + chunk.x + " Z: " + chunk.z + "|| in " + chunkType + " chunks in the" + currentDimension.identifier().getPath() + "\"," +
                             "\"fields\": [" +
                                 "{" +
                                     "\"name\": \"Chests\"," +
@@ -674,8 +674,8 @@ public class StashFinderPlus extends Module
         }
 
         public void calculatePos() {
-            x = chunkPos.x * 16 + 8;
-            z = chunkPos.z * 16 + 8;
+            x = chunkPos.x() * 16 + 8;
+            z = chunkPos.z() * 16 + 8;
         }
 
         public int getTotal() {

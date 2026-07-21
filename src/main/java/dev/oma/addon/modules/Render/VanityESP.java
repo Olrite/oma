@@ -15,6 +15,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.decoration.ItemFrame;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -177,7 +178,7 @@ public class VanityESP extends Module {
         tickCounter = 0;
 
         // Check if player moved to a new chunk
-        BlockPos playerPos = mc.player.getBlockPos();
+        BlockPos playerPos = mc.player.blockPosition();
         int currentChunkX = playerPos.getX() >> 4;
         int currentChunkZ = playerPos.getZ() >> 4;
         
@@ -203,7 +204,7 @@ public class VanityESP extends Module {
         // Render item frames
         if (showItemFrames.get()) {
             for (BlockPos pos : itemFrames) {
-                if (mc.player.getBlockPos().getSquaredDistance(pos) > maxDist) continue;
+                if (mc.player.blockPosition().distSqr(pos) > maxDist) continue;
                 
                 event.renderer.box(
                     pos.getX(), pos.getY(), pos.getZ(),
@@ -217,7 +218,7 @@ public class VanityESP extends Module {
         // Render banners
         if (showBanners.get()) {
             for (BlockPos pos : banners) {
-                if (mc.player.getBlockPos().getSquaredDistance(pos) > maxDist) continue;
+                if (mc.player.blockPosition().distSqr(pos) > maxDist) continue;
                 
                 event.renderer.box(
                     pos.getX(), pos.getY(), pos.getZ(),
@@ -238,7 +239,7 @@ public class VanityESP extends Module {
         banners.clear();
 
         double maxDist = maxDistance.get();
-        BlockPos playerPos = mc.player.getBlockPos();
+        BlockPos playerPos = mc.player.blockPosition();
         long currentTime = System.currentTimeMillis();
 
         // Get chunks around player (reduced radius for performance)
@@ -250,12 +251,12 @@ public class VanityESP extends Module {
 
         for (int chunkX = centerChunkX - chunkRadius; chunkX <= centerChunkX + chunkRadius; chunkX++) {
             for (int chunkZ = centerChunkZ - chunkRadius; chunkZ <= centerChunkZ + chunkRadius; chunkZ++) {
-                Chunk chunk = mc.level.getChunk(chunkX, chunkZ);
+                LevelChunk chunk = mc.level.getChunk(chunkX, chunkZ);
                 if (chunk == null) continue;
 
                 // Check block entities (banners) - much more efficient
                 if (showBanners.get()) {
-                    for (BlockPos pos : chunk.getBlockEntityPositions()) {
+                    for (BlockPos pos : chunk.getBlockEntities().keySet()) {
                         // Check cache first
                         if (enableCaching.get() && bannerCache.containsKey(pos)) {
                             if (currentTime - bannerCache.get(pos) < cacheTimeout.get() * 50L) {
@@ -266,7 +267,7 @@ public class VanityESP extends Module {
                         
                         BlockEntity blockEntity = chunk.getBlockEntity(pos);
                         if (blockEntity instanceof BannerBlockEntity) {
-                            if (playerPos.getSquaredDistance(pos) <= maxDist * maxDist) {
+                            if (playerPos.distSqr(pos) <= maxDist * maxDist) {
                                 banners.add(pos);
                                 if (enableCaching.get()) {
                                     bannerCache.put(pos, currentTime);
@@ -290,8 +291,8 @@ public class VanityESP extends Module {
                 entityCount++;
                 
                 if (entity instanceof ItemFrame) {
-                    BlockPos pos = entity.getBlockPos();
-                    if (playerPos.getSquaredDistance(pos) <= maxDist * maxDist) {
+                    BlockPos pos = entity.blockPosition();
+                    if (playerPos.distSqr(pos) <= maxDist * maxDist) {
                         itemFrames.add(pos);
                         if (enableCaching.get()) {
                             itemFrameCache.put(pos, currentTime);
@@ -315,7 +316,7 @@ public class VanityESP extends Module {
         long currentTime = System.currentTimeMillis();
         long timeout = cacheTimeout.get() * 50L; // Convert ticks to milliseconds
         double maxDist = maxDistance.get();
-        BlockPos playerPos = mc.player.getBlockPos();
+        BlockPos playerPos = mc.player.blockPosition();
 
         // Remove expired items from cache
         itemFrameCache.entrySet().removeIf(entry -> currentTime - entry.getValue() > timeout);
@@ -327,13 +328,13 @@ public class VanityESP extends Module {
 
         // Add cached items that are still within distance
         for (BlockPos pos : itemFrameCache.keySet()) {
-            if (playerPos.getSquaredDistance(pos) <= maxDist * maxDist) {
+            if (playerPos.distSqr(pos) <= maxDist * maxDist) {
                 itemFrames.add(pos);
             }
         }
 
         for (BlockPos pos : bannerCache.keySet()) {
-            if (playerPos.getSquaredDistance(pos) <= maxDist * maxDist) {
+            if (playerPos.distSqr(pos) <= maxDist * maxDist) {
                 banners.add(pos);
             }
         }

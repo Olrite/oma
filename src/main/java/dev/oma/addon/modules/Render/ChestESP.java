@@ -24,6 +24,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -226,7 +227,7 @@ public class ChestESP extends Module {
         
         // Check if we're opening a chest screen
         if (event.screen instanceof ContainerScreen chestScreen) {
-            AbstractContainerMenu handler = chestScreen.getScreenHandler();
+            AbstractContainerMenu handler = chestScreen.getMenu();
             
             // Check if this is a chest (not a shulker box or other container)
             if (handler instanceof ChestMenu genericHandler) {
@@ -279,7 +280,7 @@ public class ChestESP extends Module {
         if (!renderChests.get() || mc.level == null || mc.player == null) return;
 
         for (BlockPos chestPos : chestsWithShulkers) {
-            if (mc.player.getBlockPos().getSquaredDistance(chestPos) > maxDistance.get() * maxDistance.get()) {
+            if (mc.player.blockPosition().distSqr(chestPos) > maxDistance.get() * maxDistance.get()) {
                 continue;
             }
 
@@ -294,7 +295,7 @@ public class ChestESP extends Module {
             // If this is a double chest, also render the other half
             if (supportDoubleChests.get() && doubleChestPairs.containsKey(chestPos)) {
                 BlockPos otherHalf = doubleChestPairs.get(chestPos);
-                if (mc.player.getBlockPos().getSquaredDistance(otherHalf) <= maxDistance.get() * maxDistance.get()) {
+                if (mc.player.blockPosition().distSqr(otherHalf) <= maxDistance.get() * maxDistance.get()) {
                     event.renderer.box(
                         otherHalf.getX(), otherHalf.getY(), otherHalf.getZ(),
                         otherHalf.getX() + 1, otherHalf.getY() + boxHeight.get(), otherHalf.getZ() + 1,
@@ -315,16 +316,16 @@ public class ChestESP extends Module {
             return;
         }
         
-        List<Chunk> loadedChunks = getLoadedChunks();
+        List<LevelChunk> loadedChunks = getLoadedChunks();
         int totalChests = 0;
         int chestsWithShulkersCount = 0;
         
-        for (Chunk chunk : loadedChunks) {
-            for (BlockPos pos : chunk.getBlockEntityPositions()) {
+        for (LevelChunk chunk : loadedChunks) {
+            for (BlockPos pos : chunk.getBlockEntities().keySet()) {
                 BlockEntity blockEntity = chunk.getBlockEntity(pos);
                 
                 if (blockEntity instanceof ChestBlockEntity chestEntity) {
-                    double distance = mc.player.position().distanceTo(pos.toCenterPos());
+                    double distance = mc.player.position().distanceTo(pos.getCenter());
                     
                     if (distance <= maxDistance.get()) {
                         totalChests++;
@@ -346,7 +347,7 @@ public class ChestESP extends Module {
         
         // Add remembered chests (those that were previously seen with shulkers)
         for (BlockPos rememberedChest : chestMemory.keySet()) {
-            double distance = mc.player.position().distanceTo(rememberedChest.toCenterPos());
+            double distance = mc.player.position().distanceTo(rememberedChest.getCenter());
             if (distance <= maxDistance.get()) {
                 currentChests.add(rememberedChest);
                 chestsWithShulkersCount++;
@@ -365,7 +366,7 @@ public class ChestESP extends Module {
         if (mc.player == null) return;
         
         int shulkerCount = 0;
-        int totalSlots = mc.player.getInventory().size();
+        int totalSlots = mc.player.getInventory().getContainerSize();
         
         if (showDebugInfo.get()) {
             info("Testing player inventory with " + totalSlots + " slots");
@@ -395,7 +396,7 @@ public class ChestESP extends Module {
     private boolean chestContainsShulker(ChestBlockEntity chestEntity) {
         // Check if the chest inventory contains any shulker boxes
         try {
-            int inventorySize = chestEntity.size();
+            int inventorySize = chestEntity.getContainerSize();
             if (showDebugInfo.get()) {
                 info("Checking chest with " + inventorySize + " slots");
             }
@@ -468,17 +469,17 @@ public class ChestESP extends Module {
         return false;
     }
 
-    private List<Chunk> getLoadedChunks() {
-        List<Chunk> chunks = new ArrayList<>();
-        BlockPos playerPos = mc.player.getBlockPos();
-        int renderDistance = mc.options.getViewDistance().getValue();
+    private List<LevelChunk> getLoadedChunks() {
+        List<LevelChunk> chunks = new ArrayList<>();
+        BlockPos playerPos = mc.player.blockPosition();
+        int renderDistance = mc.options.renderDistance().get();
         
         for (int x = -renderDistance; x <= renderDistance; x++) {
             for (int z = -renderDistance; z <= renderDistance; z++) {
                 int chunkX = (playerPos.getX() >> 4) + x;
                 int chunkZ = (playerPos.getZ() >> 4) + z;
                 
-                if (mc.level.isChunkLoaded(chunkX, chunkZ)) {
+                if (mc.level.hasChunk(chunkX, chunkZ)) {
                     chunks.add(mc.level.getChunk(chunkX, chunkZ));
                 }
             }
@@ -537,14 +538,14 @@ public class ChestESP extends Module {
         if (mc.level == null || mc.player == null) return;
         
         // Check all chests in a small radius around the player
-        List<Chunk> loadedChunks = getLoadedChunks();
+        List<LevelChunk> loadedChunks = getLoadedChunks();
         
-        for (Chunk chunk : loadedChunks) {
-            for (BlockPos pos : chunk.getBlockEntityPositions()) {
+        for (LevelChunk chunk : loadedChunks) {
+            for (BlockPos pos : chunk.getBlockEntities().keySet()) {
                 BlockEntity blockEntity = chunk.getBlockEntity(pos);
                 
                 if (blockEntity instanceof ChestBlockEntity chestEntity) {
-                    double distance = mc.player.position().distanceTo(pos.toCenterPos());
+                    double distance = mc.player.position().distanceTo(pos.getCenter());
                     
                     if (distance <= 3.0) { // Very close chests
                         if (showDebugInfo.get()) {
@@ -569,7 +570,7 @@ public class ChestESP extends Module {
         if (mc.player == null || mc.level == null) return;
         
         // Check if we're currently in a chest screen
-        if (mc.player.currentScreenHandler instanceof ChestMenu handler) {
+        if (mc.player.containerMenu instanceof ChestMenu handler) {
             // This is a chest or shulker box screen
             int containerSlots = handler.slots.size() - 36; // Subtract player inventory
             
@@ -615,19 +616,19 @@ public class ChestESP extends Module {
     private BlockPos findClosestChestToPlayer() {
         if (mc.player == null || mc.level == null) return null;
         
-        List<Chunk> loadedChunks = getLoadedChunks();
+        List<LevelChunk> loadedChunks = getLoadedChunks();
         BlockPos closestChest = null;
         double closestDistance = Double.MAX_VALUE;
         
-        for (Chunk chunk : loadedChunks) {
-            for (BlockPos pos : chunk.getBlockEntityPositions()) {
+        for (LevelChunk chunk : loadedChunks) {
+            for (BlockPos pos : chunk.getBlockEntities().keySet()) {
                 BlockEntity blockEntity = chunk.getBlockEntity(pos);
                 
                 if (blockEntity instanceof ChestBlockEntity chestEntity) {
-                    double distance = mc.player.position().distanceTo(pos.toCenterPos());
+                    double distance = mc.player.position().distanceTo(pos.getCenter());
                     
                     // If this chest is close and has the right size
-                    if (distance <= 6.0 && chestEntity.size() == 27) {
+                    if (distance <= 6.0 && chestEntity.getContainerSize() == 27) {
                         if (distance < closestDistance) {
                             closestDistance = distance;
                             closestChest = pos;
@@ -646,7 +647,7 @@ public class ChestESP extends Module {
         if (mc.player == null || mc.level == null) return positions;
         
         try {
-            List<Chunk> loadedChunks = getLoadedChunks();
+            List<LevelChunk> loadedChunks = getLoadedChunks();
             
             if (containerSlots == 27) {
                 // Single chest - find the closest one
@@ -656,15 +657,15 @@ public class ChestESP extends Module {
                 }
             } else if (containerSlots == 54) {
                 // Double chest - find both chest blocks
-                for (Chunk chunk : loadedChunks) {
-                    for (BlockPos pos : chunk.getBlockEntityPositions()) {
+                for (LevelChunk chunk : loadedChunks) {
+                    for (BlockPos pos : chunk.getBlockEntities().keySet()) {
                         BlockEntity blockEntity = chunk.getBlockEntity(pos);
                         
                         if (blockEntity instanceof ChestBlockEntity chestEntity) {
-                            double distance = mc.player.position().distanceTo(pos.toCenterPos());
+                            double distance = mc.player.position().distanceTo(pos.getCenter());
                             
                             // If this chest is close and has the right size
-                            if (distance <= 6.0 && chestEntity.size() == 27) {
+                            if (distance <= 6.0 && chestEntity.getContainerSize() == 27) {
                                 // Check if this chest has a partner (double chest)
                                 BlockPos partner = findDoubleChestPartner(pos);
                                 if (partner != null) {
@@ -703,7 +704,7 @@ public class ChestESP extends Module {
         Direction[] directions = {Direction.NORTH, Direction.SOUTH, Direction.EAST, Direction.WEST};
         
         for (Direction direction : directions) {
-            BlockPos adjacentPos = chestPos.offset(direction);
+            BlockPos adjacentPos = chestPos.relative(direction);
             BlockEntity adjacentEntity = mc.level.getBlockEntity(adjacentPos);
             
             if (adjacentEntity instanceof ChestBlockEntity) {
@@ -770,7 +771,7 @@ public class ChestESP extends Module {
         
         info("Testing shulker box detection with all items in inventory...");
         
-        int totalSlots = mc.player.getInventory().size();
+        int totalSlots = mc.player.getInventory().getContainerSize();
         int shulkerCount = 0;
         int testedItems = 0;
         

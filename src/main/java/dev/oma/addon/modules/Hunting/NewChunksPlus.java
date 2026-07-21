@@ -36,6 +36,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.biome.Biomes;
 import net.minecraft.world.level.chunk.*;
+import net.minecraft.world.level.chunk.status.ChunkStatus;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.nio.charset.StandardCharsets;
@@ -411,7 +412,7 @@ public class NewChunksPlus extends Module {
 			clearChunkData();
 		}
 		if (save.get() || load.get() && mc.level != null) {
-			world= mc.level.dimension().getValue().toString().replace(':', '_');
+			world= mc.level.dimension().identifier().toString().replace(':', '_');
 			if (mc.isSingleplayer()){
 				String[] array = mc.getSingleplayerServer().getWorldPath(LevelResource.ROOT).toString().replace(':', '_').split("/|\\\\");
 				serverip=array[array.length-2];
@@ -479,7 +480,7 @@ public class NewChunksPlus extends Module {
 	}
 	@EventHandler
 	private void onPreTick(TickEvent.Pre event) {
-		world= mc.level.dimension().getValue().toString().replace(':', '_');
+		world= mc.level.dimension().identifier().toString().replace(':', '_');
 
 		if (deletewarningTicks<=100) deletewarningTicks++;
 		else deletewarning=0;
@@ -583,7 +584,7 @@ public class NewChunksPlus extends Module {
 		if (newChunksLineColor.get().a > 5 || newChunksSideColor.get().a > 5) {
 			synchronized (newChunks) {
 				for (ChunkPos c : newChunks) {
-					if (c != null && playerPos.closerToCenterThan(new BlockPos(c.getMiddleBlockX(), renderHeight.get(), c.getMiddleBlockZ()), renderDistance.get()*16)) {
+					if (c != null && Vec3.atCenterOf(playerPos).distanceToSqr(Vec3.atCenterOf(c.getMiddleBlockPosition(renderHeight.get()))) < Math.pow(renderDistance.get()*16, 2)) {
 						render(new AABB(new Vec3(c.getWorldPosition().getX(), c.getWorldPosition().getY()+renderHeight.get(), c.getWorldPosition().getZ()), new Vec3(c.getWorldPosition().getX()+16, c.getWorldPosition().getY()+renderHeight.get(), c.getWorldPosition().getZ()+16)), newChunksSideColor.get(), newChunksLineColor.get(), shapeMode.get(), event);
 					}
 				}
@@ -592,7 +593,7 @@ public class NewChunksPlus extends Module {
 		if (tickexploitChunksLineColor.get().a > 5 || tickexploitChunksSideColor.get().a > 5) {
 			synchronized (tickexploitChunks) {
 				for (ChunkPos c : tickexploitChunks) {
-					if (c != null && playerPos.closerToCenterThan(new BlockPos(c.getMiddleBlockX(), renderHeight.get(), c.getMiddleBlockZ()), renderDistance.get()*16)) {
+					if (c != null && Vec3.atCenterOf(playerPos).distanceToSqr(Vec3.atCenterOf(c.getMiddleBlockPosition(renderHeight.get()))) < Math.pow(renderDistance.get()*16, 2)) {
 						if (detectmode.get()== DetectMode.BlockExploitMode && blockupdateexploit.get()) {
 							render(new AABB(new Vec3(c.getWorldPosition().getX(), c.getWorldPosition().getY()+renderHeight.get(), c.getWorldPosition().getZ()), new Vec3(c.getWorldPosition().getX()+16, c.getWorldPosition().getY()+renderHeight.get(), c.getWorldPosition().getZ()+16)), tickexploitChunksSideColor.get(), tickexploitChunksLineColor.get(), shapeMode.get(), event);
 						} else if ((detectmode.get()== DetectMode.Normal) && blockupdateexploit.get()) {
@@ -609,7 +610,7 @@ public class NewChunksPlus extends Module {
 		if (oldChunksLineColor.get().a > 5 || oldChunksSideColor.get().a > 5){
 			synchronized (oldChunks) {
 				for (ChunkPos c : oldChunks) {
-					if (c != null && playerPos.closerToCenterThan(new BlockPos(c.getMiddleBlockX(), renderHeight.get(), c.getMiddleBlockZ()), renderDistance.get()*16)) {
+					if (c != null && Vec3.atCenterOf(playerPos).distanceToSqr(Vec3.atCenterOf(c.getMiddleBlockPosition(renderHeight.get()))) < Math.pow(renderDistance.get()*16, 2)) {
 						render(new AABB(new Vec3(c.getWorldPosition().getX(), c.getWorldPosition().getY()+renderHeight.get(), c.getWorldPosition().getZ()), new Vec3(c.getWorldPosition().getX()+16, c.getWorldPosition().getY()+renderHeight.get(), c.getWorldPosition().getZ()+16)), oldChunksSideColor.get(), oldChunksLineColor.get(), shapeMode.get(), event);
 					}
 				}
@@ -618,7 +619,7 @@ public class NewChunksPlus extends Module {
 		if (beingUpdatedOldChunksLineColor.get().a > 5 || beingUpdatedOldChunksSideColor.get().a > 5){
 			synchronized (beingUpdatedOldChunks) {
 				for (ChunkPos c : beingUpdatedOldChunks) {
-					if (c != null && playerPos.closerToCenterThan(new BlockPos(c.getMiddleBlockX(), renderHeight.get(), c.getMiddleBlockZ()), renderDistance.get()*16)) {
+					if (c != null && Vec3.atCenterOf(playerPos).distanceToSqr(Vec3.atCenterOf(c.getMiddleBlockPosition(renderHeight.get()))) < Math.pow(renderDistance.get()*16, 2)) {
 						render(new AABB(new Vec3(c.getWorldPosition().getX(), c.getWorldPosition().getY()+renderHeight.get(), c.getWorldPosition().getZ()), new Vec3(c.getWorldPosition().getX()+16, c.getWorldPosition().getY()+renderHeight.get(), c.getWorldPosition().getZ()+16)), beingUpdatedOldChunksSideColor.get(), beingUpdatedOldChunksLineColor.get(), shapeMode.get(), event);
 					}
 				}
@@ -627,7 +628,7 @@ public class NewChunksPlus extends Module {
 		if (OldGenerationOldChunksLineColor.get().a > 5 || OldGenerationOldChunksSideColor.get().a > 5){
 			synchronized (OldGenerationOldChunks) {
 				for (ChunkPos c : OldGenerationOldChunks) {
-					if (c != null && playerPos.closerToCenterThan(new BlockPos(c.getMiddleBlockX(), renderHeight.get(), c.getMiddleBlockZ()), renderDistance.get()*16)) {
+					if (c != null && Vec3.atCenterOf(playerPos).distanceToSqr(Vec3.atCenterOf(c.getMiddleBlockPosition(renderHeight.get()))) < Math.pow(renderDistance.get()*16, 2)) {
 						render(new AABB(new Vec3(c.getWorldPosition().getX(), c.getWorldPosition().getY()+renderHeight.get(), c.getWorldPosition().getZ()), new Vec3(c.getWorldPosition().getX()+16, c.getWorldPosition().getY()+renderHeight.get(), c.getWorldPosition().getZ()+16)), OldGenerationOldChunksSideColor.get(), OldGenerationOldChunksLineColor.get(), shapeMode.get(), event);
 					}
 				}
@@ -646,12 +647,12 @@ public class NewChunksPlus extends Module {
 		if (event.packet instanceof ServerboundAcceptTeleportationPacket )return; //for some reason this packet keeps getting cast to other packets
 		if (!(event.packet instanceof ServerboundAcceptTeleportationPacket) && event.packet instanceof ClientboundSectionBlocksUpdatePacket packet && liquidexploit.get()) {
 
-			packet.visitUpdates((pos, state) -> {
-				ChunkPos chunkPos = new ChunkPos(pos);
-				if (!state.getFluidState().isEmpty() && !state.getFluidState().isStill()) {
+			packet.runUpdates((pos, state) -> {
+				ChunkPos chunkPos = ChunkPos.containing(pos);
+				if (!state.getFluidState().isEmpty() && !state.getFluidState().isSource()) {
 					for (Direction dir: searchDirs) {
 						try {
-							if (mc.level != null && mc.level.getBlockState(pos.offset(dir)).getFluidState().isStill() && (!OldGenerationOldChunks.contains(chunkPos) && !beingUpdatedOldChunks.contains(chunkPos) && !newChunks.contains(chunkPos) && !oldChunks.contains(chunkPos))) {
+							if (mc.level != null && mc.level.getBlockState(pos.relative(dir)).getFluidState().isSource() && (!OldGenerationOldChunks.contains(chunkPos) && !beingUpdatedOldChunks.contains(chunkPos) && !newChunks.contains(chunkPos) && !oldChunks.contains(chunkPos))) {
 								tickexploitChunks.remove(chunkPos);
 								newChunks.add(chunkPos);
 								if (save.get()){
@@ -665,7 +666,7 @@ public class NewChunksPlus extends Module {
 			});
 		}
 		else if (!(event.packet instanceof ServerboundAcceptTeleportationPacket) && event.packet instanceof ClientboundBlockUpdatePacket packet) {
-			ChunkPos chunkPos = new ChunkPos(packet.getPos());
+			ChunkPos chunkPos = ChunkPos.containing(packet.getPos());
 			if (blockupdateexploit.get()){
 				try {
 					if (!OldGenerationOldChunks.contains(chunkPos) && !beingUpdatedOldChunks.contains(chunkPos) && !tickexploitChunks.contains(chunkPos) && !oldChunks.contains(chunkPos) && !newChunks.contains(chunkPos)){
@@ -677,10 +678,10 @@ public class NewChunksPlus extends Module {
 				}
 				catch (Exception e){}
 			}
-			if (!packet.getState().getFluidState().isEmpty() && !packet.getState().getFluidState().isStill() && liquidexploit.get()) {
+			if (!packet.getBlockState().getFluidState().isEmpty() && !packet.getBlockState().getFluidState().isSource() && liquidexploit.get()) {
 				for (Direction dir: searchDirs) {
 					try {
-						if (mc.level != null && mc.level.getBlockState(packet.getPos().offset(dir)).getFluidState().isStill() && (!OldGenerationOldChunks.contains(chunkPos) && !beingUpdatedOldChunks.contains(chunkPos) && !newChunks.contains(chunkPos) && !oldChunks.contains(chunkPos))) {
+						if (mc.level != null && mc.level.getBlockState(packet.getPos().relative(dir)).getFluidState().isSource() && (!OldGenerationOldChunks.contains(chunkPos) && !beingUpdatedOldChunks.contains(chunkPos) && !newChunks.contains(chunkPos) && !oldChunks.contains(chunkPos))) {
 							tickexploitChunks.remove(chunkPos);
 							newChunks.add(chunkPos);
 							if (save.get()){
@@ -693,14 +694,17 @@ public class NewChunksPlus extends Module {
 			}
 		}
 		else if (!(event.packet instanceof ServerboundAcceptTeleportationPacket) && !(event.packet instanceof ServerboundMovePlayerPacket) && event.packet instanceof ClientboundLevelChunkWithLightPacket packet && mc.level != null) {
-			ChunkPos oldpos = new ChunkPos(packet.getChunkX(), packet.getChunkZ());
+			ChunkPos oldpos = new ChunkPos(packet.getX(), packet.getZ());
 
-			if (mc.level.getChunkSource().getChunk(packet.getChunkX(), packet.getChunkZ()) == null) {
+			if (mc.level.getChunkSource().getChunk(packet.getX(), packet.getZ(), ChunkStatus.FULL, false) == null) {
 				LevelChunk chunk = new LevelChunk(mc.level, oldpos);
 				try {
 					CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-						chunk.loadFromPacket(packet.getChunkData().getSectionsDataBuf(), null,
-								packet.getChunkData().getBlockEntities(packet.getChunkX(), packet.getChunkZ()));
+						var chunkData = packet.getChunkData();
+						chunk.replaceWithPacketData(
+								chunkData.getReadBuffer(),
+								chunkData.getHeightmaps(),
+								chunkData.getBlockEntitiesTagsConsumer(packet.getX(), packet.getZ()));
 					}, taskExecutor);
 					future.join();
 				} catch (CompletionException e) {}
@@ -711,12 +715,12 @@ public class NewChunksPlus extends Module {
 				boolean foundAnyOre = false;
 				boolean isNewOverworldGeneration = false;
 				boolean isNewNetherGeneration = false;
-				LevelChunkSection[] sections = chunk.getSectionArray();
+				LevelChunkSection[] sections = chunk.getSections();
 
-				if (overworldOldChunksDetector.get() && mc.level.dimension() == Level.OVERWORLD && chunk.getStatus().isAtLeast(ChunkStatus.FULL) && !chunk.isEmpty()) {
+				if (overworldOldChunksDetector.get() && mc.level.dimension() == Level.OVERWORLD && chunk.getHighestGeneratedStatus().isOrAfter(ChunkStatus.FULL) && !chunk.isEmpty()) {
 					for (int i = 0; i < 17; i++) {
 						LevelChunkSection section = sections[i];
-						if (section != null && !section.isEmpty()) {
+						if (section != null && !section.hasOnlyAir()) {
 							for (int x = 0; x < 16; x++) {
 								for (int y = 0; y < 16; y++) {
 									for (int z = 0; z < 16; z++) {
@@ -733,10 +737,10 @@ public class NewChunksPlus extends Module {
 					if (foundAnyOre && !isOldGeneration && !isNewOverworldGeneration) isOldGeneration = true;
 				}
 
-				if (netherOldChunksDetector.get() && mc.level.dimension() == Level.NETHER && chunk.getStatus().isAtLeast(ChunkStatus.FULL) && !chunk.isEmpty()) {
+				if (netherOldChunksDetector.get() && mc.level.dimension() == Level.NETHER && chunk.getHighestGeneratedStatus().isOrAfter(ChunkStatus.FULL) && !chunk.isEmpty()) {
 					for (int i = 0; i < 8; i++) {
 						LevelChunkSection section = sections[i];
-						if (section != null && !section.isEmpty()) {
+						if (section != null && !section.hasOnlyAir()) {
 							for (int x = 0; x < 16; x++) {
 								for (int y = 0; y < 16; y++) {
 									for (int z = 0; z < 16; z++) {
@@ -752,14 +756,14 @@ public class NewChunksPlus extends Module {
 					if (!isOldGeneration && !isNewNetherGeneration) isOldGeneration = true;
 				}
 
-				if (endOldChunksDetector.get() && mc.level.dimension() == Level.END && chunk.getStatus().isAtLeast(ChunkStatus.FULL) && !chunk.isEmpty()) {
+				if (endOldChunksDetector.get() && mc.level.dimension() == Level.END && chunk.getHighestGeneratedStatus().isOrAfter(ChunkStatus.FULL) && !chunk.isEmpty()) {
 					LevelChunkSection section = chunk.getSection(0);
-					var biomesContainer = section.getBiomeContainer();
+					var biomesContainer = section.getBiomes();
 					if (biomesContainer instanceof PalettedContainer<Holder<Biome>> biomesPaletteContainer) {
 						Palette<Holder<Biome>> biomePalette = getPalette(biomesPaletteContainer);
 						if (biomePalette != null) {
 							for (int i = 0; i < biomePalette.getSize(); i++) {
-								if (biomePalette.get(i).getKey().get() == Biomes.THE_END) {
+								if (biomePalette.valueFor(i).is(Biomes.THE_END)) {
 									isOldGeneration = true;
 									break;
 								}
@@ -779,13 +783,13 @@ public class NewChunksPlus extends Module {
 								int isNewSection = 0;
 								int isBeingUpdatedSection = 0;
 
-								if (!section.isEmpty()) {
-									var blockStatesContainer = section.getBlockStateContainer();
+								if (!section.hasOnlyAir()) {
+									var blockStatesContainer = section.getStates();
 									Palette<BlockState> blockStatePalette = getPalette(blockStatesContainer);
 									if (blockStatePalette == null) continue;
 									int blockPaletteLength = blockStatePalette.getSize();
 
-									if (blockStatePalette instanceof PalettedContainer<BlockState>){
+									if (blockStatesContainer instanceof PalettedContainer<BlockState>){
 										Set<BlockState> bstates = new HashSet<>();
 										for (int x = 0; x < 16; x++) {
 											for (int y = 0; y < 16; y++) {
@@ -802,7 +806,7 @@ public class NewChunksPlus extends Module {
 									}
 
 									for (int i2 = 0; i2 < blockPaletteLength; i2++) {
-										BlockState blockPaletteEntry = blockStatePalette.get(i2);
+										BlockState blockPaletteEntry = blockStatePalette.valueFor(i2);
 										if (i2 == 0 && loops == 0 && blockPaletteEntry.getBlock() == Blocks.AIR && mc.level.dimension() != Level.END)
 											firstchunkappearsnew = true;
 										if (i2 == 0 && blockPaletteEntry.getBlock() == Blocks.AIR && mc.level.dimension() != Level.NETHER && mc.level.dimension() != Level.END)
@@ -822,18 +826,18 @@ public class NewChunksPlus extends Module {
 									if (isNewSection >= 2) newChunkQuantifier++;
 								}
 								if (mc.level.dimension() == Level.END) {
-									var biomesContainer = section.getBiomeContainer();
+									var biomesContainer = section.getBiomes();
 									if (biomesContainer instanceof PalettedContainer<Holder<Biome>> biomesPaletteContainer) {
 										Palette<Holder<Biome>> biomePalette = getPalette(biomesPaletteContainer);
 										if (biomePalette != null) {
 											for (int i3 = 0; i3 < biomePalette.getSize(); i3++) {
-												if (i3 == 0 && biomePalette.get(i3).getKey().get() == Biomes.PLAINS) isNewChunk = true;
-												if (!isNewChunk && i3 == 0 && biomePalette.get(i3).getKey().get() != Biomes.THE_END) isNewChunk = false;
+												if (i3 == 0 && biomePalette.valueFor(i3).is(Biomes.PLAINS)) isNewChunk = true;
+												if (!isNewChunk && i3 == 0 && !biomePalette.valueFor(i3).is(Biomes.THE_END)) isNewChunk = false;
 											}
 										}
 									}
 								}
-								if (!section.isEmpty())loops++;
+								if (!section.hasOnlyAir())loops++;
 							}
 						}
 
@@ -911,11 +915,11 @@ public class NewChunksPlus extends Module {
 				}
 				if (liquidexploit.get()) {
 					for (int x = 0; x < 16; x++) {
-						for (int y = mc.level.getMinY(); y < mc.level.getTopYInclusive(); y++) {
+						for (int y = mc.level.getMinY(); y < mc.level.getMaxY(); y++) {
 							for (int z = 0; z < 16; z++) {
 								FluidState fluid = chunk.getFluidState(x, y, z);
 								try {
-									if (!OldGenerationOldChunks.contains(oldpos) && !beingUpdatedOldChunks.contains(oldpos) && !oldChunks.contains(oldpos) && !tickexploitChunks.contains(oldpos) && !newChunks.contains(oldpos) && !fluid.isEmpty() && !fluid.isStill()) {
+									if (!OldGenerationOldChunks.contains(oldpos) && !beingUpdatedOldChunks.contains(oldpos) && !oldChunks.contains(oldpos) && !tickexploitChunks.contains(oldpos) && !newChunks.contains(oldpos) && !fluid.isEmpty() && !fluid.isSource()) {
 										oldChunks.add(oldpos);
 										if (save.get()){
 											saveData(Paths.get("OldChunkData.txt"), oldpos);
@@ -987,6 +991,6 @@ public class NewChunksPlus extends Module {
 		removeChunksOutsideRenderDistance(tickexploitChunks, playerPos, renderDistanceBlocks);
 	}
 	private void removeChunksOutsideRenderDistance(Set<ChunkPos> chunkSet, BlockPos playerPos, double renderDistanceBlocks) {
-		chunkSet.removeIf(c -> !playerPos.closerToCenterThan(new BlockPos(c.getMiddleBlockX(), renderHeight.get(), c.getMiddleBlockZ()), renderDistanceBlocks));
+		chunkSet.removeIf(c -> Vec3.atCenterOf(playerPos).distanceToSqr(Vec3.atCenterOf(c.getMiddleBlockPosition(renderHeight.get()))) >= renderDistanceBlocks * renderDistanceBlocks);
 	}
 }

@@ -266,7 +266,7 @@ public class EntityList extends HudElement {
 
     private String getEntityName(Entity entity) {
         if (entity instanceof ItemEntity item) {
-            return item.getItem().getName().getString();
+            return item.getItem().getHoverName().getString();
         } else if (entity instanceof Player player) {
             return player.getName().getString();
         } else if (entity instanceof FireworkRocketEntity) {

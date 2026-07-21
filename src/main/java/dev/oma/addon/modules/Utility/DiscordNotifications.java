@@ -165,10 +165,10 @@ public class DiscordNotifications extends Module {
         {
             for (Entity entity : mc.level.entitiesForRendering())
             {
-                if (entity.getUuid().equals(mc.player.getUuid())) continue;
+                if (entity.getUUID().equals(mc.player.getUUID())) continue;
                 if (entity instanceof Player playerEntity)
                 {
-                    uuidsCurrentlyInRange.add(playerEntity.getUuid());
+                    uuidsCurrentlyInRange.add(playerEntity.getUUID());
                     if (!playersInRange.contains(playerEntity.getGameProfile()))
                     {
                         playersInRange.add(playerEntity.getGameProfile());
@@ -217,7 +217,7 @@ public class DiscordNotifications extends Module {
         for (Component sibling : message.getSiblings())
         {
             TextColor color = sibling.getStyle().getColor();
-            if (color != null && color.getRgb() == 43690)
+            if (color != null && color.getValue() == 43690)
             {
                 handleMessage(message.getString(), MessageType.DEATH);
                 return;

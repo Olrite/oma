@@ -28,7 +28,7 @@ public class Utils
 
         // cant use a rocket if not wearing an elytra
         int elytraSwapSlot = -1;
-        if (elytraRequired && !mc.player.getInventory().getItem(SlotUtils.ARMOR_START + 2).isOf(Items.ELYTRA))
+        if (elytraRequired && !(mc.player.getInventory().getItem(SlotUtils.ARMOR_START + 2).getItem() == Items.ELYTRA))
         {
             FindItemResult itemResult = InvUtils.findInHotbar(Items.ELYTRA);
             if (!itemResult.found()) {

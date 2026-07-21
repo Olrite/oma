@@ -19,6 +19,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import net.minecraft.world.level.chunk.ChunkAccess;
+import net.minecraft.world.level.chunk.LevelChunk;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -178,7 +179,7 @@ public class SignRender extends Module {
             if (signInfo.distance > maxDist) continue;
 
             BlockPos pos = signInfo.pos;
-            Vec3 renderPos = Vec3.ofCenter(pos).add(0, 1.5, 0);
+            Vec3 renderPos = Vec3.atCenterOf(pos).add(0, 1.5, 0);
 
             // Build the text to display (keep as 4 lines)
             StringBuilder displayText = new StringBuilder();
@@ -265,14 +266,14 @@ public class SignRender extends Module {
         signInfos.clear();
         
         // Get all loaded chunks within render distance
-        List<Chunk> chunks = getLoadedChunks();
+        List<LevelChunk> chunks = getLoadedChunks();
         
-        for (Chunk chunk : chunks) {
-            for (BlockPos pos : chunk.getBlockEntityPositions()) {
+        for (LevelChunk chunk : chunks) {
+            for (BlockPos pos : chunk.getBlockEntities().keySet()) {
                 BlockEntity blockEntity = chunk.getBlockEntity(pos);
                 
                 if (blockEntity instanceof SignBlockEntity signEntity) {
-                    double distance = mc.player.position().distanceTo(Vec3.ofCenter(pos));
+                    double distance = mc.player.position().distanceTo(Vec3.atCenterOf(pos));
                     
                     if (distance <= maxDist) {
                         SignText frontText = signEntity.getFrontText();
@@ -341,17 +342,17 @@ public class SignRender extends Module {
         LogUtils.info(message.toString().trim());
     }
 
-    private List<Chunk> getLoadedChunks() {
-        List<Chunk> chunks = new ArrayList<>();
-        BlockPos playerPos = mc.player.getBlockPos();
-        int renderDistance = mc.options.getViewDistance().getValue();
+    private List<LevelChunk> getLoadedChunks() {
+        List<LevelChunk> chunks = new ArrayList<>();
+        BlockPos playerPos = mc.player.blockPosition();
+        int renderDistance = mc.options.renderDistance().get();
         
         for (int x = -renderDistance; x <= renderDistance; x++) {
             for (int z = -renderDistance; z <= renderDistance; z++) {
                 int chunkX = (playerPos.getX() >> 4) + x;
                 int chunkZ = (playerPos.getZ() >> 4) + z;
                 
-                if (mc.level.isChunkLoaded(chunkX, chunkZ)) {
+                if (mc.level.hasChunk(chunkX, chunkZ)) {
                     chunks.add(mc.level.getChunk(chunkX, chunkZ));
                 }
             }

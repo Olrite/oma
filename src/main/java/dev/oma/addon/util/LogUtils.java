@@ -14,7 +14,7 @@ public class LogUtils {
         MutableComponent message = Component.literal("");
         message.append(txt);
 
-        IChatHud chatHud = (IChatHud) mc.inGameHud.getChatHud();
+        IChatHud chatHud = (IChatHud) mc.gui.getChat();
         chatHud.meteor$add(message,0);
     }
 }

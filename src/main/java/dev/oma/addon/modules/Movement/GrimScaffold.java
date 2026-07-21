@@ -169,7 +169,7 @@ public class GrimScaffold extends Module {
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         if (mc.player == null || mc.level == null) return;
-        if (onlyOnClick.get() && !mc.options.useKey.isPressed()) return;
+        if (onlyOnClick.get() && !mc.options.keyUse.isDown()) return;
         tickDelay++;
         if (tickDelay < placeDelay.get()) return;
         FindItemResult blockItem = findBlock();
@@ -185,11 +185,11 @@ public class GrimScaffold extends Module {
         for (BlockPos pos : placementPositions) {
             if (placed >= blocksToPlace) break;
             if (rotationMode.get() == RotationMode.Precise) {
-                Vec3 hitVec = Vec3.ofCenter(pos).add(0, 0.5, 0);
-                float[] rotations = RotationUtils.getRotationsTo(mc.player.getEyePos(), hitVec);
+                Vec3 hitVec = Vec3.atCenterOf(pos).add(0, 0.5, 0);
+                float[] rotations = RotationUtils.getRotationsTo(mc.player.getEyePosition(), hitVec);
                 Rotations.rotate(rotations[0], rotations[1], () -> placeBlock(pos));
             } else if (rotationMode.get() == RotationMode.Simple) {
-                Vec3 hitVec = Vec3.ofCenter(pos).add(0, 0.5, 0);
+                Vec3 hitVec = Vec3.atCenterOf(pos).add(0, 0.5, 0);
                 float[] rotations = calculateSimpleRotations(hitVec);
                 Rotations.rotate(rotations[0], rotations[1], () -> placeBlock(pos));
             } else {
@@ -198,12 +198,12 @@ public class GrimScaffold extends Module {
             placed++;
         }
         if (tower.get() && shouldTower()) {
-            mc.player.setVelocity(mc.player.getVelocity().x, towerSpeed.get(), mc.player.getVelocity().z);
+            mc.player.setDeltaMovement(mc.player.getDeltaMovement().x, towerSpeed.get(), mc.player.getDeltaMovement().z);
         }
     }
     private int getBlocksPerTick() {
         if (!adaptiveSpeed.get()) return 1;
-        double velocity = Math.abs(mc.player.getVelocity().y);
+        double velocity = Math.abs(mc.player.getDeltaMovement().y);
         if (velocity > 0.5) return maxBlocksPerTick.get();
         if (velocity > 0.3) return Math.min(2, maxBlocksPerTick.get());
         return 1;
@@ -211,7 +211,7 @@ public class GrimScaffold extends Module {
     private List<BlockPos> getPlacementPositions() {
         List<BlockPos> positions = new ArrayList<>();
         Vec3 playerPos = mc.player.position();
-        Vec3 velocity = mc.player.getVelocity();
+        Vec3 velocity = mc.player.getDeltaMovement();
         Vec3 predictedPos = playerPos;
         if (velocityPredict.get() && Math.abs(velocity.y) > 0.1) {
             double multiplier = velocityMultiplier.get();
@@ -222,12 +222,12 @@ public class GrimScaffold extends Module {
             predictedPos = predictedPos.add(moveVec.scale(extendDistance.get()));
         }
         targetPos.set(predictedPos.x, playerPos.y - 1, predictedPos.z);
-        if (mc.level.getBlockState(targetPos).isReplaceable()) {
-            positions.add(targetPos.toImmutable());
+        if (mc.level.getBlockState(targetPos).canBeReplaced()) {
+            positions.add(targetPos.immutable());
         }
         if (Math.abs(velocity.y) > 0.4) {
-            BlockPos aboveTarget = targetPos.up().toImmutable();
-            if (mc.level.getBlockState(aboveTarget).isReplaceable()) {
+            BlockPos aboveTarget = targetPos.relative(Direction.UP).immutable();
+            if (mc.level.getBlockState(aboveTarget).canBeReplaced()) {
                 positions.add(aboveTarget);
             }
         }
@@ -236,17 +236,17 @@ public class GrimScaffold extends Module {
     private Vec3 getMovementVector() {
         Vec3 velocity = Vec3.ZERO;
         float yaw = mc.player.getYRot();
-        if (mc.options.forwardKey.isPressed()) {
-            velocity = velocity.add(Vec3.fromPolar(0, yaw));
+        if (mc.options.keyUp.isDown()) {
+            velocity = velocity.add(Vec3.directionFromRotation(0, yaw));
         }
-        if (mc.options.backKey.isPressed()) {
-            velocity = velocity.add(Vec3.fromPolar(0, yaw + 180));
+        if (mc.options.keyDown.isDown()) {
+            velocity = velocity.add(Vec3.directionFromRotation(0, yaw + 180));
         }
-        if (mc.options.leftKey.isPressed()) {
-            velocity = velocity.add(Vec3.fromPolar(0, yaw - 90));
+        if (mc.options.keyLeft.isDown()) {
+            velocity = velocity.add(Vec3.directionFromRotation(0, yaw - 90));
         }
-        if (mc.options.rightKey.isPressed()) {
-            velocity = velocity.add(Vec3.fromPolar(0, yaw + 90));
+        if (mc.options.keyRight.isDown()) {
+            velocity = velocity.add(Vec3.directionFromRotation(0, yaw + 90));
         }
         if (velocity.lengthSqr() > 0) {
             return velocity.normalize();
@@ -254,20 +254,20 @@ public class GrimScaffold extends Module {
         return velocity;
     }
     private boolean isMovingHorizontally() {
-        return mc.options.forwardKey.isPressed() ||
-               mc.options.backKey.isPressed() ||
-               mc.options.leftKey.isPressed() ||
-               mc.options.rightKey.isPressed();
+        return mc.options.keyUp.isDown() ||
+               mc.options.keyDown.isDown() ||
+               mc.options.keyLeft.isDown() ||
+               mc.options.keyRight.isDown();
     }
     private boolean shouldTower() {
-        return mc.options.jumpKey.isPressed() &&
-               !mc.options.sneakKey.isPressed() &&
+        return mc.options.keyJump.isDown() &&
+               !mc.options.keyShift.isDown() &&
                !isMovingHorizontally();
     }
     private void placeBlock(BlockPos pos) {
         Direction side = Direction.UP;
         BlockHitResult hitResult = new BlockHitResult(
-            Vec3.ofCenter(pos),
+            Vec3.atCenterOf(pos),
             side,
             pos,
             false
@@ -275,7 +275,7 @@ public class GrimScaffold extends Module {
         mc.player.connection.send(
             new ServerboundPlayerActionPacket(
                 ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND,
-                BlockPos.ORIGIN,
+                BlockPos.ZERO,
                 Direction.DOWN
             )
         );
@@ -283,22 +283,22 @@ public class GrimScaffold extends Module {
             new ServerboundUseItemOnPacket(
                 InteractionHand.OFF_HAND,
                 hitResult,
-                mc.player.currentScreenHandler.getRevision() + 2
+                mc.player.containerMenu.getStateId() + 2
             )
         );
         mc.player.connection.send(
             new ServerboundPlayerActionPacket(
                 ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND,
-                BlockPos.ORIGIN,
+                BlockPos.ZERO,
                 Direction.DOWN
             )
         );
         mc.player.swing(InteractionHand.MAIN_HAND);
-        renderedBlocks.add(pos.toImmutable());
+        renderedBlocks.add(pos.immutable());
         tickDelay = 0;
     }
     private float[] calculateSimpleRotations(Vec3 target) {
-        Vec3 eyePos = mc.player.getEyePos();
+        Vec3 eyePos = mc.player.getEyePosition();
         Vec3 diff = target.subtract(eyePos);
         double diffX = diff.x;
         double diffY = diff.y;
@@ -314,15 +314,15 @@ public class GrimScaffold extends Module {
             Block block = blockItem.getBlock();
             if (blocksFilter.get() == ListMode.Blacklist && blocks.get().contains(block)) return false;
             if (blocksFilter.get() == ListMode.Whitelist && !blocks.get().contains(block)) return false;
-            if (!Block.isShapeFullCube(block.getDefaultState().getCollisionShape(mc.level, targetPos))) return false;
-            if (block instanceof FallingBlock && FallingBlock.canFallThrough(mc.level.getBlockState(targetPos))) return false;
+            if (!Block.isShapeFullBlock(block.defaultBlockState().getCollisionShape(mc.level, targetPos))) return false;
+            if (block instanceof FallingBlock && FallingBlock.isFree(mc.level.getBlockState(targetPos))) return false;
             return true;
         });
     }
     @EventHandler
     private void onRender(Render3DEvent event) {
         if (!render.get() || renderedBlocks.isEmpty()) return;
-        renderedBlocks.removeIf(pos -> !mc.level.getBlockState(pos).isReplaceable());
+        renderedBlocks.removeIf(pos -> !mc.level.getBlockState(pos).canBeReplaced());
         for (BlockPos pos : renderedBlocks) {
             event.renderer.box(pos, sideColor.get(), lineColor.get(), shapeMode.get(), 0);
         }

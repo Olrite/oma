@@ -90,17 +90,17 @@ public class GrimAirPlace extends Module {
     private void onTick(TickEvent.Post event) {
         if (mc.player == null) return;
         delay++;
-        double r = customRange.get() ? range.get() : mc.player.getBlockInteractionRange();
-        hitResult = mc.getCameraEntity().raycast(r, 0, false);
+        double r = customRange.get() ? range.get() : mc.player.blockInteractionRange();
+        hitResult = mc.player.pick(r, 0, false);
 
-        if (!(hitResult instanceof BlockHitResult blockHitResult) || !(mc.player.getMainHandStack().getItem() instanceof BlockItem) && !(mc.player.getMainHandStack().getItem() instanceof SpawnEggItem)) return;
+        if (!(hitResult instanceof BlockHitResult blockHitResult) || !(mc.player.getMainHandItem().getItem() instanceof BlockItem) && !(mc.player.getMainHandItem().getItem() instanceof SpawnEggItem)) return;
 
         if (delay < placeDelay.get()) return;
 
-        if (mc.options.useKey.isPressed()) {
+        if (mc.options.keyUse.isDown()) {
             mc.player.connection.send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, new BlockPos(0,0,0), Direction.DOWN));
 
-            mc.player.connection.send(new ServerboundUseItemOnPacket(InteractionHand.OFF_HAND, blockHitResult, mc.player.currentScreenHandler.getRevision() + 2));
+            mc.player.connection.send(new ServerboundUseItemOnPacket(InteractionHand.OFF_HAND, blockHitResult, mc.player.containerMenu.getStateId() + 2));
 
             mc.player.connection.send(new ServerboundPlayerActionPacket(ServerboundPlayerActionPacket.Action.SWAP_ITEM_WITH_OFFHAND, new BlockPos(0,0,0), Direction.DOWN));
 
@@ -112,8 +112,8 @@ public class GrimAirPlace extends Module {
     @EventHandler
     private void onRender(Render3DEvent event) {
         if (!(hitResult instanceof BlockHitResult blockHitResult)
-            || !mc.level.getBlockState(blockHitResult.getBlockPos()).isReplaceable()
-            || !(mc.player.getMainHandStack().getItem() instanceof BlockItem) && !(mc.player.getMainHandStack().getItem() instanceof SpawnEggItem)
+            || !mc.level.getBlockState(blockHitResult.getBlockPos()).canBeReplaced()
+            || !(mc.player.getMainHandItem().getItem() instanceof BlockItem) && !(mc.player.getMainHandItem().getItem() instanceof SpawnEggItem)
             || !render.get()) return;
 
         event.renderer.box(blockHitResult.getBlockPos(), sideColor.get(), lineColor.get(), shapeMode.get(), 0);

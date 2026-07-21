@@ -107,7 +107,7 @@ public class AFKVanillaFly extends Module {
             }
         } else {
             if (!launched) {
-                mc.player.jump();
+                mc.player.jumpFromGround();
                 launched = true;
             } else if (System.currentTimeMillis() - lastRocketUse > 1000) {
                 tryUseFirework();

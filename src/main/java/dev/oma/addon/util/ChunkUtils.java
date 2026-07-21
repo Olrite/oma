@@ -24,13 +24,13 @@ public class ChunkUtils {
         BlockPos bPos = mc.player.blockPosition();
         int playerX = bPos.getX();
         int playerZ = bPos.getZ();
-        int renderDistance = mc.options.getViewDistance().getValue() * 16;
+        int renderDistance = mc.options.renderDistance().get() * 16;
 
         for (int x = playerX - renderDistance; x <= playerX + renderDistance; x += 16) {
             for (int z = playerZ - renderDistance; z <= playerZ + renderDistance; z += 16) {
                 ChunkPos chunkPos = new ChunkPos(x >> 4, z >> 4);
-                if (mc.level.isChunkLoaded(chunkPos.x, chunkPos.z)) {
-                    loadedChunks.add(mc.level.getChunk(chunkPos.getWorldPosition()));
+                if (mc.level.hasChunk(chunkPos.x(), chunkPos.z())) {
+                    loadedChunks.add(mc.level.getChunk(chunkPos.x(), chunkPos.z()));
                 }
             }
         }
@@ -53,7 +53,7 @@ public class ChunkUtils {
     public static int getShulkerCount(LevelChunk chunk) {
         int count = 0;
 
-        for (BlockPos pos : chunk.getBlockEntityPositions()) {
+        for (BlockPos pos : chunk.getBlockEntities().keySet()) {
             BlockEntity block = chunk.getBlockEntity(pos);
             if (block instanceof ShulkerBoxBlockEntity) count++;
         }
@@ -66,7 +66,7 @@ public class ChunkUtils {
         int count = 0;
 
         for (LevelChunk chunk : chunks) {
-            for (BlockPos pos : chunk.getBlockEntityPositions()) {
+            for (BlockPos pos : chunk.getBlockEntities().keySet()) {
                 BlockEntity block = chunk.getBlockEntity(pos);
                 if (block instanceof ChestBlockEntity) count++;
             }
@@ -82,7 +82,7 @@ public class ChunkUtils {
         int count = 0;
 
         for (LevelChunk chunk : chunks) {
-            for (BlockPos pos : chunk.getBlockEntityPositions()) {
+            for (BlockPos pos : chunk.getBlockEntities().keySet()) {
                 BlockEntity block = chunk.getBlockEntity(pos);
                 if (block instanceof ShulkerBoxBlockEntity) count++;
             }
@@ -100,7 +100,7 @@ public class ChunkUtils {
             for (int x = 0; x < 16; x++) {
                 for (int y = -64; y < 320; y++) {
                     for (int z = 0; z < 16; z++) {
-                        BlockPos pos = new BlockPos(chunkPos.x * 16 + x, y, chunkPos.z * 16 + z);
+                        BlockPos pos = new BlockPos(chunkPos.x() * 16 + x, y, chunkPos.z() * 16 + z);
                         if (chunk.getBlockState(pos).getBlock() == block) {
                             count++;
                         }

@@ -211,7 +211,7 @@ public class AutoLogPlus extends Module {
 
     private void playerLog() {
         for (Entity entity : mc.level.entitiesForRendering()) {
-            if (entity instanceof Player && entity.getUuid() != mc.player.getUuid()) {
+            if (entity instanceof Player && entity.getUUID() != mc.player.getUUID()) {
                 if (onlyTrusted.get() && entity != mc.player && !Friends.get().isFriend((Player) entity)) {
                     disconnect(Component.literal("[AutoLogout] A non trusted player [" + entity.getName().getString()
                             + "] has entered your render distance."));
@@ -242,7 +242,7 @@ public class AutoLogPlus extends Module {
             } else if (!useTotalCount.get()) {
                 for (Object2IntMap.Entry<EntityType<?>> entry : entityCounts.object2IntEntrySet()) {
                     if (entry.getIntValue() >= individualEntityThreshold.get()) {
-                        disconnect(Component.literal("[AutoLogout] Number of " + entry.getKey().getName().getString()
+                        disconnect(Component.literal("[AutoLogout] Number of " + entry.getKey().getDescription().getString()
                                 + " within range exceeded the limit."));
                         if (toggleOff.get())
                             this.toggle();
@@ -258,12 +258,12 @@ public class AutoLogPlus extends Module {
             return;
 
         for (Entity entity : mc.level.entitiesForRendering()) {
-            if (entity.getUuid().equals(mc.player.getUuid()))
+            if (entity.getUUID().equals(mc.player.getUUID()))
                 continue;
 
             if (proximityEntities.get().contains(entity.getType())
                     && PlayerUtils.isWithin(entity, proximityRange.get())) {
-                disconnect(Component.literal("[AutoLogout] " + entity.getType().getName().getString()
+                disconnect(Component.literal("[AutoLogout] " + entity.getType().getDescription().getString()
                         + " detected within close range (" + proximityRange.get() + " blocks)."));
                 if (toggleOff.get())
                     this.toggle();
@@ -301,7 +301,7 @@ public class AutoLogPlus extends Module {
             return;
         if (mc.getConnection() == null || mc.player == null)
             return;
-        PlayerInfo playerListEntry = mc.getConnection().getPlayerListEntry(mc.player.getUuid());
+        PlayerInfo playerListEntry = mc.getConnection().getPlayerInfo(mc.player.getUUID());
 
         int ping = playerListEntry.getLatency();
 
@@ -320,7 +320,7 @@ public class AutoLogPlus extends Module {
     private void disconnect(Component text) {
         if (mc.getConnection() == null)
             return;
-        mc.player.connection.onDisconnect(new ClientboundDisconnectPacket(text));
+        mc.player.connection.handleDisconnect(new ClientboundDisconnectPacket(text));
 
         if (toggleOff.get())
             toggle();

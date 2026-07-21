@@ -129,10 +129,10 @@ public class Pitch40Util extends Module {
             // -40 pitch is facing upwards
             if (mc.player.getXRot() == -40)
             {
-//                info("Velocity less than target: " + (mc.player.getVelocity().y < velocityThreshold.get()));
+//                info("Velocity less than target: " + (mc.player.getDeltaMovement().y < velocityThreshold.get()));
 //                info("Y less than upper bounds: " + (mc.player.getY() < (double)elytraFlyModule.settings.get("pitch40-upper-bounds").get()));
                 goingUp = true;
-                if (autoFirework.get() && mc.player.getVelocity().y < velocityThreshold.get() && mc.player.getY() < (double)elytraFly.settings.get("pitch40-upper-bounds").get())
+                if (autoFirework.get() && mc.player.getDeltaMovement().y < velocityThreshold.get() && mc.player.getY() < (double)elytraFly.settings.get("pitch40-upper-bounds").get())
                 {
                     if (fireworkCooldown == 0) {
                         int launchStatus = firework(mc, false);
@@ -148,7 +148,7 @@ public class Pitch40Util extends Module {
                 }
             }
             // waits until your at the highest point, when y velocity is 0, then sets min and max bounds based on your position
-            else if (autoBoundAdjust.get() && goingUp && mc.player.getVelocity().y <= 0) {
+            else if (autoBoundAdjust.get() && goingUp && mc.player.getDeltaMovement().y <= 0) {
                 goingUp = false;
                 resetBounds();
             }
@@ -156,7 +156,7 @@ public class Pitch40Util extends Module {
         else
         {
             // waits for you to not be in queue, then turns elytrafly back on
-            if (!mc.player.getAbilities().allowFlying)
+            if (!mc.player.getAbilities().mayfly)
             {
                 elytraFly.toggle();
                 // always reset when rejoining

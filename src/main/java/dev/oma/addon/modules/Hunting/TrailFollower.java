@@ -469,7 +469,7 @@ public class TrailFollower extends Module
     {
         if (followMode == FollowMode.BARITONE) return;
         mc.player.setYRot(getActualYaw((float) (mc.player.getYRot() + circlingDegPerTick.get())));
-        if (mc.player.age % 100 == 0)
+        if (mc.player.tickCount % 100 == 0)
         {
             log("Circling to look for new chunks, abandoning trail in " + (trailTimeout.get() - (System.currentTimeMillis() - lastFoundTrailTime)) / 1000 + " seconds.");
         }
@@ -506,7 +506,7 @@ public class TrailFollower extends Module
                 }
                 case DISCONNECT:
                 {
-                    mc.player.connection.onDisconnect(new ClientboundDisconnectPacket(Component.literal("[TrailFollower] Trail timed out.")));
+                    mc.player.connection.handleDisconnect(new ClientboundDisconnectPacket(Component.literal("[TrailFollower] Trail timed out.")));
                     break;
                 }
             }
@@ -618,24 +618,24 @@ public class TrailFollower extends Module
         ResourceKey<Level> currentDimension = mc.level.dimension();
         LevelChunk chunk = event.chunk();
         ChunkPos chunkPos = chunk.getPos();
-        long chunkLong = chunkPos.toLong();
+        long chunkLong = chunkPos.pack();
 
         // if found in the cache then ignore the chunk
         if (seenChunksCache.getIfPresent(chunkLong) != null) return;
 
-        ChunkPos chunkDelta = new ChunkPos(chunkPos.x - mc.player.getChunkPos().x, chunkPos.z - mc.player.getChunkPos().z);
+        ChunkPos chunkDelta = new ChunkPos(chunkPos.x() - mc.player.chunkPosition().x(), chunkPos.z() - mc.player.chunkPosition().z());
 
         if (oppositeDimension.get())
         {
             if (currentDimension.equals(Level.OVERWORLD))
             {
-                chunkPos = new ChunkPos(mc.player.getChunkPos().x / 8 + chunkDelta.x, mc.player.getChunkPos().z / 8 + chunkDelta.z);
+                chunkPos = new ChunkPos(mc.player.chunkPosition().x() / 8 + chunkDelta.x(), mc.player.chunkPosition().z() / 8 + chunkDelta.z());
                 currentDimension = Level.NETHER;
             }
             else if (currentDimension.equals(Level.NETHER))
             {
-                chunkPos = new ChunkPos(mc.player.getChunkPos().x * 8 + chunkDelta.x, mc.player.getChunkPos().z * 8 + chunkDelta.z);
-//                log("ChunkPos: " + chunkPos.x + ", " + chunkPos.z);
+                chunkPos = new ChunkPos(mc.player.chunkPosition().x() * 8 + chunkDelta.x(), mc.player.chunkPosition().z() * 8 + chunkDelta.z());
+//                log("ChunkPos: " + chunkPos.x() + ", " + chunkPos.z());
                 currentDimension = Level.OVERWORLD;
             }
         }
@@ -655,7 +655,7 @@ public class TrailFollower extends Module
 
 
         // use chunk.getPos() here instead of the dimension specific chunkPos because we have to path to blocks in our dimension
-        Vec3 pos = chunk.getPos().getCenterAtY(0).toCenterPos();
+        Vec3 pos = chunk.getPos().getMiddleBlockPosition(0).getCenter();
         posDebug = pos;
 
         if (!followingTrail)
@@ -750,22 +750,22 @@ public class TrailFollower extends Module
         PaletteNewChunks paletteNewChunks = ModuleManager.getModule(PaletteNewChunks.class);
         boolean is119NewChunk = paletteNewChunks
             .isNewChunk(
-                chunkPos.x,
-                chunkPos.z,
+                chunkPos.x(),
+                chunkPos.z(),
                 currentDimension
             );
 
         boolean is112OldChunk = ModuleManager.getModule(OldChunks.class)
             .isOldChunk(
-                chunkPos.x,
-                chunkPos.z,
+                chunkPos.x(),
+                chunkPos.z(),
                 currentDimension
             );
 
         boolean isHighlighted = is119NewChunk || paletteNewChunks
             .isInverseNewChunk(
-                chunkPos.x,
-                chunkPos.z,
+                chunkPos.x(),
+                chunkPos.z(),
                 currentDimension
             );
 
@@ -777,8 +777,8 @@ public class TrailFollower extends Module
     {
         if (cardinalPriority.get() == null || cardinalPriority.get() == CardinalDirection.NONE) return false;
         
-        double deltaX = chunkPos.x - playerPos.x;
-        double deltaZ = chunkPos.z - playerPos.z;
+        double deltaX = chunkPos.x() - playerPos.x;
+        double deltaZ = chunkPos.z() - playerPos.z;
         
         switch (cardinalPriority.get()) {
             case NORTH:
@@ -833,7 +833,7 @@ public class TrailFollower extends Module
             
             if (chunksPerSecond > maxChunkLoadSpeed.get()) {
                 log("Chunk load speed exceeded threshold (" + String.format("%.2f", chunksPerSecond) + " > " + maxChunkLoadSpeed.get() + " chunks/sec). Disconnecting...");
-                mc.player.connection.onDisconnect(new ClientboundDisconnectPacket(Component.literal("[TrailFollower] Chunk load speed exceeded threshold.")));
+                mc.player.connection.handleDisconnect(new ClientboundDisconnectPacket(Component.literal("[TrailFollower] Chunk load speed exceeded threshold.")));
             }
         }
         

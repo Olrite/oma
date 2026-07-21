@@ -145,7 +145,7 @@ public class ElytraSwap extends Module {
         if (mc.player == null || mc.level == null) return;
         
         // Don't swap if player is dead or in critical state
-        if (mc.player.isDead() || mc.player.getHealth() <= 0) {
+        if (mc.player.isRemoved() || mc.player.getHealth() <= 0) {
             resetSwapState();
             return;
         }
@@ -157,7 +157,7 @@ public class ElytraSwap extends Module {
             cooldownTimer--;
             return;
         }
-        if (pauseInInventory.get() && mc.player.currentScreenHandler != mc.player.playerScreenHandler) {
+        if (pauseInInventory.get() && mc.player.containerMenu != mc.player.inventoryMenu) {
             resetSwapState();
             return;
         }
@@ -175,7 +175,7 @@ public class ElytraSwap extends Module {
             processSwapStages();
             return;
         }
-        int currentDurability = chestItem.getMaxDamage() - chestItem.getDamage();
+        int currentDurability = chestItem.getMaxDamage() - chestItem.getDamageValue();
         int maxDurability = chestItem.getMaxDamage();
         int durabilityPercentage = (int) ((double) currentDurability / maxDurability * 100);
         if (durabilityPercentage <= durabilityThreshold.get()) {
@@ -191,7 +191,7 @@ public class ElytraSwap extends Module {
         for (int i = 0; i < 36; i++) {
             ItemStack stack = mc.player.getInventory().getItem(i);
             if (stack.getItem().equals(Items.ELYTRA)) {
-                int currentDurability = stack.getMaxDamage() - stack.getDamage();
+                int currentDurability = stack.getMaxDamage() - stack.getDamageValue();
                 int maxDurability = stack.getMaxDamage();
                 int durabilityPercentage = (int) ((double) currentDurability / maxDurability * 100);
                 if (durabilityPercentage > bestDurabilityPercentage) {
@@ -215,7 +215,7 @@ public class ElytraSwap extends Module {
         
         if (notifySwap.get()) {
             ItemStack targetElytra = mc.player.getInventory().getItem(bestSlot);
-            int targetDurability = targetElytra.getMaxDamage() - targetElytra.getDamage();
+            int targetDurability = targetElytra.getMaxDamage() - targetElytra.getDamageValue();
             int targetMaxDurability = targetElytra.getMaxDamage();
             int targetDurabilityPercentage = (int) ((double) targetDurability / targetMaxDurability * 100);
             info("Initiating swap to elytra with %d%% durability", targetDurabilityPercentage);
@@ -282,9 +282,9 @@ public class ElytraSwap extends Module {
                 // Equip the elytra from the target slot
                 InvUtils.swap(targetSlot, false);
                 // Use right-click to equip the elytra
-                mc.options.useKey.setPressed(true);
+                mc.options.keyUse.setDown(true);
                 mc.gameMode.useItem(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND);
-                mc.options.useKey.setPressed(false);
+                mc.options.keyUse.setDown(false);
                 InvUtils.swapBack();
                 swapStage = 3;
                 stageTimer = 0;
@@ -312,7 +312,7 @@ public class ElytraSwap extends Module {
                 }
                 
                 if (notifySwap.get()) {
-                    int newDurability = newChest.getMaxDamage() - newChest.getDamage();
+                    int newDurability = newChest.getMaxDamage() - newChest.getDamageValue();
                     int newMaxDurability = newChest.getMaxDamage();
                     int newDurabilityPercentage = (int) ((double) newDurability / newMaxDurability * 100);
                     info("Successfully swapped to elytra with %d%% durability", newDurabilityPercentage);
@@ -331,7 +331,7 @@ public class ElytraSwap extends Module {
                 }
                 for (int i = 9; i < 36; i++) {
                     ItemStack stack = mc.player.getInventory().getItem(i);
-                    if (ItemStack.areItemsEqual(stack, hotbarOriginalItem)) {
+                    if (ItemStack.isSameItemSameComponents(stack, hotbarOriginalItem)) {
                         InvUtils.move().from(i).toHotbar(hotbarSlotUsed);
                         break;
                     }
@@ -454,9 +454,9 @@ public class ElytraSwap extends Module {
                 // Equip the chestplate from the target slot
                 InvUtils.swap(chestplateSlot, false);
                 // Use right-click to equip the chestplate
-                mc.options.useKey.setPressed(true);
+                mc.options.keyUse.setDown(true);
                 mc.gameMode.useItem(mc.player, net.minecraft.world.InteractionHand.MAIN_HAND);
-                mc.options.useKey.setPressed(false);
+                mc.options.keyUse.setDown(false);
                 InvUtils.swapBack();
                 chestplateSwapStage = 3;
                 stageTimer = 0;
@@ -509,19 +509,19 @@ public class ElytraSwap extends Module {
         if (stack.isEmpty()) return 0;
         if (stack.getItem().equals(Items.NETHERITE_CHESTPLATE)) {
             if (prioritizeNetherite.get()) {
-                return 1000 + (stack.getMaxDamage() - stack.getDamage());
+                return 1000 + (stack.getMaxDamage() - stack.getDamageValue());
             }
-            return 400 + (stack.getMaxDamage() - stack.getDamage());
+            return 400 + (stack.getMaxDamage() - stack.getDamageValue());
         } else if (stack.getItem().equals(Items.DIAMOND_CHESTPLATE)) {
-            return 300 + (stack.getMaxDamage() - stack.getDamage());
+            return 300 + (stack.getMaxDamage() - stack.getDamageValue());
         } else if (stack.getItem().equals(Items.IRON_CHESTPLATE)) {
-            return 200 + (stack.getMaxDamage() - stack.getDamage());
+            return 200 + (stack.getMaxDamage() - stack.getDamageValue());
         } else if (stack.getItem().equals(Items.GOLDEN_CHESTPLATE)) {
-            return 100 + (stack.getMaxDamage() - stack.getDamage());
+            return 100 + (stack.getMaxDamage() - stack.getDamageValue());
         } else if (stack.getItem().equals(Items.CHAINMAIL_CHESTPLATE)) {
-            return 150 + (stack.getMaxDamage() - stack.getDamage());
+            return 150 + (stack.getMaxDamage() - stack.getDamageValue());
         } else if (stack.getItem().equals(Items.LEATHER_CHESTPLATE)) {
-            return 50 + (stack.getMaxDamage() - stack.getDamage());
+            return 50 + (stack.getMaxDamage() - stack.getDamageValue());
         }
         return 0;
     }
@@ -544,7 +544,7 @@ public class ElytraSwap extends Module {
         for (int i = 0; i < 36; i++) {
             ItemStack stack = mc.player.getInventory().getItem(i);
             if (stack.getItem().equals(Items.ELYTRA)) {
-                if (Math.abs(stack.getDamage() - storedElytra.getDamage()) <= 5) {
+                if (Math.abs(stack.getDamageValue() - storedElytra.getDamageValue()) <= 5) {
                     return i;
                 }
             }
