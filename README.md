@@ -1,26 +1,22 @@
-# o.m.a.
+# o.m.a. (Olrite's Meteor Addon)
 
-A 2b2t Meteor Client utility addon, ported and maintained from [cozisAddon](https://github.com/Olrite/cozisAddon).
+A 2b2t Meteor Client addon mainly for basehunting and quality of life improvements.
 
 ## Supported Minecraft versions
 
-| Branch | Minecraft | Meteor Client |
-|--------|-----------|---------------|
-| `master` | **26.1.2** | [Latest](https://meteorclient.com/) |
+
+| Branch           | Minecraft   | Meteor Client                                                        |
+| ---------------- | ----------- | -------------------------------------------------------------------- |
+| `master`         | **26.1.2**  | [Latest](https://meteorclient.com/)                                  |
 | `legacy/1.21.11` | **1.21.11** | [Archive #85](https://meteorclient.com/api/download?version=1.21.11) |
-| `legacy/1.21.4` | **1.21.4** | [Archive #42](https://meteorclient.com/api/download?version=1.21.4) |
+| `legacy/1.21.4`  | **1.21.4**  | [Archive #42](https://meteorclient.com/api/download?version=1.21.4)  |
 
-Check out the branch matching your Minecraft version before building.
 
-## Install (releases)
+Check out the branch matching your Minecraft version before building/installing.
 
-Download the JAR for your Minecraft version from [GitHub Releases](https://github.com/Olrite/oma/releases):
+## Install (Pre-Built JAR)
 
-- `oma-1.0-mc1.21.4.jar`
-- `oma-1.0-mc1.21.11.jar`
-- `oma-1.0-mc26.1.2.jar`
-
-Place the matching JAR in your `mods` folder alongside the correct Meteor Client version.
+Download the JAR for your Minecraft version from [GitHub Releases](https://github.com/Olrite/oma/releases) and place the matching JAR in your `mods` folder alongside the correct Meteor Client version.
 
 ## Build from source
 
@@ -28,7 +24,12 @@ Place the matching JAR in your `mods` folder alongside the correct Meteor Client
 git clone https://github.com/Olrite/oma.git
 cd oma
 git checkout <branch-for-your-mc-version>
-./gradlew build
+```
+
+On Linux:
+
+```bash
+./gradlew build 
 ```
 
 On Windows:
@@ -39,24 +40,13 @@ On Windows:
 
 The built JAR is in `build/libs/`.
 
+
 **Java requirements:**
+
 - `legacy/*` branches: Java **21**
 - `master` (26.1.2): Java **25**
 
-## Releases
-
-Releases use **two-part tags** only: `vX.Y` (e.g. `v1.0`).
-
-Pushing a tag triggers CI to build all three Minecraft versions and create a **draft** release containing:
-
-- `oma-X.Y-mc1.21.4.jar`
-- `oma-X.Y-mc1.21.11.jar`
-- `oma-X.Y-mc26.1.2.jar`
-
-Review the draft on GitHub and publish manually when ready.
-
-## Modules
-
+# Modules
 ### Utility
 - AutoLog Plus, Auto Shulker, Elytra Swap, Chat Tracker, Player History
 - DiscordNotifications, PortalMaker, AntiSpam, Dub Counter, GrimAirPlace, Map Exporter
@@ -73,10 +63,8 @@ Review the draft on GitHub and publish manually when ready.
 ### HUD
 - TotemCount, CrystalCount, Dub Count, Sign Display, ETA, Lag Detector, EntityList
 
-## Attribution
-
-Based on [cozisAddon](https://github.com/Olrite/cozisAddon) by cozidev / CoziSoftware. Many modules were ported from community addons — see the original README for credits.
+## Credits
+Credit to [xqyet](https://github.com/xqyet), [Asteroide](https://github.com/asteroide-development), [miles352](https://github.com/miles352), [dekrom](https://github.com/dekrom), and [etianl](https://github.com/etianl) for some of the modules that I built upon.
 
 ## Disclaimer
-
 Review the code yourself before use. This is a utility addon for anarchy servers; use at your own risk.

@@ -1,0 +1,32 @@
+---
+description: Propagate changes to all Minecraft version branches and verify they build
+alwaysApply: true
+---
+
+# Multi-branch sync (required)
+
+This repo maintains three Minecraft targets. After any user-facing change, update **all** branches — not only the one currently checked out:
+
+| Branch | Minecraft | Java |
+|--------|-----------|------|
+| `master` | 26.1.2 | 25 |
+| `legacy/1.21.11` | 1.21.11 | 21 |
+| `legacy/1.21.4` | 1.21.4 | 21 |
+
+## What to sync
+
+- **Shared (copy or cherry-pick as-is):** `LICENSE`, README/docs, CI workflows, `.cursor/rules/`, release notes, credits, non-API module logic when identical.
+- **Version-specific (adapt):** Java/Minecraft APIs, mappings, `fabric.mod.json` `depends`, Gradle versions, mixins, and any code that differs per MC version.
+
+## Workflow
+
+1. Implement and verify on the branch where the change was requested (usually `master`).
+2. Port the same change to the other two branches, adapting APIs as needed.
+3. On each affected branch, run `./gradlew build` (or `.\gradlew.bat build` on Windows) and fix compile errors before finishing.
+4. Commit on each branch with a clear message; push all updated branches when the user asks to push (or when they asked to commit/push the change).
+
+## Do not
+
+- Leave LICENSE, docs, or feature work only on one branch.
+- Blindly merge/rebase entire branches — prefer targeted file ports and version-aware code edits.
+- Skip the legacy builds after code (non-docs-only) changes.
