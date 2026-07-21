@@ -2,11 +2,13 @@ package dev.oma.addon.hud;
 
 import dev.oma.addon.Main;
 import dev.oma.addon.modules.Utility.DubCount;
+import dev.oma.addon.util.HudFont;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.hud.HudElement;
 import meteordevelopment.meteorclient.systems.hud.HudElementInfo;
 import meteordevelopment.meteorclient.systems.hud.HudRenderer;
 import meteordevelopment.meteorclient.utils.render.color.Color;
+import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
@@ -45,6 +47,20 @@ public class DubCountGUI extends HudElement {
         .build()
     );
 
+    private final Setting<Boolean> customFont = sgGeneral.add(new BoolSetting.Builder()
+        .name("custom-font")
+        .description("Use Meteor's custom font. Off uses the default Minecraft / resource pack font.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<SettingColor> countColor = sgGeneral.add(new ColorSetting.Builder()
+        .name("count-color")
+        .description("Color of the count text.")
+        .defaultValue(new SettingColor(255, 255, 255, 255))
+        .build()
+    );
+
     public DubCountGUI() {
         super(INFO);
         calculateSize();
@@ -56,27 +72,35 @@ public class DubCountGUI extends HudElement {
     }
 
     private void calculateSize() {
-        setSize(17 * scale.get(), 17 * scale.get());
+        setSize(17 * scale.get() + 40, 17 * scale.get());
     }
 
     @Override
     public void render(HudRenderer renderer) {
-        int dubCount = DubCount.getDubCount();
-        ItemStack chestStack = new ItemStack(Items.CHEST, dubCount);
+        double displayCount = DubCount.getDisplayCount();
+        String countText = DubCount.getFormattedCount();
+        boolean empty = displayCount <= 0;
 
-        if (shouldHideInEditor(chestStack)) {
+        if (mode.get() == Mode.HideItem && empty && !isInEditor()) {
             renderEditorPlaceholder(renderer);
-        } else {
-            renderer.post(() -> {
-                double xPos = this.x + border.get();
-                double yPos = this.y + border.get();
-                renderItem(renderer, chestStack, (int) xPos, (int) yPos);
-            });
+            return;
         }
-    }
 
-    private boolean shouldHideInEditor(ItemStack itemStack) {
-        return mode.get() == Mode.HideItem && itemStack.isEmpty() && !isInEditor();
+        ItemStack chestStack = new ItemStack(Items.CHEST, 1);
+        double xPos = this.x + border.get();
+        double yPos = this.y + border.get();
+
+        renderer.post(() -> renderItem(renderer, chestStack, (int) xPos, (int) yPos));
+
+        if (mode.get() != Mode.HideCount || !empty || isInEditor()) {
+            String text = empty && mode.get() == Mode.ShowCount ? "0" : (empty && !isInEditor() ? "" : countText);
+            if (isInEditor() && empty) text = "0.0";
+            if (!text.isEmpty()) {
+                double textX = xPos + 17 * scale.get() + 2;
+                double textY = yPos + (17 * scale.get() - HudFont.textHeight(renderer, customFont.get(), false, scale.get() * 0.5)) / 2.0;
+                HudFont.text(renderer, text, textX, textY, countColor.get(), customFont.get(), false, scale.get() * 0.5);
+            }
+        }
     }
 
     private void renderEditorPlaceholder(HudRenderer renderer) {
@@ -87,27 +111,7 @@ public class DubCountGUI extends HudElement {
     }
 
     private void renderItem(HudRenderer renderer, ItemStack itemStack, int x, int y) {
-        if (mode.get() == Mode.HideItem) {
-            renderer.item(itemStack, x, y, scale.get().floatValue(), true);
-            return;
-        }
-
-        String countOverride = null;
-        boolean needsReset = false;
-
-        if (itemStack.isEmpty() || itemStack.getCount() == 0) {
-            if (mode.get() == Mode.ShowCount) {
-                countOverride = "0";
-            }
-            itemStack = new ItemStack(Items.CHEST, 1);
-            needsReset = true;
-        }
-
-        renderer.item(itemStack, x, y, scale.get().floatValue(), true, countOverride);
-
-        if (needsReset) {
-            itemStack.setCount(0);
-        }
+        renderer.item(itemStack, x, y, scale.get().floatValue(), false);
     }
 
     public enum Mode {

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "oma",
   "version": "${version}",
-  "name": "o.m.a.",
+  "name": "oma",
   "description": "A 2b2t Meteor Client utility addon",
   "authors": [
     "Olrite"

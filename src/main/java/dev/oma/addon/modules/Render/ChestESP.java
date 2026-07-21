@@ -1,6 +1,8 @@
 package dev.oma.addon.modules.Render;
 
 import dev.oma.addon.Main;
+import dev.oma.addon.modules.Utility.ItemFinder;
+import dev.oma.addon.util.ItemListSync;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
@@ -8,6 +10,7 @@ import meteordevelopment.meteorclient.events.world.BlockUpdateEvent;
 import meteordevelopment.meteorclient.renderer.ShapeMode;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
+import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.block.Block;
@@ -36,6 +39,36 @@ public class ChestESP extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgRender = settings.createGroup("Render");
 
+    private final SettingGroup sgFilters = settings.createGroup("Filters");
+
+    private final Setting<Boolean> syncWithItemFinder = sgFilters.add(new BoolSetting.Builder()
+        .name("sync-with-item-finder")
+        .description("Share custom item/block lists with Item Finder, and highlight chests containing Item Finder matches (default finds + shared lists).")
+        .defaultValue(false)
+        .build()
+    );
+
+    private final Setting<Boolean> detectShulkers = sgFilters.add(new BoolSetting.Builder()
+        .name("detect-shulkers")
+        .description("Highlight chests that contain any shulker box.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<List<net.minecraft.item.Item>> items = sgFilters.add(new ItemListSetting.Builder()
+        .name("items")
+        .description("Highlight chests that contain any of these items. Shared with Item Finder when sync is enabled.")
+        .defaultValue()
+        .build()
+    );
+
+    private final Setting<List<Block>> blocks = sgFilters.add(new BlockListSetting.Builder()
+        .name("blocks")
+        .description("Highlight chests that contain any of these blocks as items. Shared with Item Finder when sync is enabled.")
+        .defaultValue()
+        .build()
+    );
+
     // General settings
     private final Setting<Double> maxDistance = sgGeneral.add(new DoubleSetting.Builder()
         .name("max-distance")
@@ -58,7 +91,7 @@ public class ChestESP extends Module {
     // Render settings
     private final Setting<Boolean> renderChests = sgRender.add(new BoolSetting.Builder()
         .name("render-chests")
-        .description("Render ESP boxes around chests with shulker boxes.")
+        .description("Render ESP boxes around chests with tracked items.")
         .defaultValue(true)
         .build()
     );
@@ -77,6 +110,16 @@ public class ChestESP extends Module {
         .build()
     );
 
+    private final Setting<Integer> opacity = sgRender.add(new IntSetting.Builder()
+        .name("opacity")
+        .description("Opacity of the chest ESP (0-100).")
+        .defaultValue(35)
+        .min(0)
+        .max(100)
+        .sliderRange(0, 100)
+        .build()
+    );
+
     private final Setting<Double> boxHeight = sgRender.add(new DoubleSetting.Builder()
         .name("box-height")
         .description("Height of the ESP box.")
@@ -87,30 +130,34 @@ public class ChestESP extends Module {
         .build()
     );
 
-    private final Setting<Boolean> debugMode = sgGeneral.add(new BoolSetting.Builder()
+    private final SettingGroup sgDebug = settings.createGroup("Debug");
+
+    private final Setting<Boolean> debugMode = sgDebug.add(new BoolSetting.Builder()
         .name("debug-mode")
-        .description("Shows all chests for debugging purposes.")
+        .description("Shows all nearby chests regardless of contents, and unlocks testing options. Note: Minecraft only sends chest contents to the client once a chest has been opened, so normal mode can only detect tracked items in chests you have personally opened (they are then remembered for memory-duration).")
         .defaultValue(false)
         .build()
     );
 
-    private final Setting<Boolean> showDebugInfo = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting<Boolean> showDebugInfo = sgDebug.add(new BoolSetting.Builder()
         .name("show-debug-info")
         .description("Shows debug information in chat.")
         .defaultValue(false)
+        .visible(debugMode::get)
         .build()
     );
 
-    private final Setting<Boolean> testWithInventory = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting<Boolean> testWithInventory = sgDebug.add(new BoolSetting.Builder()
         .name("test-with-inventory")
         .description("Test shulker detection with your own inventory instead of chests.")
         .defaultValue(false)
+        .visible(debugMode::get)
         .build()
     );
 
     private final Setting<Integer> memoryDuration = sgGeneral.add(new IntSetting.Builder()
         .name("memory-duration")
-        .description("How long to remember chests with shulker boxes (in minutes).")
+        .description("How long to remember chests with tracked items (in minutes).")
         .defaultValue(60)
         .min(1)
         .max(1440)
@@ -120,29 +167,32 @@ public class ChestESP extends Module {
 
     private final Setting<Boolean> trackOpenedChests = sgGeneral.add(new BoolSetting.Builder()
         .name("track-opened-chests")
-        .description("Remember chests with shulker boxes when you open them.")
+        .description("Remember chests with tracked items when you open them.")
         .defaultValue(true)
         .build()
     );
 
-    private final Setting<Boolean> manualTest = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting<Boolean> manualTest = sgDebug.add(new BoolSetting.Builder()
         .name("manual-test")
         .description("Manually check current chest when enabled.")
         .defaultValue(false)
+        .visible(debugMode::get)
         .build()
     );
 
-    private final Setting<Boolean> showDetectionMethod = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting<Boolean> showDetectionMethod = sgDebug.add(new BoolSetting.Builder()
         .name("show-detection-method")
         .description("Shows which detection method was used for shulker boxes.")
         .defaultValue(false)
+        .visible(debugMode::get)
         .build()
     );
 
-    private final Setting<Boolean> testAllShulkerTypes = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting<Boolean> testAllShulkerTypes = sgDebug.add(new BoolSetting.Builder()
         .name("test-all-shulker-types")
         .description("Tests detection with all shulker box variants in your inventory.")
         .defaultValue(false)
+        .visible(debugMode::get)
         .build()
     );
 
@@ -160,6 +210,23 @@ public class ChestESP extends Module {
         .build()
     );
 
+    private final SettingGroup sgChat = settings.createGroup("Chat");
+
+    private final Setting<Boolean> chatOutput = sgChat.add(new BoolSetting.Builder()
+        .name("chat-output")
+        .description("Client-side chat notification when a chest with tracked items is found.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> chatCoords = sgChat.add(new BoolSetting.Builder()
+        .name("chat-coordinates")
+        .description("Include coordinates in chat notifications.")
+        .defaultValue(true)
+        .visible(chatOutput::get)
+        .build()
+    );
+
 
     private final Set<BlockPos> chestsWithShulkers = new HashSet<>();
     private final Map<BlockPos, Long> chestMemory = new HashMap<>(); // BlockPos -> timestamp when shulker was seen
@@ -168,7 +235,29 @@ public class ChestESP extends Module {
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public ChestESP() {
-        super(Main.RENDER, "Chest ESP", "Highlights chests that contain shulker boxes.");
+        super(Main.MOD, "Chest ESP", "Highlights chests that contain shulkers or user-specified items/blocks.");
+    }
+
+    public boolean isListSyncEnabled() {
+        return syncWithItemFinder.get();
+    }
+
+    public List<net.minecraft.item.Item> getConfiguredItems() {
+        return items.get();
+    }
+
+    public List<Block> getConfiguredBlocks() {
+        return blocks.get();
+    }
+
+    public boolean matchesCustomLists(ItemStack stack) {
+        if (stack == null || stack.isEmpty()) return false;
+
+        if (items.get().contains(stack.getItem())) return true;
+        if (stack.getItem() instanceof BlockItem blockItem && blocks.get().contains(blockItem.getBlock())) {
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -236,11 +325,10 @@ public class ChestESP extends Module {
                     info("Opened container screen with " + containerSlots + " slots");
                 }
                 
-                // Only process if it looks like a chest (27 slots)
-                if (containerSlots == 27) {
-                    if (showDebugInfo.get()) {
-                        info("Chest screen opened - detection will happen in tick event");
-                    }
+                // Only process if it looks like a chest (27 or 54 slots)
+                if (containerSlots == 27 || containerSlots == 54) {
+                    // Check immediately instead of waiting for the next tick interval
+                    checkCurrentChestScreen();
                 }
             }
         }
@@ -278,6 +366,9 @@ public class ChestESP extends Module {
     private void onRender3D(Render3DEvent event) {
         if (!renderChests.get() || mc.world == null || mc.player == null) return;
 
+        SettingColor base = chestColor.get();
+        SettingColor renderColor = new SettingColor(base.r, base.g, base.b, opacity.get() * 255 / 100);
+
         for (BlockPos chestPos : chestsWithShulkers) {
             if (mc.player.getBlockPos().getSquaredDistance(chestPos) > maxDistance.get() * maxDistance.get()) {
                 continue;
@@ -287,7 +378,7 @@ public class ChestESP extends Module {
             event.renderer.box(
                 chestPos.getX(), chestPos.getY(), chestPos.getZ(),
                 chestPos.getX() + 1, chestPos.getY() + boxHeight.get(), chestPos.getZ() + 1,
-                chestColor.get(), chestColor.get(), shapeMode.get(),
+                renderColor, renderColor, shapeMode.get(),
                 0
             );
 
@@ -298,7 +389,7 @@ public class ChestESP extends Module {
                     event.renderer.box(
                         otherHalf.getX(), otherHalf.getY(), otherHalf.getZ(),
                         otherHalf.getX() + 1, otherHalf.getY() + boxHeight.get(), otherHalf.getZ() + 1,
-                        chestColor.get(), chestColor.get(), shapeMode.get(),
+                        renderColor, renderColor, shapeMode.get(),
                         0
                     );
                 }
@@ -407,19 +498,10 @@ public class ChestESP extends Module {
                         info("Slot " + i + ": " + stack.getItem().toString());
                     }
                     
-                    // Use proper shulker box detection like in AutoShulker
-                    if (isShulkerBox(stack)) {
+                    // Use tracked-item detection (shulkers and/or custom lists)
+                    if (isTrackedContent(stack)) {
                         if (showDebugInfo.get()) {
-                            info("Found shulker box in slot " + i);
-                        }
-                        return true;
-                    }
-                    
-                    // Alternative detection method using item name
-                    String itemName = stack.getItem().toString().toLowerCase();
-                    if (itemName.contains("shulker_box")) {
-                        if (showDebugInfo.get()) {
-                            info("Found shulker box by name in slot " + i + ": " + itemName);
+                            info("Found tracked item in slot " + i);
                         }
                         return true;
                     }
@@ -430,6 +512,30 @@ public class ChestESP extends Module {
                 info("Error checking chest inventory: " + e.getMessage());
             }
         }
+        return false;
+    }
+
+    private boolean isTrackedContent(ItemStack stack) {
+        if (stack.isEmpty()) return false;
+
+        if (detectShulkers.get() && isShulkerBox(stack)) {
+            return true;
+        }
+
+        if (matchesCustomLists(stack)) {
+            return true;
+        }
+
+        if (ItemListSync.isEnabled()) {
+            Modules modules = Modules.get();
+            if (modules != null) {
+                ItemFinder finder = modules.get(ItemFinder.class);
+                if (finder != null && finder.matches(stack)) {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
@@ -500,9 +606,9 @@ public class ChestESP extends Module {
                         info("Chest slot " + i + ": " + stack.getItem().toString());
                     }
                     
-                    if (isShulkerBox(stack)) {
+                    if (isTrackedContent(stack)) {
                         if (showDebugInfo.get()) {
-                            info("Found shulker box in chest slot " + i);
+                            info("Found tracked item in chest slot " + i);
                         }
                         return true;
                     }
@@ -515,6 +621,19 @@ public class ChestESP extends Module {
         }
         
         return false;
+    }
+
+    private void rememberChest(BlockPos pos) {
+        boolean isNew = !chestMemory.containsKey(pos);
+        chestMemory.put(pos, System.currentTimeMillis());
+        chestsWithShulkers.add(pos);
+        if (isNew && chatOutput.get()) {
+            if (chatCoords.get()) {
+                info("Tracked chest at %d, %d, %d", pos.getX(), pos.getY(), pos.getZ());
+            } else {
+                info("Tracked chest found");
+            }
+        }
     }
 
     private void cleanupOldMemory() {
@@ -552,8 +671,7 @@ public class ChestESP extends Module {
                         }
                         
                         if (chestContainsShulker(chestEntity)) {
-                            chestMemory.put(pos, System.currentTimeMillis());
-                            chestsWithShulkers.add(pos);
+                            rememberChest(pos);
                             
                             if (showDebugInfo.get()) {
                                 info("Found shulker box in nearby chest at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
@@ -594,8 +712,7 @@ public class ChestESP extends Module {
                         if (chestScreenHandlerContainsShulker(handler)) {
                             // Remember all chest positions
                             for (BlockPos chestPos : chestPositions) {
-                                chestMemory.put(chestPos, System.currentTimeMillis());
-                                chestsWithShulkers.add(chestPos);
+                                rememberChest(chestPos);
                                 updateDoubleChestPairs(chestPos);
                             }
                             

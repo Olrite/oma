@@ -109,7 +109,7 @@ public class ElytraSwap extends Module {
     private ItemStack storedElytra = ItemStack.EMPTY;
 
     public ElytraSwap() {
-        super(Main.UTILS, "Elytra Swap", "Automatically swaps elytras when they reach low durability.");
+        super(Main.MOD, "Elytra Swap", "Automatically swaps elytras when they reach low durability.");
     }
 
     @Override

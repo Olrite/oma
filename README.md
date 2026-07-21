@@ -1,4 +1,4 @@
-# o.m.a. (Olrite's Meteor Addon)
+# oma (Olrite's Meteor Addon)
 
 A 2b2t Meteor Client addon mainly for basehunting and quality of life improvements.
 
@@ -48,13 +48,13 @@ The built JAR is in `build/libs/`.
 
 # Modules
 ### Utility
-- Better Auto Log, Auto Shulker, Elytra Swap, Chat Tracker, Player History, Discord Notifications, Portal Maker, Anti Spam, Dub Counter, Grim Air Place, Map Exporter
+- Better Auto Log, Auto Shulker, Elytra Swap, Leak Logger, Render Notifications, Discord Notifications, Portal Maker, Anti Spam, Dub Counter, Map Archiver, Item Finder, FPS Limiter
 
 ### Renders
-- Sign Render, Chest ESP, Decor ESP, Mob Item ESP, Pearl Owner
+- Sign Render, Chest ESP, Decor ESP, Weird Block ESP, Mob Dimension, Pearl Owner
 
 ### Movement
-- Auto Liftoff, Auto Pitch40, Search Area, Smart eFly, Grim Scaffold
+- Auto Liftoff, Auto Pitch40, Search Area, Smart eFly
 
 ### Hunting
 - Better Stash Finder, Better New Chunks, Trail Follower (requires Baritone)

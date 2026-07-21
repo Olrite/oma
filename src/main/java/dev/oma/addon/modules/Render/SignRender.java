@@ -1,6 +1,7 @@
 package dev.oma.addon.modules.Render;
 
 import dev.oma.addon.Main;
+import dev.oma.addon.util.HudFont;
 import dev.oma.addon.util.LogUtils;
 import meteordevelopment.meteorclient.events.render.Render2DEvent;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
@@ -117,6 +118,13 @@ public class SignRender extends Module {
         .build()
     );
 
+    private final Setting<Boolean> customFont = sgRender.add(new BoolSetting.Builder()
+        .name("custom-font")
+        .description("Use Meteor's custom font. Off uses the default Minecraft / resource pack font.")
+        .defaultValue(true)
+        .build()
+    );
+
     private final Setting<SettingColor> backgroundColor = sgRender.add(new ColorSetting.Builder()
         .name("background-color")
         .description("Color of the background.")
@@ -138,7 +146,7 @@ public class SignRender extends Module {
     private final List<SignRenderInfo> signsToRender = new ArrayList<>();
 
     public SignRender() {
-        super(Main.RENDER, "Sign Render", "Detects signs in render distance and outputs their text to chat and HUD.");
+        super(Main.MOD, "Sign Render", "Detects signs in render distance and outputs their text to chat and HUD.");
     }
 
     @Override
@@ -209,7 +217,7 @@ public class SignRender extends Module {
     private void onRender2D(Render2DEvent event) {
         if (!render3D.get() || signsToRender.isEmpty()) return;
 
-        TextRenderer textRenderer = TextRenderer.get();
+        TextRenderer textRenderer = HudFont.worldRenderer(customFont.get());
 
         for (SignRenderInfo signInfo : signsToRender) {
             // Calculate text dimensions for multi-line text

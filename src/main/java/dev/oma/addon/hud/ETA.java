@@ -1,6 +1,7 @@
 package dev.oma.addon.hud;
 
 import dev.oma.addon.Main;
+import dev.oma.addon.util.HudFont;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.hud.HudElement;
@@ -73,6 +74,13 @@ public class ETA extends HudElement {
         .defaultValue(1.0)
         .min(0.1)
         .sliderRange(0.1, 3.0)
+        .build()
+    );
+
+    private final Setting<Boolean> customFont = sgGeneral.add(new BoolSetting.Builder()
+        .name("custom-font")
+        .description("Use Meteor's custom font. Off uses the default Minecraft / resource pack font.")
+        .defaultValue(true)
         .build()
     );
 
@@ -238,8 +246,8 @@ public class ETA extends HudElement {
     public void render(HudRenderer renderer) {
         if (MeteorClient.mc.player == null || MeteorClient.mc.world == null) {
             if (isInEditor()) {
-                renderer.text("ETA", x, y, titleColor.get(), true, textScale.get());
-                setSize(renderer.textWidth("ETA", true, textScale.get()), renderer.textHeight(true, textScale.get()));
+                HudFont.text(renderer, "ETA", x, y, titleColor.get(), customFont.get(), true, textScale.get());
+                setSize(HudFont.textWidth(renderer, "ETA", customFont.get(), true, textScale.get()), HudFont.textHeight(renderer, customFont.get(), true, textScale.get()));
             }
             return;
         }
@@ -385,13 +393,13 @@ public class ETA extends HudElement {
         double scale = textScale.get();
         double maxWidth = 0;
         double height = 0;
-        double textHeight = renderer.textHeight(true, scale);
+        double textHeight = HudFont.textHeight(renderer, customFont.get(), true, scale);
         double spacing = 2;
 
         if (showTitle.get()) {
             String title = "ETA";
-            double titleWidth = renderer.textWidth(title, true, scale);
-            renderer.text(title, curX, curY, titleColor.get(), true, scale);
+            double titleWidth = HudFont.textWidth(renderer, title, customFont.get(), true, scale);
+            HudFont.text(renderer, title, curX, curY, titleColor.get(), customFont.get(), true, scale);
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, titleWidth);
@@ -399,8 +407,8 @@ public class ETA extends HudElement {
 
         if (showGoalCoordinates.get() && usingCustomGoal) {
             String goalText = String.format("Goal: %d, %d, %d", customGoalX.get().intValue(), customGoalY.get().intValue(), customGoalZ.get().intValue());
-            double goalWidth = renderer.textWidth(goalText, true, scale);
-            renderer.text(goalText, curX, curY, new SettingColor(255, 165, 0, 255), true, scale); // Orange color
+            double goalWidth = HudFont.textWidth(renderer, goalText, customFont.get(), true, scale);
+            HudFont.text(renderer, goalText, curX, curY, new SettingColor(255, 165, 0, 255), customFont.get(), true, scale); // Orange color
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, goalWidth);
@@ -408,8 +416,8 @@ public class ETA extends HudElement {
 
         if (showElytraIndicator.get() && usingElytraMode) {
             String elytraText = "Elytra Mode Active";
-            double elytraWidth = renderer.textWidth(elytraText, true, scale);
-            renderer.text(elytraText, curX, curY, new SettingColor(0, 255, 255, 255), true, scale); // Cyan color
+            double elytraWidth = HudFont.textWidth(renderer, elytraText, customFont.get(), true, scale);
+            HudFont.text(renderer, elytraText, curX, curY, new SettingColor(0, 255, 255, 255), customFont.get(), true, scale); // Cyan color
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, elytraWidth);
@@ -417,8 +425,8 @@ public class ETA extends HudElement {
 
         if (showDistance.get()) {
             String distanceText = String.format("Distance: %.1f", distance);
-            double distanceWidth = renderer.textWidth(distanceText, true, scale);
-            renderer.text(distanceText, curX, curY, distanceColor.get(), true, scale);
+            double distanceWidth = HudFont.textWidth(renderer, distanceText, customFont.get(), true, scale);
+            HudFont.text(renderer, distanceText, curX, curY, distanceColor.get(), customFont.get(), true, scale);
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, distanceWidth);
@@ -426,8 +434,8 @@ public class ETA extends HudElement {
 
         if (showSpeed.get()) {
             String speedText = String.format("Speed: %.1f b/s", currentSpeed);
-            double speedWidth = renderer.textWidth(speedText, true, scale);
-            renderer.text(speedText, curX, curY, speedColor.get(), true, scale);
+            double speedWidth = HudFont.textWidth(renderer, speedText, customFont.get(), true, scale);
+            HudFont.text(renderer, speedText, curX, curY, speedColor.get(), customFont.get(), true, scale);
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, speedWidth);
@@ -435,8 +443,8 @@ public class ETA extends HudElement {
 
         if (showETA.get()) {
             String etaDisplayText = String.format("ETA: %s", etaText);
-            double etaWidth = renderer.textWidth(etaDisplayText, true, scale);
-            renderer.text(etaDisplayText, curX, curY, etaColor.get(), true, scale);
+            double etaWidth = HudFont.textWidth(renderer, etaDisplayText, customFont.get(), true, scale);
+            HudFont.text(renderer, etaDisplayText, curX, curY, etaColor.get(), customFont.get(), true, scale);
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, etaWidth);
@@ -448,8 +456,8 @@ public class ETA extends HudElement {
                 lastUpdateTime != 0 ? (int)(System.currentTimeMillis() - lastUpdateTime) : 0,
                 speedHistory.size(),
                 currentSpeed);
-            double debugWidth = renderer.textWidth(debugText, true, scale);
-            renderer.text(debugText, curX, curY, new SettingColor(128, 128, 128, 255), true, scale);
+            double debugWidth = HudFont.textWidth(renderer, debugText, customFont.get(), true, scale);
+            HudFont.text(renderer, debugText, curX, curY, new SettingColor(128, 128, 128, 255), customFont.get(), true, scale);
             height += textHeight;
             maxWidth = Math.max(maxWidth, debugWidth);
         }
@@ -463,13 +471,13 @@ public class ETA extends HudElement {
         double scale = textScale.get();
         double maxWidth = 0;
         double height = 0;
-        double textHeight = renderer.textHeight(true, scale);
+        double textHeight = HudFont.textHeight(renderer, customFont.get(), true, scale);
         double spacing = 2;
 
         if (showTitle.get()) {
             String title = "ETA";
-            double titleWidth = renderer.textWidth(title, true, scale);
-            renderer.text(title, curX, curY, titleColor.get(), true, scale);
+            double titleWidth = HudFont.textWidth(renderer, title, customFont.get(), true, scale);
+            HudFont.text(renderer, title, curX, curY, titleColor.get(), customFont.get(), true, scale);
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, titleWidth);
@@ -481,8 +489,8 @@ public class ETA extends HudElement {
         } else {
             noGoalText = "No Baritone goal set";
         }
-        double noGoalWidth = renderer.textWidth(noGoalText, true, scale);
-        renderer.text(noGoalText, curX, curY, noGoalColor.get(), true, scale);
+        double noGoalWidth = HudFont.textWidth(renderer, noGoalText, customFont.get(), true, scale);
+        HudFont.text(renderer, noGoalText, curX, curY, noGoalColor.get(), customFont.get(), true, scale);
         height += textHeight;
         maxWidth = Math.max(maxWidth, noGoalWidth);
 
@@ -495,21 +503,21 @@ public class ETA extends HudElement {
         double scale = textScale.get();
         double maxWidth = 0;
         double height = 0;
-        double textHeight = renderer.textHeight(true, scale);
+        double textHeight = HudFont.textHeight(renderer, customFont.get(), true, scale);
         double spacing = 2;
 
         if (showTitle.get()) {
             String title = "ETA";
-            double titleWidth = renderer.textWidth(title, true, scale);
-            renderer.text(title, curX, curY, titleColor.get(), true, scale);
+            double titleWidth = HudFont.textWidth(renderer, title, customFont.get(), true, scale);
+            HudFont.text(renderer, title, curX, curY, titleColor.get(), customFont.get(), true, scale);
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, titleWidth);
         }
 
         String noBaritoneText = "Baritone not available";
-        double noBaritoneWidth = renderer.textWidth(noBaritoneText, true, scale);
-        renderer.text(noBaritoneText, curX, curY, noGoalColor.get(), true, scale);
+        double noBaritoneWidth = HudFont.textWidth(renderer, noBaritoneText, customFont.get(), true, scale);
+        HudFont.text(renderer, noBaritoneText, curX, curY, noGoalColor.get(), customFont.get(), true, scale);
         height += textHeight;
         maxWidth = Math.max(maxWidth, noBaritoneWidth);
 

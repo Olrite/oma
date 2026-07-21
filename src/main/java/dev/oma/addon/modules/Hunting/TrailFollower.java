@@ -315,7 +315,7 @@ public class TrailFollower extends Module
 
     public TrailFollower()
     {
-        super(Main.HUNTING, "Trail Follower", "Automatically follows trails in all dimensions.");
+        super(Main.HUNT, "Trail Follower", "Automatically follows trails in all dimensions.");
     }
 
     void resetTrail()
