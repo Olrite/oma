@@ -153,7 +153,7 @@ public class MobItemESP extends Module {
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public MobItemESP() {
-        super(Main.RENDER, "MobItemESP", "Highlights mobs holding items they wouldn't normally spawn with.");
+        super(Main.RENDER, "Mob Item ESP", "Highlights mobs holding items they wouldn't normally spawn with.");
     }
 
     @Override

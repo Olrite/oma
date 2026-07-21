@@ -24,7 +24,7 @@ import java.util.Map;
 import dev.oma.addon.Main;
 
 public class EntityList extends HudElement {
-    public static final HudElementInfo<EntityList> INFO = new HudElementInfo<>(Main.HUD_GROUP, "EntityList", "Displays nearby entities in a list.", EntityList::new);
+    public static final HudElementInfo<EntityList> INFO = new HudElementInfo<>(Main.HUD_GROUP, "Entity List", "Displays nearby entities in a list.", EntityList::new);
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 

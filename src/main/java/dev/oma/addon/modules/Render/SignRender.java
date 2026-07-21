@@ -138,7 +138,7 @@ public class SignRender extends Module {
     private final List<SignRenderInfo> signsToRender = new ArrayList<>();
 
     public SignRender() {
-        super(Main.RENDER, "sign-render", "Detects signs in render distance and outputs their text to chat and HUD.");
+        super(Main.RENDER, "Sign Render", "Detects signs in render distance and outputs their text to chat and HUD.");
     }
 
     @Override

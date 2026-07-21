@@ -76,7 +76,7 @@ public class DubCount extends Module {
     );
 
     public DubCount() {
-        super(Main.RENDER, "dub-counter", "Counts how many double chests are in render distance.");
+        super(Main.RENDER, "Dub Counter", "Counts how many double chests are in render distance.");
     }
 
     @Override
