@@ -14,14 +14,14 @@ import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.item.Items;
 
-public class AFKVanillaFly extends Module {
+public class SmartEFly extends Module {
     private long lastRocketUse = 0;
     private boolean launched = false;
     private double yTarget = -1;
     private float targetPitch = 0;
 
-    public AFKVanillaFly() {
-        super(Main.MOVEMENT, "AFKVanillaFly", "Maintains a level Y-flight with fireworks and smooth pitch control.");
+    public SmartEFly() {
+        super(Main.MOVEMENT, "Smart eFly", "Maintains a level Y-flight with fireworks and smooth pitch control.");
     }
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -57,7 +57,7 @@ public class AFKVanillaFly extends Module {
         yTarget = -1;
 
         if (mc.player == null || !mc.player.isGliding()) {
-            info("You must be flying before enabling AFKVanillaFly.");
+            info("You must be flying before enabling SmartEFly.");
         }
     }
 

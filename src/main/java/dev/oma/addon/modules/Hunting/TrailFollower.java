@@ -1,7 +1,7 @@
 package dev.oma.addon.modules.Hunting;
 
-import dev.oma.addon.modules.Movement.Pitch40Util;
-import dev.oma.addon.modules.Movement.AFKVanillaFly;
+import dev.oma.addon.modules.Movement.AutoPitch40;
+import dev.oma.addon.modules.Movement.SmartEFly;
 import baritone.api.BaritoneAPI;
 import baritone.api.pathing.goals.GoalXZ;
 import dev.oma.addon.Main;
@@ -382,22 +382,22 @@ public class TrailFollower extends Module
 
             if (followMode == FollowMode.YAWLOCK && !mc.world.getRegistryKey().equals(World.NETHER)) {
                 if (overworldFlightMode.get() == OverworldFlightMode.PITCH40) {
-                    Class<? extends Module> pitch40Util = Pitch40Util.class;
-                    Module pitch40UtilModule = Modules.get().get(pitch40Util);
-                    if (!pitch40UtilModule.isActive()) {
-                        pitch40UtilModule.toggle();
+                    Class<? extends Module> autoPitch40 = AutoPitch40.class;
+                    Module autoPitch40Module = Modules.get().get(autoPitch40);
+                    if (!autoPitch40Module.isActive()) {
+                        autoPitch40Module.toggle();
                         if (pitch40Firework.get()) {
                             @SuppressWarnings("unchecked")
-                            Setting<Boolean> setting = (Setting<Boolean>) pitch40UtilModule.settings.get("auto-firework");
-                            info("Auto Firework enabled, if you want to change the velocity threshold or the firework cooldown check the settings under Pitch40Util.");
+                            Setting<Boolean> setting = (Setting<Boolean>) autoPitch40Module.settings.get("auto-firework");
+                            info("Auto Firework enabled, if you want to change the velocity threshold or the firework cooldown check the settings under Auto Pitch40.");
                             oldAutoFireworkValue = setting.get();
                             setting.set(true);
                         }
                     }
                 } else if (overworldFlightMode.get() == OverworldFlightMode.VANILLA) {
-                    AFKVanillaFly afkVanillaFly = Modules.get().get(AFKVanillaFly.class);
-                    if (!afkVanillaFly.isActive()) {
-                        afkVanillaFly.toggle();
+                    SmartEFly smartEFly = Modules.get().get(SmartEFly.class);
+                    if (!smartEFly.isActive()) {
+                        smartEFly.toggle();
                     }
                 }
             }
@@ -438,19 +438,19 @@ public class TrailFollower extends Module
             case YAWLOCK: {
                 if (mc.world == null || mc.world.getRegistryKey().equals(World.NETHER)) return;
                 if (overworldFlightMode.get() == OverworldFlightMode.VANILLA) {
-                    AFKVanillaFly afkVanillaFly = Modules.get().get(AFKVanillaFly.class);
-                    if (afkVanillaFly != null) {
-                        afkVanillaFly.resetYLock();
-                        if (afkVanillaFly.isActive()) afkVanillaFly.toggle();
+                    SmartEFly smartEFly = Modules.get().get(SmartEFly.class);
+                    if (smartEFly != null) {
+                        smartEFly.resetYLock();
+                        if (smartEFly.isActive()) smartEFly.toggle();
                     }
                 } else if (overworldFlightMode.get() == OverworldFlightMode.PITCH40) {
-                    Class<? extends Module> pitch40Util = Pitch40Util.class;
-                    Module pitch40UtilModule = Modules.get().get(pitch40Util);
-                    if (pitch40UtilModule.isActive()) {
-                        pitch40UtilModule.toggle();
+                    Class<? extends Module> autoPitch40 = AutoPitch40.class;
+                    Module autoPitch40Module = Modules.get().get(autoPitch40);
+                    if (autoPitch40Module.isActive()) {
+                        autoPitch40Module.toggle();
                     }
                     @SuppressWarnings("unchecked")
-                    Setting<Boolean> setting = (Setting<Boolean>) pitch40UtilModule.settings.get("auto-firework");
+                    Setting<Boolean> setting = (Setting<Boolean>) autoPitch40Module.settings.get("auto-firework");
                     setting.set(oldAutoFireworkValue);
                 }
                 break;

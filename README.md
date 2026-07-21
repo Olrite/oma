@@ -48,17 +48,16 @@ The built JAR is in `build/libs/`.
 
 # Modules
 ### Utility
-- AutoLog Plus, Auto Shulker, Elytra Swap, Chat Tracker, Player History
-- DiscordNotifications, PortalMaker, AntiSpam, Dub Counter, GrimAirPlace, Map Exporter
+- Better Auto Log, Auto Shulker, Elytra Swap, Chat Tracker, Player History, DiscordNotifications, PortalMaker, AntiSpam, Dub Counter, GrimAirPlace, Map Exporter
 
 ### Renders
-- SignRender, ChestESP, VanityESP, Mob Item ESP, PearlOwner
+- SignRender, ChestESP, DecorESP, MobItemESP, PearlOwner
 
 ### Movement
-- Elytra Redeploy, Pitch40Util, SearchArea, AFKVanillaFly, GrimScaffold
+- Auto eFly, Auto Pitch40, SearchArea, Smart eFly, GrimScaffold
 
 ### Hunting
-- StashFinderPlus, NewChunksPlus, TrailFollower (requires Baritone)
+- Better Stash Finder, Better New Chunks, TrailFollower (requires Baritone)
 
 ### HUD
 - TotemCount, CrystalCount, Dub Count, Sign Display, ETA, Lag Detector, EntityList

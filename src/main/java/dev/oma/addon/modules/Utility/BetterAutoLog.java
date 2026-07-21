@@ -22,7 +22,7 @@ import java.util.Set;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import it.unimi.dsi.fastutil.objects.Object2IntOpenHashMap;
 
-public class AutoLogPlus extends Module {
+public class BetterAutoLog extends Module {
     private final SettingGroup sgTimeLog = settings.createGroup("Time Log");
     private final SettingGroup sgLocationLog = settings.createGroup("Location Log");
     private final SettingGroup sgPingLog = settings.createGroup("Ping Log");
@@ -192,8 +192,8 @@ public class AutoLogPlus extends Module {
             .defaultValue(true)
             .build());
 
-    public AutoLogPlus() {
-        super(Main.UTILS, "AutoLog-Plus", "Disconnects you when a specific condition is reached.");
+    public BetterAutoLog() {
+        super(Main.UTILS, "Better Auto Log", "Disconnects you when a specific condition is reached.");
     }
 
     @EventHandler

@@ -14,7 +14,7 @@ import meteordevelopment.meteorclient.systems.modules.movement.elytrafly.ElytraF
 import static dev.oma.addon.util.Utils.firework;
 
 
-public class Pitch40Util extends Module {
+public class AutoPitch40 extends Module {
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
@@ -58,8 +58,8 @@ public class Pitch40Util extends Module {
         .build()
     );
 
-    public Pitch40Util() {
-        super(Main.MOVEMENT, "Pitch40Util", "Makes sure pitch 40 stays on when reconnecting to 2b2t, and sets your bounds as you reach highest point each climb.");
+    public AutoPitch40() {
+        super(Main.MOVEMENT, "Auto Pitch40", "Makes sure pitch 40 stays on when reconnecting to 2b2t, and sets your bounds as you reach highest point each climb.");
     }
 
     Module elytraFly = Modules.get().get(ElytraFly.class);
