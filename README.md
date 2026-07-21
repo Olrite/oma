@@ -54,7 +54,7 @@ The built JAR is in `build/libs/`.
 - Sign Render, Chest ESP, Decor ESP, Mob Item ESP, Pearl Owner
 
 ### Movement
-- Auto eFly, Auto Pitch40, Search Area, Smart eFly, Grim Scaffold
+- Auto Liftoff, Auto Pitch40, Search Area, Smart eFly, Grim Scaffold
 
 ### Hunting
 - Better Stash Finder, Better New Chunks, Trail Follower (requires Baritone)

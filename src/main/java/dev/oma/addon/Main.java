@@ -10,7 +10,7 @@ import dev.oma.addon.hud.ETA;
 import dev.oma.addon.hud.LagDetector;
 import dev.oma.addon.modules.Hunting.BetterNewChunks;
 import dev.oma.addon.modules.Movement.SmartEFly;
-import dev.oma.addon.modules.Movement.AutoEFly;
+import dev.oma.addon.modules.Movement.AutoLiftoff;
 import dev.oma.addon.modules.Movement.GrimScaffold;
 import dev.oma.addon.modules.Utility.GrimAirPlace;
 import dev.oma.addon.modules.Hunting.BetterStashFinder;
@@ -69,7 +69,7 @@ public class Main extends MeteorAddon {
          Modules.get().add(new BetterAutoLog());
          Modules.get().add(new SmartEFly());
          Modules.get().add(new AutoShulker());
-         Modules.get().add(new AutoEFly());
+         Modules.get().add(new AutoLiftoff());
          Modules.get().add(new DubCount());
          Modules.get().add(new GrimScaffold());
          Modules.get().add(new GrimAirPlace());
