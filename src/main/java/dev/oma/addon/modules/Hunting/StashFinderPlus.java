@@ -283,10 +283,10 @@ public class StashFinderPlus extends Module
                     switch (notificationMode.get())
                     {
                         case Chat -> info("Found stash at (highlight)%s(default), (highlight)%s(default).", chunk.x, chunk.z);
-                        case Toast -> mc.getToastManager().add(new MeteorToast.Builder("Stash Found!").text("Found stash at " + chunk.x + ", " + chunk.z).icon(Items.CHEST).build());
+                        case Toast -> mc.getToastManager().add(new MeteorToast(Items.CHEST, "Stash Found!", "Found stash at " + chunk.x + ", " + chunk.z));
                         case Both -> {
                             info("Found stash at (highlight)%s(default), (highlight)%s(default).", chunk.x, chunk.z);
-                            mc.getToastManager().add(new MeteorToast.Builder("Stash Found!").text("Found stash at " + chunk.x + ", " + chunk.z).icon(Items.CHEST).build());
+                            mc.getToastManager().add(new MeteorToast(Items.CHEST, "Stash Found!", "Found stash at " + chunk.x + ", " + chunk.z));
                         }
                     }
                 }
@@ -353,7 +353,7 @@ public class StashFinderPlus extends Module
                     else
                     {
                         String message = "Found stash at " + chunk.x + ", " + chunk.z + ".";
-                        new Thread(() -> sendWebhook(webhookLink.get(), "Stash Found!", message, ping.get() ? discordId.get() : null, mc.player.getGameProfile().name())).start();
+                        new Thread(() -> sendWebhook(webhookLink.get(), "Stash Found!", message, ping.get() ? discordId.get() : null, mc.player.getGameProfile().getName())).start();
                     }
                 }
 
@@ -777,7 +777,7 @@ public class StashFinderPlus extends Module
         {
             if (disableOnTeleport.get() && mc.player.squaredDistanceTo(lastPosition) > 16 * 16) this.toggle();
         }
-        lastPosition = mc.player.getEntityPos();
+        lastPosition = mc.player.getPos();
     }
 }
 

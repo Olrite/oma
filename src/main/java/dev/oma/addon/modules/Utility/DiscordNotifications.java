@@ -172,7 +172,7 @@ public class DiscordNotifications extends Module {
                     if (!playersInRange.contains(playerEntity.getGameProfile()))
                     {
                         playersInRange.add(playerEntity.getGameProfile());
-                        handleMessage(playerEntity.getGameProfile().name() + " has entered visual range!", MessageType.PLAYER_RANGE);
+                        handleMessage(playerEntity.getGameProfile().getName() + " has entered visual range!", MessageType.PLAYER_RANGE);
                     }
                 }
             }
@@ -181,10 +181,10 @@ public class DiscordNotifications extends Module {
         // Check for players leaving range
         for (GameProfile profile : playersInRange)
         {
-            if (!uuidsCurrentlyInRange.contains(profile.id()))
+            if (!uuidsCurrentlyInRange.contains(profile.getId()))
             {
                 playersInRange.remove(profile);
-                handleMessage(profile.name() + " has left visual range!", MessageType.PLAYER_RANGE);
+                handleMessage(profile.getName() + " has left visual range!", MessageType.PLAYER_RANGE);
             }
         }
     }

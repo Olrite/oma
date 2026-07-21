@@ -240,7 +240,7 @@ public class SignRender extends Module {
                 // Render background using Renderer2D
                 Renderer2D.COLOR.begin();
                 Renderer2D.COLOR.quad(bgX, bgY, bgWidth, bgHeight, backgroundColor.get());
-                Renderer2D.COLOR.render();
+                Renderer2D.COLOR.render(event.drawContext.getMatrices());
             }
 
             // Render each line separately
@@ -272,7 +272,7 @@ public class SignRender extends Module {
                 BlockEntity blockEntity = chunk.getBlockEntity(pos);
                 
                 if (blockEntity instanceof SignBlockEntity signEntity) {
-                    double distance = mc.player.getEntityPos().distanceTo(Vec3d.ofCenter(pos));
+                    double distance = mc.player.getPos().distanceTo(Vec3d.ofCenter(pos));
                     
                     if (distance <= maxDist) {
                         SignText frontText = signEntity.getFrontText();

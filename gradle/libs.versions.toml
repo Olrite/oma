@@ -2,22 +2,22 @@
 mod-version = "1.0"
 
 # Fabric (https://fabricmc.net/develop)
-minecraft = "1.21.11"
-yarn-mappings = "1.21.11+build.4"
-fabric-loader = "0.18.4"
-fabric-api = "0.141.3+1.21.11"
+minecraft = "1.21.4"
+yarn-mappings = "1.21.4+build.8"
+fabric-loader = "0.16.9"
+fabric-api = "0.119.4+1.21.4"
 
 # Loom (https://github.com/FabricMC/fabric-loom)
 loom = "1.17-SNAPSHOT"
 
 # Meteor (https://github.com/MeteorDevelopment/meteor-client/)
-meteor = "1.21.11-SNAPSHOT"
-baritone = "1.21.10-SNAPSHOT"
+meteor = "1.21.4-SNAPSHOT"
+baritone = "1.21.4-SNAPSHOT"
 
 # Xaero (Modrinth)
-xaeroplus = "2.34.5+fabric-1.21.11"
-xaeros-worldmap = "fabric-1.21.11-1.44.2"
-xaeros-minimap = "fabric-1.21.11-26.4.2"
+xaeroplus = "2.34.5+fabric-1.21.4"
+xaeros-worldmap = "fabric-1.21.4-1.44.2"
+xaeros-minimap = "fabric-1.21.4-26.4.2"
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }

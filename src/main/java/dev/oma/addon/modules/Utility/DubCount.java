@@ -161,8 +161,8 @@ public class DubCount extends Module {
     @EventHandler
     private void onRenderBlockEntity(RenderBlockEntityEvent event) {
         if (countMode.get() == CountMode.Rendered) {
-            if (event.blockEntityState.type == BlockEntityType.CHEST || event.blockEntityState.type == BlockEntityType.TRAPPED_CHEST) {
-                BlockPos pos = event.blockEntityState.pos;
+            if (event.blockEntity.getType() == BlockEntityType.CHEST || event.blockEntity.getType() == BlockEntityType.TRAPPED_CHEST) {
+                BlockPos pos = event.blockEntity.getPos();
                 if (coords.contains(pos)) return;
                 coords.add(pos);
             }

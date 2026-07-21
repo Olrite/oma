@@ -93,8 +93,8 @@ public class PearlOwner extends Module {
 
             // Culling check
             if (culling.get()) {
-                Vec3d cameraPos = mc.gameRenderer.getCamera().getCameraPos();
-                Vec3d pearlPos = pearl.getEntityPos();
+                Vec3d cameraPos = mc.gameRenderer.getCamera().getPos();
+                Vec3d pearlPos = pearl.getPos();
                 Vec3d cameraToEntity = pearlPos.subtract(cameraPos).normalize();
                 Vec3d cameraDirection = Vec3d.fromPolar(mc.gameRenderer.getCamera().getPitch(), mc.gameRenderer.getCamera().getYaw()).normalize();
 

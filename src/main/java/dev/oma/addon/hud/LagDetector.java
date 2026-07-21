@@ -226,7 +226,7 @@ public class LagDetector extends HudElement {
 
         // Track player position for lagback detection
         if (MeteorClient.mc.player != null) {
-            Vec3d currentPos = MeteorClient.mc.player.getEntityPos();
+            Vec3d currentPos = MeteorClient.mc.player.getPos();
             long currentPosTime = System.currentTimeMillis();
             
             if (lastPosition != null) {

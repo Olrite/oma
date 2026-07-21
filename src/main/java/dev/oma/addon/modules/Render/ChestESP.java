@@ -324,7 +324,7 @@ public class ChestESP extends Module {
                 BlockEntity blockEntity = chunk.getBlockEntity(pos);
                 
                 if (blockEntity instanceof ChestBlockEntity chestEntity) {
-                    double distance = mc.player.getEntityPos().distanceTo(pos.toCenterPos());
+                    double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
                     
                     if (distance <= maxDistance.get()) {
                         totalChests++;
@@ -346,7 +346,7 @@ public class ChestESP extends Module {
         
         // Add remembered chests (those that were previously seen with shulkers)
         for (BlockPos rememberedChest : chestMemory.keySet()) {
-            double distance = mc.player.getEntityPos().distanceTo(rememberedChest.toCenterPos());
+            double distance = mc.player.getPos().distanceTo(rememberedChest.toCenterPos());
             if (distance <= maxDistance.get()) {
                 currentChests.add(rememberedChest);
                 chestsWithShulkersCount++;
@@ -544,7 +544,7 @@ public class ChestESP extends Module {
                 BlockEntity blockEntity = chunk.getBlockEntity(pos);
                 
                 if (blockEntity instanceof ChestBlockEntity chestEntity) {
-                    double distance = mc.player.getEntityPos().distanceTo(pos.toCenterPos());
+                    double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
                     
                     if (distance <= 3.0) { // Very close chests
                         if (showDebugInfo.get()) {
@@ -624,7 +624,7 @@ public class ChestESP extends Module {
                 BlockEntity blockEntity = chunk.getBlockEntity(pos);
                 
                 if (blockEntity instanceof ChestBlockEntity chestEntity) {
-                    double distance = mc.player.getEntityPos().distanceTo(pos.toCenterPos());
+                    double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
                     
                     // If this chest is close and has the right size
                     if (distance <= 6.0 && chestEntity.size() == 27) {
@@ -661,7 +661,7 @@ public class ChestESP extends Module {
                         BlockEntity blockEntity = chunk.getBlockEntity(pos);
                         
                         if (blockEntity instanceof ChestBlockEntity chestEntity) {
-                            double distance = mc.player.getEntityPos().distanceTo(pos.toCenterPos());
+                            double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
                             
                             // If this chest is close and has the right size
                             if (distance <= 6.0 && chestEntity.size() == 27) {

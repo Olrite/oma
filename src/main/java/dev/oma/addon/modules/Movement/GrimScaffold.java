@@ -210,7 +210,7 @@ public class GrimScaffold extends Module {
     }
     private List<BlockPos> getPlacementPositions() {
         List<BlockPos> positions = new ArrayList<>();
-        Vec3d playerPos = mc.player.getEntityPos();
+        Vec3d playerPos = mc.player.getPos();
         Vec3d velocity = mc.player.getVelocity();
         Vec3d predictedPos = playerPos;
         if (velocityPredict.get() && Math.abs(velocity.y) > 0.1) {

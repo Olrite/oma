@@ -188,7 +188,7 @@ public class ModItemESP extends Module {
 
         for (Entity mob : mobsWithModifiedItems) {
             if (mob.isRemoved() || !mob.isAlive()) continue;
-            if (mc.player.getEntityPos().squaredDistanceTo(mob.getEntityPos()) > maxDist) continue;
+            if (mc.player.getPos().squaredDistanceTo(mob.getPos()) > maxDist) continue;
 
             Box box = mob.getBoundingBox();
             event.renderer.box(
@@ -214,7 +214,7 @@ public class ModItemESP extends Module {
             mobCount++;
 
             if (!isTargetMob(entity)) continue;
-            if (mc.player.getEntityPos().squaredDistanceTo(entity.getEntityPos()) > maxDist * maxDist) continue;
+            if (mc.player.getPos().squaredDistanceTo(entity.getPos()) > maxDist * maxDist) continue;
 
             ItemStack mainHand = ItemStack.EMPTY;
             ItemStack offHand = ItemStack.EMPTY;

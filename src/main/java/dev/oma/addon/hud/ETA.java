@@ -203,7 +203,7 @@ public class ETA extends HudElement {
         WButton setGoalButton = list.add(theme.button("Set Goal to Current Position")).expandX().widget();
         setGoalButton.action = () -> {
             if (MeteorClient.mc.player != null) {
-                Vec3d pos = MeteorClient.mc.player.getEntityPos();
+                Vec3d pos = MeteorClient.mc.player.getPos();
                 customGoalX.set(pos.x);
                 customGoalY.set(pos.y);
                 customGoalZ.set(pos.z);
@@ -299,7 +299,7 @@ public class ETA extends HudElement {
         }
 
         // Calculate distance
-        Vec3d playerPos = MeteorClient.mc.player.getEntityPos();
+        Vec3d playerPos = MeteorClient.mc.player.getPos();
         double distance = playerPos.distanceTo(goalPos);
 
         // Calculate ETA
@@ -310,7 +310,7 @@ public class ETA extends HudElement {
     }
 
     private void updateSpeed() {
-        Vec3d currentPos = MeteorClient.mc.player.getEntityPos();
+        Vec3d currentPos = MeteorClient.mc.player.getPos();
         long currentTime = System.currentTimeMillis();
 
         // Only update speed if enough time has passed since last update
