@@ -50,7 +50,7 @@ public class SearchAreaMode
     protected File getJsonFile(String fileName) {
         try
         {
-            return new File(new File(new File(MeteorClient.FOLDER, "Search Area"), searchArea.saveLocation.get()), fileName + ".json");
+            return new File(new File(new File(MeteorClient.FOLDER, "search-area"), searchArea.saveLocation.get()), fileName + ".json");
         }
         catch (NullPointerException e)
         {
