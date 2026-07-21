@@ -26,7 +26,7 @@ public class DiscordNotifications extends Module {
 
     // Add constructor with category
     public DiscordNotifications() {
-        super(Main.UTILS, "Discord Notifications", "Sends notifications to a Discord webhook.");
+        super(Main.MOD, "Discord Notifications", "Sends notifications to a Discord webhook.");
     }
 
     private final Setting<String> webhookURL = sgGeneral.add(new StringSetting.Builder()

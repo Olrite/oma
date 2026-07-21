@@ -198,7 +198,7 @@ public class BetterStashFinder extends Module
 
     public BetterStashFinder()
     {
-        super(Main.HUNTING, "Better Stash Finder", "Jefff mod's BetterStashFinder but with more features.");
+        super(Main.HUNT, "Better Stash Finder", "Finds stashes in chunks and logs them to a file and/or sends a webhook.");
     }
 
     private Vec3 lastPosition = null;

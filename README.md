@@ -1,10 +1,7 @@
-# o.m.a. (Olrite's Meteor Addon)
-
+# oma (Olrite's Meteor Addon)
 A 2b2t Meteor Client addon mainly for basehunting and quality of life improvements.
 
 ## Supported Minecraft versions
-
-
 | Branch           | Minecraft   | Meteor Client                                                        |
 | ---------------- | ----------- | -------------------------------------------------------------------- |
 | `master`         | **26.1.2**  | [Latest](https://meteorclient.com/)                                  |
@@ -15,11 +12,9 @@ A 2b2t Meteor Client addon mainly for basehunting and quality of life improvemen
 Check out the branch matching your Minecraft version before building/installing.
 
 ## Install (Pre-Built JAR)
-
 Download the JAR for your Minecraft version from [GitHub Releases](https://github.com/Olrite/oma/releases) and place the matching JAR in your `mods` folder alongside the correct Meteor Client version.
 
 ## Build from source
-
 ```bash
 git clone https://github.com/Olrite/oma.git
 cd oma
@@ -48,22 +43,42 @@ The built JAR is in `build/libs/`.
 
 # Modules
 ### Utility
-- Better Auto Log, Auto Shulker, Elytra Swap, Chat Tracker, Player History, Discord Notifications, Portal Maker, Anti Spam, Dub Counter, Grim Air Place, Map Exporter
-
-### Renders
-- Sign Render, Chest ESP, Decor ESP, Mob Item ESP, Pearl Owner
-
-### Movement
-- Auto Liftoff, Auto Pitch40, Search Area, Smart eFly, Grim Scaffold
-
+- Better Auto Log - Gives more customization for Auto Log
+- Auto Shulker - Automatically places and fills Shulker Boxes
+- Elytra Swap - Automatically swaps Elytras when durability and certain conditions are met
+- Leak Logger - Logs chat messages when possible leaks are messaged
+- Render Notifications - Gives notifications and logs when certain items or mobs are rendered
+- Discord Notifications - Sends notifications to a Discord webhook
+- Portal Maker - Automatically makes and lights a Nether Portal
+- Anti Spam - Combines similar chat messages or hides them completely based on provided keywords
+- Map Archiver - Saves the map in the user's hand as a png file
+- Item Finder - Highlights user specified items or illegal/valuable items in open containers
+- Sign Render - Detects signs in render distance and outputs their text to chat and HUD
+- Chest ESP - Highlights chests that contain shulkers or user specified items/blocks
+- Decor ESP - Highlights decorative user-placed items
+- Weird Block ESP - Highlights blocks placed in unnatural rotations or positions
+- Mob Dimension - ESP for mobs and animals that do not normally spawn in the current dimension
+- Pearl Owner - Displays the name of the player who threw an ender pearl
+- FPS Limiter - Caps FPS when the game window is unfocused, or optionally while other modules are enabled
 ### Hunting
-- Better Stash Finder, Better New Chunks, Trail Follower (requires Baritone)
-
+- Better Stash Finder - Finds stashes in chunks and logs them to a file and/or sends a webhook
+- Better New Chunks - Detects new chunks and old chunks in the world
+- Trail Follower - Automatically follows trails in all dimensions
+- Auto Liftoff - Automatically jumps and redeploys elytra when touching the ground
+- Auto Pitch40 - Makes sure pitch 40 stays on when reconnecting to 2b2t, and sets your bounds as you reach highest point each climb
+- Search Area - Either loads chunks in a rectangle to a certain point from you, or spirals endlessly from you. Useful with Better Stash Finder or other map saving mods
+- Smart eFly - Maintains a level Y-flight with fireworks and smooth pitch control
 ### HUD
-- Totem Count, Crystal Count, Dub Count, Sign Display, ETA, Lag Detector, Entity List
+- Totem Count - Displays the count of Totems in the user's inventory
+- Crystal Count - Displays the count of Crystals in the user's inventory
+- Dub Counter - Counts how many chests are in render distance
+- Sign Display - Displays nearby sign text
+- ETA - Displays estimated time to get to Baritone goal
+- Lag Detector - Detects lagbacks by analyzing the server's TPS and packet timings
+- Entity List - Displays nearby entities in a list
 
 ## Credits
-Credit to [xqyet](https://github.com/xqyet), [Asteroide](https://github.com/asteroide-development), [miles352](https://github.com/miles352), [dekrom](https://github.com/dekrom), and [etianl](https://github.com/etianl) for some of the modules that I built upon.
+Credit to [xqyet](https://github.com/xqyet), [Asteroide](https://github.com/asteroide-development), [miles352](https://github.com/miles352), [dekrom](https://github.com/dekrom), and [etianl](https://github.com/etianl) for some of the module bases that I built upon.
 
 ## Disclaimer
 Review the code yourself before use. This is a utility addon for anarchy servers; use at your own risk.

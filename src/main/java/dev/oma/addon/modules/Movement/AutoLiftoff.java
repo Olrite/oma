@@ -52,7 +52,7 @@ public class AutoLiftoff extends Module {
     private boolean needsFirework = false;
 
     public AutoLiftoff() {
-        super(Main.MOVEMENT, "Auto Liftoff", "Automatically jumps and redeploys elytra when touching the ground.");
+        super(Main.HUNT, "Auto Liftoff", "Automatically jumps and redeploys elytra when touching the ground.");
     }
 
     @Override

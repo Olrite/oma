@@ -193,7 +193,7 @@ public class BetterAutoLog extends Module {
             .build());
 
     public BetterAutoLog() {
-        super(Main.UTILS, "Better Auto Log", "Disconnects you when a specific condition is reached.");
+        super(Main.MOD, "Better Auto Log", "Disconnects you when a specific condition is reached.");
     }
 
     @EventHandler

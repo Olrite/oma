@@ -1,6 +1,7 @@
 package dev.oma.addon.hud;
 
 import dev.oma.addon.Main;
+import dev.oma.addon.util.HudFont;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -64,6 +65,13 @@ public class LagDetector extends HudElement {
         .defaultValue(1.0)
         .min(0.1)
         .sliderRange(0.1, 3.0)
+        .build()
+    );
+
+    private final Setting<Boolean> customFont = sgGeneral.add(new BoolSetting.Builder()
+        .name("custom-font")
+        .description("Use Meteor's custom font. Off uses the default Minecraft / resource pack font.")
+        .defaultValue(true)
         .build()
     );
 
@@ -271,8 +279,8 @@ public class LagDetector extends HudElement {
     public void render(HudRenderer renderer) {
         if (MeteorClient.mc.player == null || MeteorClient.mc.level == null) {
             if (isInEditor()) {
-                renderer.text("Lag Detector", x, y, titleColor.get(), true, textScale.get());
-                setSize(renderer.textWidth("Lag Detector", true, textScale.get()), renderer.textHeight(true, textScale.get()));
+                HudFont.text(renderer, "Lag Detector", x, y, titleColor.get(), customFont.get(), true, textScale.get());
+                setSize(HudFont.textWidth(renderer, "Lag Detector", customFont.get(), true, textScale.get()), HudFont.textHeight(renderer, customFont.get(), true, textScale.get()));
             }
             return;
         }
@@ -282,13 +290,13 @@ public class LagDetector extends HudElement {
         double scale = textScale.get();
         double maxWidth = 0;
         double height = 0;
-        double textHeight = renderer.textHeight(true, scale);
+        double textHeight = HudFont.textHeight(renderer, customFont.get(), true, scale);
         double spacing = 2;
 
         if (showTitle.get()) {
             String title = "Lag Detector";
-            double titleWidth = renderer.textWidth(title, true, scale);
-            renderer.text(title, curX, curY, titleColor.get(), true, scale);
+            double titleWidth = HudFont.textWidth(renderer, title, customFont.get(), true, scale);
+            HudFont.text(renderer, title, curX, curY, titleColor.get(), customFont.get(), true, scale);
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, titleWidth);
@@ -297,8 +305,8 @@ public class LagDetector extends HudElement {
         if (showTPS.get()) {
             String tpsText = String.format("TPS: %.1f", estimatedTPS);
             SettingColor tpsColor = estimatedTPS >= tpsThreshold.get() ? goodTpsColor.get() : badTpsColor.get();
-            double tpsWidth = renderer.textWidth(tpsText, true, scale);
-            renderer.text(tpsText, curX, curY, tpsColor, true, scale);
+            double tpsWidth = HudFont.textWidth(renderer, tpsText, customFont.get(), true, scale);
+            HudFont.text(renderer, tpsText, curX, curY, tpsColor, customFont.get(), true, scale);
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, tpsWidth);
@@ -307,8 +315,8 @@ public class LagDetector extends HudElement {
         if (showPacketTiming.get()) {
             String timingText = getPacketTimingAnalysis();
             SettingColor timingColor = hasIrregularTiming() ? irregularTimingColor.get() : normalTimingColor.get();
-            double timingWidth = renderer.textWidth(timingText, true, scale);
-            renderer.text(timingText, curX, curY, timingColor, true, scale);
+            double timingWidth = HudFont.textWidth(renderer, timingText, customFont.get(), true, scale);
+            HudFont.text(renderer, timingText, curX, curY, timingColor, customFont.get(), true, scale);
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, timingWidth);
@@ -316,8 +324,8 @@ public class LagDetector extends HudElement {
 
         if (showLagbackAlerts.get() && lagbackDetected) {
             String lagbackText = "LAGBACK DETECTED!";
-            double lagbackWidth = renderer.textWidth(lagbackText, true, scale);
-            renderer.text(lagbackText, curX, curY, lagbackColor.get(), true, scale);
+            double lagbackWidth = HudFont.textWidth(renderer, lagbackText, customFont.get(), true, scale);
+            HudFont.text(renderer, lagbackText, curX, curY, lagbackColor.get(), customFont.get(), true, scale);
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, lagbackWidth);

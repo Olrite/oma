@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 
 import dev.oma.addon.Main;
+import dev.oma.addon.util.HudFont;
 
 public class EntityList extends HudElement {
     public static final HudElementInfo<EntityList> INFO = new HudElementInfo<>(Main.HUD_GROUP, "Entity List", "Displays nearby entities in a list.", EntityList::new);
@@ -116,6 +117,13 @@ public class EntityList extends HudElement {
         .build()
     );
 
+    private final Setting<Boolean> customFont = sgGeneral.add(new BoolSetting.Builder()
+        .name("custom-font")
+        .description("Use Meteor's custom font. Off uses the default Minecraft / resource pack font.")
+        .defaultValue(true)
+        .build()
+    );
+
     private final Setting<SettingColor> playerColor = sgGeneral.add(new ColorSetting.Builder()
         .name("player-color")
         .description("Color for player entities.")
@@ -151,16 +159,34 @@ public class EntityList extends HudElement {
         .build()
     );
 
+    private final Setting<SettingColor> countColor = sgGeneral.add(new ColorSetting.Builder()
+        .name("count-color")
+        .description("Color for item / entity count text (e.g. x64).")
+        .defaultValue(new SettingColor(200, 200, 200, 255))
+        .build()
+    );
+
+    private final Setting<SettingColor> distanceColor = sgGeneral.add(new ColorSetting.Builder()
+        .name("distance-color")
+        .description("Color for distance text (e.g. 12m).")
+        .defaultValue(new SettingColor(180, 180, 180, 255))
+        .build()
+    );
+
     public EntityList() {
         super(INFO);
     }
 
     @Override
     public void render(HudRenderer renderer) {
+        boolean font = customFont.get();
+        boolean shadow = textShadow.get();
+        double scale = textScale.get();
+
         if (MeteorClient.mc.level == null || MeteorClient.mc.player == null) {
             if (isInEditor()) {
-                renderer.text("Entity List", x, y, playerColor.get(), textShadow.get(), textScale.get());
-                setSize(renderer.textWidth("Entity List", textShadow.get(), textScale.get()), renderer.textHeight(textShadow.get(), textScale.get()));
+                HudFont.text(renderer, "Entity List", x, y, playerColor.get(), font, shadow, scale);
+                setSize(HudFont.textWidth(renderer, "Entity List", font, shadow, scale), HudFont.textHeight(renderer, font, shadow, scale));
             }
             return;
         }
@@ -169,31 +195,25 @@ public class EntityList extends HudElement {
         for (Entity entity : MeteorClient.mc.level.entitiesForRendering()) {
             if (entity == MeteorClient.mc.player) continue;
 
-            // Calculate distance based on settings
             double dx = entity.getX() - MeteorClient.mc.player.getX();
             double dz = entity.getZ() - MeteorClient.mc.player.getZ();
             double distance;
 
             if (includeYLevel.get()) {
-                // 3D distance including Y level
                 double dy = entity.getY() - MeteorClient.mc.player.getY();
                 distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
             } else {
-                // Horizontal distance only (ignore Y level differences)
                 distance = Math.sqrt(dx * dx + dz * dz);
             }
 
             if (distance > maxDistance.get()) continue;
 
-            // Handle FireworkRocketEntity separately
             boolean isRocket = entity instanceof FireworkRocketEntity;
             if (isRocket && !showRockets.get()) continue;
 
             boolean isItem = entity instanceof ItemEntity && showItems.get();
             boolean isMob = entity instanceof Mob && showMobs.get();
             boolean isPlayer = entity instanceof Player && showPlayers.get();
-
-            // Show projectiles but exclude FireworkRocketEntity from normal projectiles
             boolean isProjectile = !isRocket && (entity instanceof Projectile || entity instanceof ThrownEnderpearl) && showProjectiles.get();
 
             if (!isItem && !isMob && !isPlayer && !isProjectile && !isRocket) continue;
@@ -232,36 +252,45 @@ public class EntityList extends HudElement {
         double curY = y;
         double maxWidth = 0;
         double height = 0;
-        double textHeight = renderer.textHeight(textShadow.get(), textScale.get());
+        double textHeight = HudFont.textHeight(renderer, font, shadow, scale);
         double spacing = 2;
 
         if (showTitle.get()) {
             String title = "Entity List";
-            double titleWidth = renderer.textWidth(title, textShadow.get(), textScale.get());
-            renderer.text(title, curX, curY, playerColor.get(), textShadow.get(), textScale.get());
+            double titleWidth = HudFont.textWidth(renderer, title, font, shadow, scale);
+            HudFont.text(renderer, title, curX, curY, playerColor.get(), font, shadow, scale);
             curY += textHeight + spacing;
             height += textHeight + spacing;
             maxWidth = Math.max(maxWidth, titleWidth);
         }
 
         for (Aggregated agg : aggregatedList) {
-            String text = agg.name;
-            if (agg.count > 1) {
-                text += " x" + agg.count;
-            }
-            if (showDistance.get()) {
-                text += " (" + (int) agg.minDist + "m)";
-            }
-            double textWidth = renderer.textWidth(text, textShadow.get(), textScale.get());
+            double rowX = curX;
+            double rowWidth = 0;
 
-            renderer.text(text, curX, curY, agg.color, textShadow.get(), textScale.get());
+            double nameW = HudFont.text(renderer, agg.name, rowX, curY, agg.color, font, shadow, scale);
+            rowX += nameW;
+            rowWidth += nameW;
+
+            if (agg.count > 1) {
+                String countText = " x" + agg.count;
+                double countW = HudFont.text(renderer, countText, rowX, curY, countColor.get(), font, shadow, scale);
+                rowX += countW;
+                rowWidth += countW;
+            }
+
+            if (showDistance.get()) {
+                String distText = " (" + (int) agg.minDist + "m)";
+                double distW = HudFont.text(renderer, distText, rowX, curY, distanceColor.get(), font, shadow, scale);
+                rowWidth += distW;
+            }
 
             curY += textHeight + spacing;
             height += textHeight + spacing;
-            maxWidth = Math.max(maxWidth, textWidth);
+            maxWidth = Math.max(maxWidth, rowWidth);
         }
 
-        setSize(maxWidth, height - spacing);  // Subtract last spacing
+        setSize(maxWidth, Math.max(0, height - spacing));
     }
 
     private String getEntityName(Entity entity) {

@@ -311,11 +311,10 @@ public class TrailFollower extends Module
         .expireAfterWrite(Duration.ofMinutes(5))
         .build();
 
-    // Credit to WarriorLost: https://github.com/WarriorLost/meteor-client/tree/master
 
     public TrailFollower()
     {
-        super(Main.HUNTING, "Trail Follower", "Automatically follows trails in all dimensions.");
+        super(Main.HUNT, "Trail Follower", "Automatically follows trails in all dimensions.");
     }
 
     void resetTrail()

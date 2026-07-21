@@ -21,7 +21,7 @@ public class SmartEFly extends Module {
     private float targetPitch = 0;
 
     public SmartEFly() {
-        super(Main.MOVEMENT, "Smart eFly", "Maintains a level Y-flight with fireworks and smooth pitch control.");
+        super(Main.HUNT, "Smart eFly", "Maintains a level Y-flight with fireworks and smooth pitch control.");
     }
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();

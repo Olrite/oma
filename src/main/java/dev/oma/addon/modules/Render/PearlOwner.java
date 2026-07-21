@@ -1,7 +1,6 @@
 package dev.oma.addon.modules.Render;
 
 import meteordevelopment.meteorclient.events.render.Render2DEvent;
-// import meteordevelopment.meteorclient.renderer.Renderer2D;
 import meteordevelopment.meteorclient.renderer.text.TextRenderer;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
@@ -13,12 +12,17 @@ import net.minecraft.world.entity.projectile.throwableitemprojectile.ThrownEnder
 import net.minecraft.world.phys.Vec3;
 import org.joml.Vector3d;
 import dev.oma.addon.Main;
+import dev.oma.addon.util.HudFont;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.UUID;
 
 public class PearlOwner extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgRender = settings.createGroup("Render");
+    private final SettingGroup sgChat = settings.createGroup("Chat");
 
     private final Setting<Double> maxDistance = sgGeneral.add(new DoubleSetting.Builder()
         .name("max-distance")
@@ -42,6 +46,13 @@ public class PearlOwner extends Module {
         .name("name-color")
         .description("The color of the owner's name.")
         .defaultValue(new SettingColor(255, 255, 255, 255))
+        .build()
+    );
+
+    private final Setting<Boolean> customFont = sgRender.add(new BoolSetting.Builder()
+        .name("custom-font")
+        .description("Use Meteor's custom font. Off uses the default Minecraft / resource pack font.")
+        .defaultValue(true)
         .build()
     );
 
@@ -70,11 +81,37 @@ public class PearlOwner extends Module {
         .build()
     );
 
+    private final Setting<Boolean> chatOutput = sgChat.add(new BoolSetting.Builder()
+        .name("chat-output")
+        .description("Client-side chat notification when an ender pearl is found.")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> chatCoords = sgChat.add(new BoolSetting.Builder()
+        .name("chat-coordinates")
+        .description("Include coordinates in chat notifications.")
+        .defaultValue(true)
+        .visible(chatOutput::get)
+        .build()
+    );
+
     private final Vector3d pos = new Vector3d();
     private final List<PearlInfo> pearlsToRender = new ArrayList<>();
+    private final Set<UUID> announced = new HashSet<>();
 
     public PearlOwner() {
-        super(Main.RENDER, "Pearl Owner", "Displays the name of the player who threw an ender pearl.");
+        super(Main.MOD, "Pearl Owner", "Displays the name of the player who threw an ender pearl.");
+    }
+
+    @Override
+    public void onActivate() {
+        announced.clear();
+    }
+
+    @Override
+    public void onDeactivate() {
+        announced.clear();
     }
 
     @EventHandler
@@ -107,6 +144,19 @@ public class PearlOwner extends Module {
             if (owner == null) continue;
 
             String ownerName = owner.getName().getString();
+            if (chatOutput.get() && announced.add(pearl.getUUID())) {
+                if (chatCoords.get()) {
+                    info("Pearl from %s at %d, %d, %d",
+                        ownerName,
+                        (int) Math.floor(pearl.getX()),
+                        (int) Math.floor(pearl.getY()),
+                        (int) Math.floor(pearl.getZ())
+                    );
+                } else {
+                    info("Pearl from %s", ownerName);
+                }
+            }
+
             if (showDistance.get()) {
                 ownerName += String.format(" [%.1fm]", distance);
             }
@@ -127,18 +177,13 @@ public class PearlOwner extends Module {
     }
 
     private void renderNametag(String text, double x, double y, Render2DEvent event) {
-        TextRenderer textRenderer = TextRenderer.get();
+        TextRenderer textRenderer = HudFont.worldRenderer(customFont.get());
         double textWidth = textRenderer.getWidth(text, true);
         double textHeight = textRenderer.getHeight(true);
 
         // Center the text
         x -= textWidth / 2;
         y -= textHeight / 2;
-
-        // Render background
-        // Renderer2D.COLOR.begin();
-        // Renderer2D.COLOR.quad(x - 2, y - 2, textWidth + 4, textHeight + 4, backgroundColor.get());
-        // Renderer2D.COLOR.render(null);
 
         // Render text
         textRenderer.begin(scale.get());
