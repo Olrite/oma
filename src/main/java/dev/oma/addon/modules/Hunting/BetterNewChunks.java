@@ -43,7 +43,7 @@ import java.util.concurrent.*;
 
 import dev.oma.addon.Main;
 
-public class NewChunksPlus extends Module {
+public class BetterNewChunks extends Module {
 	public enum DetectMode {
 		Normal,
 		IgnoreBlockExploit,
@@ -373,8 +373,8 @@ public class NewChunksPlus extends Module {
 			Paths.get("NewChunkData.txt"),
 			Paths.get("BlockExploitChunkData.txt")
 	));
-	public NewChunksPlus() {
-		super(Main.RENDER, "New-Chunks-Plus", "NewerNewChunks from TrouserStreak just with some improvements.");
+	public BetterNewChunks() {
+		super(Main.RENDER, "Better New Chunks", "NewerNewChunks from TrouserStreak just with some improvements.");
 	}
 	
 	@SuppressWarnings("unchecked")

@@ -52,7 +52,7 @@ import static dev.oma.addon.util.Utils.sendWebhook;
 import java.io.*;
 import java.util.*;
 
-public class StashFinderPlus extends Module
+public class BetterStashFinder extends Module
 {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
@@ -196,9 +196,9 @@ public class StashFinderPlus extends Module
         .build()
     );
 
-    public StashFinderPlus()
+    public BetterStashFinder()
     {
-        super(Main.HUNTING, "stash-finder-plus", "Jefff mod's BetterStashFinder but with more features.");
+        super(Main.HUNTING, "Better Stash Finder", "Jefff mod's BetterStashFinder but with more features.");
     }
 
     private Vec3d lastPosition = null;

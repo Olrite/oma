@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class ModItemESP extends Module {
+public class MobItemESP extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgRender = settings.createGroup("Render");
     private final SettingGroup sgMobs = settings.createGroup("Mobs");
@@ -152,8 +152,8 @@ public class ModItemESP extends Module {
     private int tickCounter = 0;
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
-    public ModItemESP() {
-        super(Main.RENDER, "mod-item-esp", "Highlights mobs holding items they wouldn't normally spawn with.");
+    public MobItemESP() {
+        super(Main.RENDER, "MobItemESP", "Highlights mobs holding items they wouldn't normally spawn with.");
     }
 
     @Override
