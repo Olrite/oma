@@ -13,7 +13,7 @@ import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import java.util.List;
 
 public class SignDisplay extends HudElement {
-    public static final HudElementInfo<SignDisplay> INFO = new HudElementInfo<>(Main.HUD_GROUP, "Sign-Display", "Displays nearby sign text.", SignDisplay::new);
+    public static final HudElementInfo<SignDisplay> INFO = new HudElementInfo<>(Main.HUD_GROUP, "Sign Display", "Displays nearby sign text.", SignDisplay::new);
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 

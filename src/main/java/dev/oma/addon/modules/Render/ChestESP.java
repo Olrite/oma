@@ -169,7 +169,7 @@ public class ChestESP extends Module {
     private final Minecraft mc = Minecraft.getInstance();
 
     public ChestESP() {
-        super(Main.RENDER, "chest-esp", "Highlights chests that contain shulker boxes.");
+        super(Main.RENDER, "Chest ESP", "Highlights chests that contain shulker boxes.");
     }
 
     @Override

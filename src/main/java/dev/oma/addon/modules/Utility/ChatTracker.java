@@ -131,7 +131,7 @@ public class ChatTracker extends Module {
     private LocalDateTime sessionStart;
 
     public ChatTracker() {
-        super(Main.UTILS, "chat-tracker", "Logs chat messages to file with optional filtering.");
+        super(Main.UTILS, "Chat Tracker", "Logs chat messages to file with optional filtering.");
     }
 
     @Override

@@ -74,7 +74,7 @@ public class MapExporter extends Module {
     private boolean hasShownMessage = false;
 
     public MapExporter() {
-        super(Main.UTILS, "map-exporter", "Exports map art as PNG images");
+        super(Main.UTILS, "Map Exporter", "Exports map art as PNG images");
     }
 
     @Override

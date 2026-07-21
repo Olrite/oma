@@ -13,7 +13,7 @@ import net.minecraft.world.item.Items;
 public class DubCountGUI extends HudElement {
     public static final HudElementInfo<DubCountGUI> INFO = new HudElementInfo<>(
         Main.HUD_GROUP,
-        "dub-count",
+        "Dub Count",
         "Displays the count of double chests from DubCount module.",
         DubCountGUI::new
     );

@@ -20,7 +20,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 public class LagDetector extends HudElement {
     public static final HudElementInfo<LagDetector> INFO = new HudElementInfo<>(
         Main.HUD_GROUP,
-        "lag-detector",
+        "Lag Detector",
         "Detects lagbacks by analyzing server TPS and packet timing irregularities.",
         LagDetector::new
     );

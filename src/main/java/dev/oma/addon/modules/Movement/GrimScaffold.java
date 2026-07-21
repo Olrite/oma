@@ -159,7 +159,7 @@ public class GrimScaffold extends Module {
     private final List<BlockPos> renderedBlocks = new ArrayList<>();
     private int tickDelay = 0;
     public GrimScaffold() {
-        super(Main.MOVEMENT, "grim-scaffold", "Places blocks under you using GrimAC bypass.");
+        super(Main.MOVEMENT, "Grim Scaffold", "Places blocks under you using GrimAC bypass.");
     }
     @Override
     public void onActivate() {

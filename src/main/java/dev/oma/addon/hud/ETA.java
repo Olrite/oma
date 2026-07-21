@@ -30,7 +30,7 @@ public class ETA extends HudElement {
     }
     public static final HudElementInfo<ETA> INFO = new HudElementInfo<>(
         Main.HUD_GROUP,
-        "eta",
+        "ETA",
         "Displays estimated time of arrival to Baritone goal.",
         ETA::new
     );

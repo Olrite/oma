@@ -71,7 +71,7 @@ public class PortalMaker extends Module {
     private int index = 0;
 
     public PortalMaker() {
-        super(Main.UTILS, "portal-maker", "Creates and automatically lights a nether portal.");
+        super(Main.UTILS, "Portal Maker", "Creates and automatically lights a nether portal.");
     }
 
     @Override

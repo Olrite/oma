@@ -147,7 +147,7 @@ public class DecorESP extends Module {
     private final Minecraft mc = Minecraft.getInstance();
 
     public DecorESP() {
-        super(Main.RENDER, "DecorESP", "Highlights decorative items like item frames and banners.");
+        super(Main.RENDER, "Decor ESP", "Highlights decorative items like item frames and banners.");
     }
 
     @Override
