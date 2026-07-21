@@ -1,0 +1,88 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v[0-9]+.[0-9]+'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.mc }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - branch: master
+            mc: "26.1.2"
+            java: "25"
+          - branch: legacy/1.21.11
+            mc: "1.21.11"
+            java: "21"
+          - branch: legacy/1.21.4
+            mc: "1.21.4"
+            java: "21"
+
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: ${{ matrix.java }}
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Build
+        run: ./gradlew build --no-daemon
+
+      - name: Rename release JAR
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          MC="${{ matrix.mc }}"
+          JAR=$(ls build/libs/oma-*.jar | grep -v sources | grep -v dev | head -n1)
+          cp "$JAR" "oma-${VERSION}-mc${MC}.jar"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: oma-mc${{ matrix.mc }}
+          path: oma-*-mc${{ matrix.mc }}.jar
+
+  release:
+    name: Create draft release
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all JARs
+        uses: actions/download-artifact@v4
+        with:
+          path: release-jars
+          merge-multiple: true
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          generate_release_notes: true
+          files: release-jars/**/oma-*.jar
+          body: |
+            ## Downloads
+
+            | Minecraft | JAR | Meteor |
+            |-----------|-----|--------|
+            | 1.21.4 | `oma-*-mc1.21.4.jar` | [Archive](https://meteorclient.com/api/download?version=1.21.4) |
+            | 1.21.11 | `oma-*-mc1.21.11.jar` | [Archive](https://meteorclient.com/api/download?version=1.21.11) |
+            | 26.1.2 | `oma-*-mc26.1.2.jar` | [Latest](https://meteorclient.com/) |
+
+            Install the JAR matching your Minecraft version into `mods` next to Meteor Client.
