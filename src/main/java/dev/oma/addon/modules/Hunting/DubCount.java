@@ -1,4 +1,4 @@
-package dev.oma.addon.modules.Utility;
+package dev.oma.addon.modules.Hunting;
 
 import meteordevelopment.meteorclient.events.render.RenderBlockEntityEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -83,7 +83,7 @@ public class DubCount extends Module {
     );
 
     public DubCount() {
-        super(Main.MOD, "Dub Counter", "Counts how many chests are in render distance.");
+        super(Main.HUNT, "Dub Counter", "Counts how many chests are in render distance.");
     }
 
     @Override

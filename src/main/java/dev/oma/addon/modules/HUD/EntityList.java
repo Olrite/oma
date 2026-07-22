@@ -1,4 +1,4 @@
-package dev.oma.addon.hud;
+package dev.oma.addon.modules.HUD;
 
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.settings.*;

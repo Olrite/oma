@@ -1,4 +1,4 @@
-package dev.oma.addon.modules.Render;
+package dev.oma.addon.modules.Hunting;
 
 import meteordevelopment.meteorclient.events.render.Render2DEvent;
 import meteordevelopment.meteorclient.renderer.text.TextRenderer;
@@ -101,7 +101,7 @@ public class PearlOwner extends Module {
     private final Set<UUID> announced = new HashSet<>();
 
     public PearlOwner() {
-        super(Main.MOD, "Pearl Owner", "Displays the name of the player who threw an ender pearl.");
+        super(Main.HUNT, "Pearl Owner", "Displays the name of the player who threw an ender pearl.");
     }
 
     @Override

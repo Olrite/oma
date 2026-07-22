@@ -1,7 +1,5 @@
 package dev.oma.addon.modules.Hunting;
 
-import dev.oma.addon.modules.Movement.AutoPitch40;
-import dev.oma.addon.modules.Movement.SmartEFly;
 import baritone.api.BaritoneAPI;
 import baritone.api.pathing.goals.GoalXZ;
 import dev.oma.addon.Main;
@@ -80,7 +78,6 @@ public class TrailFollower extends Module
         .build()
     );
 
-    // changed to an enum dropdown for fly selection
     public enum OverworldFlightMode {
         VANILLA,
         PITCH40,
@@ -220,7 +217,6 @@ public class TrailFollower extends Module
         .sliderMax(1000 * 60)
         .build()
     );
-    // added trail deviation slider now that baritone is locked to trail pathing
     public final Setting<Double> maxTrailDeviation = sgAdvanced.add(new DoubleSetting.Builder()
         .name("max-trail-deviation")
         .description("Maximum allowed angle (in degrees) from the original trail direction. Helps avoid switching to intersecting trails.")
@@ -333,7 +329,6 @@ public class TrailFollower extends Module
     public void onActivate()
     {
         resetTrail();
-        // Initialize speed monitoring
         lastSpeedCheckTime = System.currentTimeMillis();
         XaeroPlus.EVENT_BUS.register(this);
         if (mc.player != null && mc.level != null)
@@ -381,14 +376,14 @@ public class TrailFollower extends Module
 
             if (followMode == FollowMode.YAWLOCK && !mc.level.dimension().equals(Level.NETHER)) {
                 if (overworldFlightMode.get() == OverworldFlightMode.PITCH40) {
-                    Class<? extends Module> autoPitch40 = AutoPitch40.class;
+                    Class<? extends Module> autoPitch40 = Pitch40Plus.class;
                     Module autoPitch40Module = Modules.get().get(autoPitch40);
                     if (!autoPitch40Module.isActive()) {
                         autoPitch40Module.toggle();
                         if (pitch40Firework.get()) {
                             @SuppressWarnings("unchecked")
                             Setting<Boolean> setting = (Setting<Boolean>) autoPitch40Module.settings.get("auto-firework");
-                            info("Auto Firework enabled, if you want to change the velocity threshold or the firework cooldown check the settings under Auto Pitch40.");
+                            info("Auto Firework enabled, if you want to change the velocity threshold or the firework cooldown check the settings under Pitch40 Plus.");
                             oldAutoFireworkValue = setting.get();
                             setting.set(true);
                         }
@@ -400,7 +395,6 @@ public class TrailFollower extends Module
                     }
                 }
             }
-            // set original pos to pathDistance blocks in the direction the player is facing
             Vec3 offset = (new Vec3(Math.sin(-mc.player.getYRot() * Math.PI / 180), 0, Math.cos(-mc.player.getYRot() * Math.PI / 180)).normalize()).scale(pathDistance.get());
             Vec3 targetPos = mc.player.position().add(offset);
             for (int i = 0; i < (maxTrailLength.get() * startDirectionWeighting.get()); i++)
@@ -418,14 +412,12 @@ public class TrailFollower extends Module
     @Override
     public void onDeactivate()
     {
-        // do this at the end to free memory
         seenChunksCache = Caffeine.newBuilder()
             .maximumSize(chunkCacheLength.get())
             .expireAfterWrite(Duration.ofMinutes(5))
             .build();
         XaeroPlus.EVENT_BUS.unregister(this);
         trail.clear();
-        // If follow mode was never set due to baritone not being present, etc.
         if (followMode == null) return;
         switch (followMode)
         {
@@ -443,7 +435,7 @@ public class TrailFollower extends Module
                         if (smartEFly.isActive()) smartEFly.toggle();
                     }
                 } else if (overworldFlightMode.get() == OverworldFlightMode.PITCH40) {
-                    Class<? extends Module> autoPitch40 = AutoPitch40.class;
+                    Class<? extends Module> autoPitch40 = Pitch40Plus.class;
                     Module autoPitch40Module = Modules.get().get(autoPitch40);
                     if (autoPitch40Module.isActive()) {
                         autoPitch40Module.toggle();
@@ -455,7 +447,6 @@ public class TrailFollower extends Module
                 break;
             }
             case AUTO:
-                // AUTO mode doesn't need cleanup as it's determined at activation
                 break;
         }
     }
@@ -479,7 +470,6 @@ public class TrailFollower extends Module
     {
         if (mc.player == null || mc.level == null) return;
         
-        // Check chunk load speed if auto-disconnect is enabled
         if (autoDisconnectOnSpeed.get()) {
             speedCheckTickCounter++;
             if (speedCheckTickCounter >= speedCheckInterval.get()) {
@@ -525,33 +515,6 @@ public class TrailFollower extends Module
                 }
                 else if (baritoneSetGoalTicks == 0)
                 {
-                    // if following overworld from nether we need to wait to set the goal until we are close to the current goal
-                    // make sure targetPos is on an actual chunk
-//                    if (mc.level.dimension().equals(Level.NETHER) && oppositeDimension.get())
-//                    {
-//                        if (BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess().currentDestination() != null
-//                            && !BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess().currentDestination().isWithinDistance(mc.player.position(), 200))
-//                        {
-//                            return;
-//                        }
-//                        else
-//                        {
-//                            boolean chunkFound = false;
-//                            for (int i = 1000; i >= 0; i--)
-//                            {
-//                                Vec3 nextPosition = positionInDirection(mc.player.position().scale(8), targetYaw, 16 * i);
-//                                ChunkPos nextChunkPosition = new ChunkPos(new BlockPos((int)nextPosition.x, 0, (int)nextPosition.z));
-//                                if (isValidChunk(nextChunkPosition, Level.OVERWORLD))
-//                                {
-//                                    pathDistanceActual = (double) (16 * i) / 8;
-//                                    chunkFound = true;
-//                                    break;
-//                                }
-//                            }
-//                            if (!chunkFound) return;
-//                        }
-//                    }
-                    //instead of flying to a calculated offset from the player using pathDistanceActual, will directly set the last trail chunk detected
                     baritoneSetGoalTicks = baritoneUpdateTicks.get();
                     if (mc.level.dimension().equals(Level.NETHER)) {
 
@@ -572,7 +535,6 @@ public class TrailFollower extends Module
                                 .setGoalAndPath(new GoalXZ((int) baritoneTarget.x, (int) baritoneTarget.z));
                         }
                     } else {
-                        // use average path for overworld
                         Vec3 targetPos = positionInDirection(mc.player.position(), targetYaw, pathDistanceActual);
                         BaritoneAPI.getProvider().getPrimaryBaritone().getCustomGoalProcess().setGoalAndPath(new GoalXZ((int) targetPos.x, (int) targetPos.z));
 
@@ -591,7 +553,6 @@ public class TrailFollower extends Module
                 break;
             }
             case AUTO:
-                // AUTO mode is resolved to either BARITONE or YAWLOCK at activation
                 break;
         }
 
@@ -634,7 +595,6 @@ public class TrailFollower extends Module
             else if (currentDimension.equals(Level.NETHER))
             {
                 chunkPos = new ChunkPos(mc.player.chunkPosition().x() * 8 + chunkDelta.x(), mc.player.chunkPosition().z() * 8 + chunkDelta.z());
-//                log("ChunkPos: " + chunkPos.x() + ", " + chunkPos.z());
                 currentDimension = Level.OVERWORLD;
             }
         }

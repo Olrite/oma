@@ -43,6 +43,7 @@ The built JAR is in `build/libs/`.
 
 # Modules
 ### Utility
+- Auto Rekit - Sorts your inventory to match a saved kit loadout when opening a container or pressing a keybind
 - Better Auto Log - Gives more customization for Auto Log
 - Auto Shulker - Automatically places and fills Shulker Boxes
 - Elytra Swap - Automatically swaps Elytras when durability and certain conditions are met
@@ -52,11 +53,10 @@ The built JAR is in `build/libs/`.
 - Portal Maker - Automatically makes and lights a Nether Portal
 - Anti Spam - Combines similar chat messages or hides them completely based on provided keywords
 - Map Archiver - Saves the map in the user's hand as a png file
-- Item Finder - Highlights user specified items or illegal/valuable items in open containers
-- Sign Render - Detects signs in render distance and outputs their text to chat and HUD
-- Chest ESP - Highlights chests that contain shulkers or user specified items/blocks
+- Item Highlight - Highlights user specified items or illegal/valuable items in open containers
+- Item Finder - Highlights containers that contain shulkers or user specified items/blocks
 - Decor ESP - Highlights decorative user-placed items
-- Weird Block ESP - Highlights blocks placed in unnatural rotations or positions
+- Misplace ESP - Highlights blocks placed in unnatural rotations or positions
 - Mob Dimension - ESP for mobs and animals that do not normally spawn in the current dimension
 - Pearl Owner - Displays the name of the player who threw an ender pearl
 - FPS Limiter - Caps FPS when the game window is unfocused, or optionally while other modules are enabled
@@ -64,10 +64,14 @@ The built JAR is in `build/libs/`.
 - Better Stash Finder - Finds stashes in chunks and logs them to a file and/or sends a webhook
 - Better New Chunks - Detects new chunks and old chunks in the world
 - Trail Follower - Automatically follows trails in all dimensions
-- Auto Liftoff - Automatically jumps and redeploys elytra when touching the ground
-- Auto Pitch40 - Makes sure pitch 40 stays on when reconnecting to 2b2t, and sets your bounds as you reach highest point each climb
-- Search Area - Either loads chunks in a rectangle to a certain point from you, or spirals endlessly from you. Useful with Better Stash Finder or other map saving mods
+- Elytra Plus - Elytra quality-of-life changes
+- eBounce - Bounces off the ground with an elytra to travel forward at high speed, with optional auto XP-bottle elytra repair
+- Pitch40 Plus - Makes sure pitch 40 stays on when reconnecting to 2b2t, and sets your bounds as you reach highest point each climb
+- Area Searcher - Either loads chunks in a rectangle , or spirals endlessly from you
 - Smart eFly - Maintains a level Y-flight with fireworks and smooth pitch control
+- Portal Skip Detector - Searches loaded chunks for air-pocket patterns that indicate a portal-skip
+- Portal Predicter - Scans around a target position for where a Nether portal could spawn
+- Sign Render - Detects signs in render distance and outputs their text to chat and HUD
 ### HUD
 - Totem Count - Displays the count of Totems in the user's inventory
 - Crystal Count - Displays the count of Crystals in the user's inventory

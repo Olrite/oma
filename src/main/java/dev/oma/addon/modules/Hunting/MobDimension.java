@@ -1,4 +1,4 @@
-package dev.oma.addon.modules.Render;
+package dev.oma.addon.modules.Hunting;
 
 import dev.oma.addon.Main;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
@@ -150,7 +150,7 @@ public class MobDimension extends Module {
     private ResourceKey<Level> lastDimension;
 
     public MobDimension() {
-        super(Main.MOD, "Mob Dimension", "ESP for mobs and animals that do not normally spawn in the current dimension.");
+        super(Main.HUNT, "Mob Dimension", "ESP for mobs and animals that do not normally spawn in the current dimension.");
     }
 
     @Override

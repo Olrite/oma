@@ -1,4 +1,4 @@
-package dev.oma.addon.modules.Movement.searcharea.modes;
+package dev.oma.addon.modules.Hunting.searcharea.modes;
 
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import meteordevelopment.meteorclient.systems.modules.misc.AutoReconnect;
@@ -9,8 +9,8 @@ import net.minecraft.core.BlockPos;
 
 import java.io.*;
 
-import dev.oma.addon.modules.Movement.searcharea.SearchAreaMode;
-import dev.oma.addon.modules.Movement.searcharea.SearchAreaModes;
+import dev.oma.addon.modules.Hunting.searcharea.SearchAreaMode;
+import dev.oma.addon.modules.Hunting.searcharea.SearchAreaModes;
 
 import static dev.oma.addon.util.Utils.*;
 import static meteordevelopment.meteorclient.utils.player.ChatUtils.info;
@@ -105,7 +105,7 @@ public class Rectangle extends SearchAreaMode
             {
                 var autoReconnect = Modules.get().get(AutoReconnect.class);
                 if (autoReconnect.isActive()) autoReconnect.toggle();
-                mc.player.connection.handleDisconnect(new ClientboundDisconnectPacket(Component.literal("[Search Area] Path is complete")));
+                mc.player.connection.handleDisconnect(new ClientboundDisconnectPacket(Component.literal("[Area Searcher] Path is complete")));
             }
         }//                                                                      if going in +X and currPos > the greater of the two sides of the rectangle
         else if (pd.mainPath && ((pd.yawDirection == -90.0f && mc.player.getX() >= (Math.max(pd.initialPos.getX(), pd.targetPos.getX())))) ||

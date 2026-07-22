@@ -1,7 +1,6 @@
-package dev.oma.addon.modules.Utility;
+package dev.oma.addon.modules.Hunting;
 
 import dev.oma.addon.Main;
-import dev.oma.addon.modules.Render.ChestESP;
 import dev.oma.addon.util.ItemListSync;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.modules.Module;
@@ -24,7 +23,6 @@ import net.minecraft.world.item.component.Fireworks;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.block.AbstractSkullBlock;
-import net.minecraft.world.level.block.Block;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 
@@ -34,7 +32,7 @@ import java.util.List;
 /**
  * Highlights matching items inside open containers (chests, shulkers, etc.).
  */
-public class ItemFinder extends Module {
+public class ItemHighlight extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgDefaults = settings.createGroup("Default Finds");
     private final SettingGroup sgCustom = settings.createGroup("Custom");
@@ -47,9 +45,9 @@ public class ItemFinder extends Module {
         .build()
     );
 
-    private final Setting<Boolean> syncWithChestEsp = sgGeneral.add(new BoolSetting.Builder()
-        .name("sync-with-chest-esp")
-        .description("Share custom item/block lists with Chest ESP. Also lets Chest ESP detect Item Finder default finds when either sync option is on.")
+    private final Setting<Boolean> syncWithItemFinder = sgGeneral.add(new BoolSetting.Builder()
+        .name("sync-with-item-finder")
+        .description("Share custom item/block lists with Item Finder. Also lets Item Finder detect Item Highlight default finds when either sync option is on.")
         .defaultValue(false)
         .build()
     );
@@ -147,14 +145,7 @@ public class ItemFinder extends Module {
 
     private final Setting<List<Item>> customItems = sgCustom.add(new ItemListSetting.Builder()
         .name("items")
-        .description("Also highlight these items. Shared with Chest ESP when sync is enabled.")
-        .defaultValue()
-        .build()
-    );
-
-    private final Setting<List<Block>> customBlocks = sgCustom.add(new BlockListSetting.Builder()
-        .name("blocks")
-        .description("Also highlight these blocks as items. Shared with Chest ESP when sync is enabled.")
+        .description("Also highlight these items (blocks can be added too, e.g. \"Chest\"). Shared with Item Finder when sync is enabled.")
         .defaultValue()
         .build()
     );
@@ -166,8 +157,8 @@ public class ItemFinder extends Module {
         .build()
     );
 
-    public ItemFinder() {
-        super(Main.MOD, "Item Finder", "Highlights interesting or illegal items in open containers.");
+    public ItemHighlight() {
+        super(Main.HUNT, "Item Highlight", "Highlights interesting or illegal items in open containers.");
     }
 
     public SettingColor getHighlightColor() {
@@ -175,15 +166,11 @@ public class ItemFinder extends Module {
     }
 
     public boolean isListSyncEnabled() {
-        return syncWithChestEsp.get();
+        return syncWithItemFinder.get();
     }
 
     public List<Item> getConfiguredItems() {
         return customItems.get();
-    }
-
-    public List<Block> getConfiguredBlocks() {
-        return customBlocks.get();
     }
 
     public boolean shouldHighlightSlot(Slot slot) {
@@ -197,11 +184,7 @@ public class ItemFinder extends Module {
     public boolean matchesCustomLists(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return false;
 
-        if (customItems.get().contains(stack.getItem())) return true;
-        if (stack.getItem() instanceof BlockItem blockItem && customBlocks.get().contains(blockItem.getBlock())) {
-            return true;
-        }
-        return false;
+        return customItems.get().contains(stack.getItem());
     }
 
     private boolean matchesSyncedLists(ItemStack stack) {
@@ -210,8 +193,8 @@ public class ItemFinder extends Module {
         Modules modules = Modules.get();
         if (modules == null) return false;
 
-        ChestESP chestEsp = modules.get(ChestESP.class);
-        return chestEsp != null && chestEsp.matchesCustomLists(stack);
+        ItemFinder itemFinder = modules.get(ItemFinder.class);
+        return itemFinder != null && itemFinder.matchesCustomLists(stack);
     }
 
     public boolean matches(ItemStack stack) {

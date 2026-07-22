@@ -1,12 +1,12 @@
-package dev.oma.addon.modules.Movement.searcharea.modes;
+package dev.oma.addon.modules.Hunting.searcharea.modes;
 
 import meteordevelopment.meteorclient.utils.player.Rotations;
 import net.minecraft.core.BlockPos;
 
 import java.io.*;
 
-import dev.oma.addon.modules.Movement.searcharea.SearchAreaMode;
-import dev.oma.addon.modules.Movement.searcharea.SearchAreaModes;
+import dev.oma.addon.modules.Hunting.searcharea.SearchAreaMode;
+import dev.oma.addon.modules.Hunting.searcharea.SearchAreaModes;
 
 import static dev.oma.addon.util.Utils.*;
 import static meteordevelopment.meteorclient.utils.player.ChatUtils.info;

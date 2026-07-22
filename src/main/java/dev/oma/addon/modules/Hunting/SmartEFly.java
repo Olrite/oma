@@ -1,4 +1,4 @@
-package dev.oma.addon.modules.Movement;
+package dev.oma.addon.modules.Hunting;
 
 import dev.oma.addon.Main;
 import dev.oma.addon.util.Utils;

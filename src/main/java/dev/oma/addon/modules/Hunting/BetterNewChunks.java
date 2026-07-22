@@ -380,7 +380,7 @@ public class BetterNewChunks extends Module {
 			Paths.get("BlockExploitChunkData.txt")
 	));
 	public BetterNewChunks() {
-		super(Main.MOD, "Better New Chunks", "Detects new chunks and old chunks in the world.");
+		super(Main.HUNT, "Better New Chunks", "Detects new chunks and old chunks in the world.");
 	}
 	
 	@SuppressWarnings("unchecked")

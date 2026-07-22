@@ -1,4 +1,4 @@
-package dev.oma.addon.modules.Render;
+package dev.oma.addon.modules.Hunting;
 
 import dev.oma.addon.Main;
 import dev.oma.addon.util.LogUtils;
@@ -148,7 +148,7 @@ public class SignRender extends Module {
     private final List<SignRenderInfo> signsToRender = new ArrayList<>();
 
     public SignRender() {
-        super(Main.MOD, "Sign Render", "Detects signs in render distance and outputs their text to chat and HUD.");
+        super(Main.HUNT, "Sign Render", "Detects signs in render distance and outputs their text to chat and HUD.");
     }
 
     @Override

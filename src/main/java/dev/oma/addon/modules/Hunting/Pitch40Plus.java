@@ -1,4 +1,4 @@
-package dev.oma.addon.modules.Movement;
+package dev.oma.addon.modules.Hunting;
 
 import dev.oma.addon.Main;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -14,7 +14,7 @@ import meteordevelopment.meteorclient.systems.modules.movement.elytrafly.ElytraF
 import static dev.oma.addon.util.Utils.firework;
 
 
-public class AutoPitch40 extends Module {
+public class Pitch40Plus extends Module {
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
@@ -58,8 +58,8 @@ public class AutoPitch40 extends Module {
         .build()
     );
 
-    public AutoPitch40() {
-        super(Main.HUNT, "Auto Pitch40", "Makes sure pitch 40 stays on when reconnecting to 2b2t, and sets your bounds as you reach highest point each climb.");
+    public Pitch40Plus() {
+        super(Main.HUNT, "Pitch40 Plus", "Makes sure pitch 40 stays on when reconnecting to 2b2t, and sets your bounds as you reach highest point each climb.");
     }
 
     Module elytraFly = Modules.get().get(ElytraFly.class);
