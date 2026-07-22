@@ -1,11 +1,11 @@
 package dev.oma.addon.util;
 
-import dev.oma.addon.modules.Render.ChestESP;
-import dev.oma.addon.modules.Utility.ItemFinder;
+import dev.oma.addon.modules.Hunting.ItemFinder;
+import dev.oma.addon.modules.Hunting.ItemHighlight;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 
 /**
- * Shared sync flag between Item Finder and Chest ESP.
+ * Shared sync flag between Item Highlight and Item Finder.
  * Enabled when either module has its sync setting turned on.
  */
 public final class ItemListSync {
@@ -15,10 +15,10 @@ public final class ItemListSync {
         Modules modules = Modules.get();
         if (modules == null) return false;
 
-        ItemFinder finder = modules.get(ItemFinder.class);
-        if (finder != null && finder.isListSyncEnabled()) return true;
+        ItemHighlight highlight = modules.get(ItemHighlight.class);
+        if (highlight != null && highlight.isListSyncEnabled()) return true;
 
-        ChestESP chestEsp = modules.get(ChestESP.class);
-        return chestEsp != null && chestEsp.isListSyncEnabled();
+        ItemFinder itemFinder = modules.get(ItemFinder.class);
+        return itemFinder != null && itemFinder.isListSyncEnabled();
     }
 }

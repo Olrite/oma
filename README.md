@@ -48,16 +48,16 @@ The built JAR is in `build/libs/`.
 
 # Modules
 ### Utility
-- Better Auto Log, Auto Shulker, Elytra Swap, Leak Logger, Render Notifications, Discord Notifications, Portal Maker, Anti Spam, Dub Counter, Map Archiver, Item Finder, FPS Limiter
+- Better Auto Log, Auto Shulker, Elytra Swap, Leak Logger, Render Notifications, Discord Notifications, Portal Maker, Anti Spam, Dub Counter, Map Archiver, Item Highlight, FPS Limiter, Auto Rekit
 
 ### Renders
-- Sign Render, Chest ESP, Decor ESP, Weird Block ESP, Mob Dimension, Pearl Owner
+- Item Finder, Decor ESP, Misplace ESP, Mob Dimension, Pearl Owner
 
 ### Movement
-- Auto Liftoff, Auto Pitch40, Search Area, Smart eFly
+- Elytra Plus, eBounce, Pitch40 Plus, Area Searcher, Smart eFly
 
 ### Hunting
-- Better Stash Finder, Better New Chunks, Trail Follower (requires Baritone)
+- Better Stash Finder, Better New Chunks, Trail Follower (requires Baritone), Portal Skip Detector, Portal Predicter, Sign Render
 
 ### HUD
 - Totem Count, Crystal Count, Dub Count, Sign Display, ETA, Lag Detector, Entity List

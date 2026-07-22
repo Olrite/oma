@@ -6,6 +6,7 @@ docs/
 # local / IDE (do not upload)
 compile-errors.txt
 .cursor/
+*.log
 
 # gradle
 

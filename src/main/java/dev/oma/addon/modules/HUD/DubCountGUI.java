@@ -1,30 +1,30 @@
-package dev.oma.addon.hud;
+package dev.oma.addon.modules.HUD;
 
 import dev.oma.addon.Main;
+import dev.oma.addon.modules.Hunting.DubCount;
 import dev.oma.addon.util.HudFont;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.hud.HudElement;
 import meteordevelopment.meteorclient.systems.hud.HudElementInfo;
 import meteordevelopment.meteorclient.systems.hud.HudRenderer;
-import meteordevelopment.meteorclient.utils.player.InvUtils;
 import meteordevelopment.meteorclient.utils.render.color.Color;
 import meteordevelopment.meteorclient.utils.render.color.SettingColor;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 
-public class TotemCount extends HudElement {
-    public static final HudElementInfo<TotemCount> INFO = new HudElementInfo<>(
+public class DubCountGUI extends HudElement {
+    public static final HudElementInfo<DubCountGUI> INFO = new HudElementInfo<>(
         Main.HUD_GROUP,
-        "Totem Count",
-        "Displays a count of totems in inventory.",
-        TotemCount::new
+        "Dub Count",
+        "Displays the count of double chests from DubCount module.",
+        DubCountGUI::new
     );
 
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
 
     private final Setting<Mode> mode = sgGeneral.add(new EnumSetting.Builder<Mode>()
         .name("none-mode")
-        .description("How to render the item when you don't have the specified item in your inventory.")
+        .description("How to render the item when no count is available.")
         .defaultValue(Mode.HideCount)
         .build()
     );
@@ -49,7 +49,7 @@ public class TotemCount extends HudElement {
 
     private final Setting<Boolean> customFont = sgGeneral.add(new BoolSetting.Builder()
         .name("custom-font")
-        .description("Use Meteor's custom font for the count. Off uses the default Minecraft / resource pack font.")
+        .description("Use Meteor's custom font. Off uses the default Minecraft / resource pack font.")
         .defaultValue(true)
         .build()
     );
@@ -61,7 +61,7 @@ public class TotemCount extends HudElement {
         .build()
     );
 
-    public TotemCount() {
+    public DubCountGUI() {
         super(INFO);
         calculateSize();
     }
@@ -72,26 +72,29 @@ public class TotemCount extends HudElement {
     }
 
     private void calculateSize() {
-        setSize(17 * scale.get() + 36, 17 * scale.get());
+        setSize(17 * scale.get() + 40, 17 * scale.get());
     }
 
     @Override
     public void render(HudRenderer renderer) {
-        int totemCount = InvUtils.find(stack -> stack.getItem() == Items.TOTEM_OF_UNDYING).count();
-        ItemStack totemStack = new ItemStack(Items.TOTEM_OF_UNDYING, Math.max(totemCount, 1));
-        boolean empty = totemCount <= 0;
+        double displayCount = DubCount.getDisplayCount();
+        String countText = DubCount.getFormattedCount();
+        boolean empty = displayCount <= 0;
 
         if (mode.get() == Mode.HideItem && empty && !isInEditor()) {
             renderEditorPlaceholder(renderer);
             return;
         }
 
+        ItemStack chestStack = new ItemStack(Items.CHEST, 1);
         double xPos = this.x + border.get();
         double yPos = this.y + border.get();
-        renderer.post(() -> renderer.item(totemStack, (int) xPos, (int) yPos, scale.get().floatValue(), false));
+
+        renderer.post(() -> renderItem(renderer, chestStack, (int) xPos, (int) yPos));
 
         if (mode.get() != Mode.HideCount || !empty || isInEditor()) {
-            String text = empty ? (mode.get() == Mode.ShowCount || isInEditor() ? "0" : "") : String.valueOf(totemCount);
+            String text = empty && mode.get() == Mode.ShowCount ? "0" : (empty && !isInEditor() ? "" : countText);
+            if (isInEditor() && empty) text = "0.0";
             if (!text.isEmpty()) {
                 double textX = xPos + 17 * scale.get() + 2;
                 double textY = yPos + (17 * scale.get() - HudFont.textHeight(renderer, customFont.get(), false, scale.get() * 0.5)) / 2.0;
@@ -105,6 +108,10 @@ public class TotemCount extends HudElement {
             renderer.line(x, y, x + getWidth(), y + getHeight(), Color.GRAY);
             renderer.line(x, y + getHeight(), x + getWidth(), y, Color.GRAY);
         }
+    }
+
+    private void renderItem(HudRenderer renderer, ItemStack itemStack, int x, int y) {
+        renderer.item(itemStack, x, y, scale.get().floatValue(), false);
     }
 
     public enum Mode {

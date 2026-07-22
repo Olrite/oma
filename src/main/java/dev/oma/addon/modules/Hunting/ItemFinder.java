@@ -1,7 +1,6 @@
-package dev.oma.addon.modules.Render;
+package dev.oma.addon.modules.Hunting;
 
 import dev.oma.addon.Main;
-import dev.oma.addon.modules.Utility.ItemFinder;
 import dev.oma.addon.util.ItemListSync;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -18,11 +17,12 @@ import net.minecraft.block.ChestBlock;
 import net.minecraft.block.ShulkerBoxBlock;
 import net.minecraft.block.entity.BlockEntity;
 import net.minecraft.block.entity.ChestBlockEntity;
+import net.minecraft.block.entity.EnderChestBlockEntity;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.client.gui.screen.ingame.GenericContainerScreen;
+import net.minecraft.client.gui.screen.ingame.HandledScreen;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.BlockItem;
 import net.minecraft.item.ItemStack;
-import net.minecraft.screen.GenericContainerScreenHandler;
 import net.minecraft.screen.ScreenHandler;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
@@ -35,15 +35,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class ChestESP extends Module {
+public class ItemFinder extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgRender = settings.createGroup("Render");
 
     private final SettingGroup sgFilters = settings.createGroup("Filters");
 
-    private final Setting<Boolean> syncWithItemFinder = sgFilters.add(new BoolSetting.Builder()
-        .name("sync-with-item-finder")
-        .description("Share custom item/block lists with Item Finder, and highlight chests containing Item Finder matches (default finds + shared lists).")
+    private final Setting<Boolean> syncWithItemHighlight = sgFilters.add(new BoolSetting.Builder()
+        .name("sync-with-item-highlight")
+        .description("Share custom item/block lists with Item Highlight, and highlight containers containing Item Highlight matches (default finds + shared lists).")
         .defaultValue(false)
         .build()
     );
@@ -57,14 +57,7 @@ public class ChestESP extends Module {
 
     private final Setting<List<net.minecraft.item.Item>> items = sgFilters.add(new ItemListSetting.Builder()
         .name("items")
-        .description("Highlight chests that contain any of these items. Shared with Item Finder when sync is enabled.")
-        .defaultValue()
-        .build()
-    );
-
-    private final Setting<List<Block>> blocks = sgFilters.add(new BlockListSetting.Builder()
-        .name("blocks")
-        .description("Highlight chests that contain any of these blocks as items. Shared with Item Finder when sync is enabled.")
+        .description("Highlight containers that contain any of these items (blocks can be added too, e.g. \"Chest\"). Shared with Item Highlight when sync is enabled.")
         .defaultValue()
         .build()
     );
@@ -234,30 +227,22 @@ public class ChestESP extends Module {
     private int tickCounter = 0;
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
-    public ChestESP() {
-        super(Main.MOD, "Chest ESP", "Highlights chests that contain shulkers or user-specified items/blocks.");
+    public ItemFinder() {
+        super(Main.HUNT, "Item Finder", "Highlights containers that contain shulkers or user-specified items/blocks.");
     }
 
     public boolean isListSyncEnabled() {
-        return syncWithItemFinder.get();
+        return syncWithItemHighlight.get();
     }
 
     public List<net.minecraft.item.Item> getConfiguredItems() {
         return items.get();
     }
 
-    public List<Block> getConfiguredBlocks() {
-        return blocks.get();
-    }
-
     public boolean matchesCustomLists(ItemStack stack) {
         if (stack == null || stack.isEmpty()) return false;
 
-        if (items.get().contains(stack.getItem())) return true;
-        if (stack.getItem() instanceof BlockItem blockItem && blocks.get().contains(blockItem.getBlock())) {
-            return true;
-        }
-        return false;
+        return items.get().contains(stack.getItem());
     }
 
     @Override
@@ -312,24 +297,17 @@ public class ChestESP extends Module {
     @EventHandler
     private void onOpenScreen(OpenScreenEvent event) {
         if (!trackOpenedChests.get() || mc.world == null || mc.player == null) return;
-        
-        // Check if we're opening a chest screen
-        if (event.screen instanceof GenericContainerScreen chestScreen) {
-            ScreenHandler handler = chestScreen.getScreenHandler();
-            
-            // Check if this is a chest (not a shulker box or other container)
-            if (handler instanceof GenericContainerScreenHandler genericHandler) {
-                int containerSlots = genericHandler.slots.size() - 36; // Subtract player inventory
-                
-                if (showDebugInfo.get()) {
-                    info("Opened container screen with " + containerSlots + " slots");
-                }
-                
-                // Only process if it looks like a chest (27 or 54 slots)
-                if (containerSlots == 27 || containerSlots == 54) {
-                    // Check immediately instead of waiting for the next tick interval
-                    checkCurrentChestScreen();
-                }
+
+        if (event.screen instanceof HandledScreen<?> containerScreen) {
+            ScreenHandler handler = containerScreen.getScreenHandler();
+            int containerSlots = getContainerSlotCount(handler);
+
+            if (showDebugInfo.get()) {
+                info("Opened container screen with " + containerSlots + " slots");
+            }
+
+            if (containerSlots > 0) {
+                checkCurrentContainerScreen();
             }
         }
     }
@@ -342,8 +320,7 @@ public class ChestESP extends Module {
         
         // Check if this is a chest that was destroyed
         if (chestMemory.containsKey(pos) || chestsWithShulkers.contains(pos)) {
-            // Check if the block at this position is no longer a chest
-            if (!(mc.world.getBlockEntity(pos) instanceof ChestBlockEntity)) {
+            if (!isTrackableContainer(mc.world.getBlockEntity(pos))) {
                 // Chest was destroyed, remove it from memory
                 chestMemory.remove(pos);
                 chestsWithShulkers.remove(pos);
@@ -407,48 +384,46 @@ public class ChestESP extends Module {
         }
         
         List<Chunk> loadedChunks = getLoadedChunks();
-        int totalChests = 0;
-        int chestsWithShulkersCount = 0;
-        
+        int totalContainers = 0;
+        int containersWithTrackedItems = 0;
+
         for (Chunk chunk : loadedChunks) {
             for (BlockPos pos : chunk.getBlockEntityPositions()) {
                 BlockEntity blockEntity = chunk.getBlockEntity(pos);
-                
-                if (blockEntity instanceof ChestBlockEntity chestEntity) {
+
+                if (isTrackableContainer(blockEntity)) {
                     double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
-                    
+
                     if (distance <= maxDistance.get()) {
-                        totalChests++;
-                        
+                        totalContainers++;
+
                         if (debugMode.get()) {
-                            // Debug mode: show all chests
                             currentChests.add(pos);
                             updateDoubleChestPairs(pos);
-                        } else if (chestContainsShulker(chestEntity)) {
-                            // Normal mode: only show chests with shulkers
+                        } else if (containerContainsTrackedItems(blockEntity)) {
                             currentChests.add(pos);
                             updateDoubleChestPairs(pos);
-                            chestsWithShulkersCount++;
+                            containersWithTrackedItems++;
                         }
                     }
                 }
             }
         }
-        
-        // Add remembered chests (those that were previously seen with shulkers)
+
+        // Add remembered containers (those that were previously seen with tracked items)
         for (BlockPos rememberedChest : chestMemory.keySet()) {
             double distance = mc.player.getPos().distanceTo(rememberedChest.toCenterPos());
             if (distance <= maxDistance.get()) {
                 currentChests.add(rememberedChest);
-                chestsWithShulkersCount++;
+                containersWithTrackedItems++;
             }
         }
-        
+
         chestsWithShulkers.clear();
         chestsWithShulkers.addAll(currentChests);
-        
+
         if (showDebugInfo.get()) {
-            info("Found " + totalChests + " chests, " + chestsWithShulkersCount + " with shulker boxes (including " + chestMemory.size() + " remembered)");
+            info("Found " + totalContainers + " containers, " + containersWithTrackedItems + " with tracked items (including " + chestMemory.size() + " remembered)");
         }
     }
 
@@ -483,22 +458,30 @@ public class ChestESP extends Module {
         }
     }
 
-    private boolean chestContainsShulker(ChestBlockEntity chestEntity) {
-        // Check if the chest inventory contains any shulker boxes
+    private boolean isTrackableContainer(BlockEntity blockEntity) {
+        return blockEntity instanceof Inventory && !(blockEntity instanceof EnderChestBlockEntity);
+    }
+
+    private int getContainerSlotCount(ScreenHandler handler) {
+        return Math.max(0, handler.slots.size() - 36);
+    }
+
+    private boolean containerContainsTrackedItems(BlockEntity blockEntity) {
+        if (!(blockEntity instanceof Inventory container)) return false;
+
         try {
-            int inventorySize = chestEntity.size();
+            int inventorySize = container.size();
             if (showDebugInfo.get()) {
-                info("Checking chest with " + inventorySize + " slots");
+                info("Checking container with " + inventorySize + " slots");
             }
-            
+
             for (int i = 0; i < inventorySize; i++) {
-                ItemStack stack = chestEntity.getStack(i);
+                ItemStack stack = container.getStack(i);
                 if (stack != null && !stack.isEmpty()) {
                     if (showDebugInfo.get()) {
                         info("Slot " + i + ": " + stack.getItem().toString());
                     }
-                    
-                    // Use tracked-item detection (shulkers and/or custom lists)
+
                     if (isTrackedContent(stack)) {
                         if (showDebugInfo.get()) {
                             info("Found tracked item in slot " + i);
@@ -509,10 +492,14 @@ public class ChestESP extends Module {
             }
         } catch (Exception e) {
             if (showDebugInfo.get()) {
-                info("Error checking chest inventory: " + e.getMessage());
+                info("Error checking container inventory: " + e.getMessage());
             }
         }
         return false;
+    }
+
+    private boolean chestContainsShulker(ChestBlockEntity chestEntity) {
+        return containerContainsTrackedItems(chestEntity);
     }
 
     private boolean isTrackedContent(ItemStack stack) {
@@ -529,8 +516,8 @@ public class ChestESP extends Module {
         if (ItemListSync.isEnabled()) {
             Modules modules = Modules.get();
             if (modules != null) {
-                ItemFinder finder = modules.get(ItemFinder.class);
-                if (finder != null && finder.matches(stack)) {
+                ItemHighlight highlight = modules.get(ItemHighlight.class);
+                if (highlight != null && highlight.matches(stack)) {
                     return true;
                 }
             }
@@ -594,21 +581,20 @@ public class ChestESP extends Module {
     }
 
 
-    private boolean chestScreenHandlerContainsShulker(GenericContainerScreenHandler handler) {
+    private boolean containerScreenHandlerContainsTracked(ScreenHandler handler) {
         try {
-            // Check chest slots (first 27 slots, excluding player inventory)
-            int chestSlotCount = handler.slots.size() - 36; // Subtract player inventory
-            
-            for (int i = 0; i < chestSlotCount; i++) {
+            int containerSlotCount = getContainerSlotCount(handler);
+
+            for (int i = 0; i < containerSlotCount; i++) {
                 ItemStack stack = handler.getSlot(i).getStack();
                 if (stack != null && !stack.isEmpty()) {
                     if (showDebugInfo.get()) {
-                        info("Chest slot " + i + ": " + stack.getItem().toString());
+                        info("Container slot " + i + ": " + stack.getItem().toString());
                     }
-                    
+
                     if (isTrackedContent(stack)) {
                         if (showDebugInfo.get()) {
-                            info("Found tracked item in chest slot " + i);
+                            info("Found tracked item in container slot " + i);
                         }
                         return true;
                     }
@@ -616,10 +602,10 @@ public class ChestESP extends Module {
             }
         } catch (Exception e) {
             if (showDebugInfo.get()) {
-                info("Error checking chest screen handler: " + e.getMessage());
+                info("Error checking container screen handler: " + e.getMessage());
             }
         }
-        
+
         return false;
     }
 
@@ -662,152 +648,146 @@ public class ChestESP extends Module {
             for (BlockPos pos : chunk.getBlockEntityPositions()) {
                 BlockEntity blockEntity = chunk.getBlockEntity(pos);
                 
-                if (blockEntity instanceof ChestBlockEntity chestEntity) {
+                if (isTrackableContainer(blockEntity)) {
                     double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
-                    
-                    if (distance <= 3.0) { // Very close chests
+
+                    if (distance <= 3.0) {
                         if (showDebugInfo.get()) {
-                            info("Checking nearby chest at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
+                            info("Checking nearby container at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
                         }
-                        
-                        if (chestContainsShulker(chestEntity)) {
+
+                        if (containerContainsTrackedItems(blockEntity)) {
                             rememberChest(pos);
-                            
+
                             if (showDebugInfo.get()) {
-                                info("Found shulker box in nearby chest at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
+                                info("Found tracked item in nearby container at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
                             }
                         }
                     }
                 }
+            }
+        }
+    }
+
+    private void checkCurrentContainerScreen() {
+        if (mc.player == null || mc.world == null) return;
+
+        ScreenHandler handler = mc.player.currentScreenHandler;
+        int containerSlots = getContainerSlotCount(handler);
+
+        if (showDebugInfo.get()) {
+            info("Currently in container screen with " + containerSlots + " slots");
+        }
+
+        if (containerSlots <= 0) return;
+
+        List<BlockPos> containerPositions = findContainerPositionsForHandler(containerSlots);
+
+        if (!containerPositions.isEmpty()) {
+            if (showDebugInfo.get()) {
+                info("Found " + containerPositions.size() + " container block(s) for handler with " + containerSlots + " slots");
+                for (BlockPos pos : containerPositions) {
+                    info("  Container at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
+                }
+            }
+
+            if (containerScreenHandlerContainsTracked(handler)) {
+                for (BlockPos containerPos : containerPositions) {
+                    rememberChest(containerPos);
+                    updateDoubleChestPairs(containerPos);
+                }
+
+                if (showDebugInfo.get()) {
+                    info("Found tracked item in open container with " + containerPositions.size() + " block(s)");
+                }
+            } else if (showDebugInfo.get()) {
+                info("No tracked items found in open container");
             }
         }
     }
 
     private void checkCurrentChestScreen() {
-        if (mc.player == null || mc.world == null) return;
-        
-        // Check if we're currently in a chest screen
-        if (mc.player.currentScreenHandler instanceof GenericContainerScreenHandler handler) {
-            // This is a chest or shulker box screen
-            int containerSlots = handler.slots.size() - 36; // Subtract player inventory
-            
-            if (showDebugInfo.get()) {
-                info("Currently in container screen with " + containerSlots + " slots");
-            }
-            
-                // Process chests (27 slots) and double chests (54 slots)
-                if (containerSlots == 27 || containerSlots == 54) {
-                    // Try to find the chest position(s)
-                    List<BlockPos> chestPositions = findChestPositionsForHandler(handler, containerSlots);
-                    
-                    if (!chestPositions.isEmpty()) {
-                        if (showDebugInfo.get()) {
-                            info("Found " + chestPositions.size() + " chest(s) for handler with " + containerSlots + " slots");
-                            for (BlockPos pos : chestPositions) {
-                                info("  Chest at " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ());
-                            }
-                        }
-                        
-                        // Check if this chest/double chest contains shulker boxes using the screen handler
-                        if (chestScreenHandlerContainsShulker(handler)) {
-                            // Remember all chest positions
-                            for (BlockPos chestPos : chestPositions) {
-                                rememberChest(chestPos);
-                                updateDoubleChestPairs(chestPos);
-                            }
-                            
-                            if (showDebugInfo.get()) {
-                                info("Found shulker box in chest/double chest with " + chestPositions.size() + " blocks");
-                            }
-                        } else {
-                            if (showDebugInfo.get()) {
-                                info("No shulker box found in chest/double chest");
-                            }
-                        }
-                    }
-                }
-        }
+        checkCurrentContainerScreen();
     }
 
-    private BlockPos findClosestChestToPlayer() {
+    private BlockPos findClosestContainerToPlayer(int slotCount) {
         if (mc.player == null || mc.world == null) return null;
-        
+
         List<Chunk> loadedChunks = getLoadedChunks();
-        BlockPos closestChest = null;
+        BlockPos closestContainer = null;
         double closestDistance = Double.MAX_VALUE;
-        
+
         for (Chunk chunk : loadedChunks) {
             for (BlockPos pos : chunk.getBlockEntityPositions()) {
                 BlockEntity blockEntity = chunk.getBlockEntity(pos);
-                
-                if (blockEntity instanceof ChestBlockEntity chestEntity) {
-                    double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
-                    
-                    // If this chest is close and has the right size
-                    if (distance <= 6.0 && chestEntity.size() == 27) {
-                        if (distance < closestDistance) {
-                            closestDistance = distance;
-                            closestChest = pos;
-                        }
-                    }
+
+                if (!isTrackableContainer(blockEntity)) continue;
+                if (!(blockEntity instanceof Inventory container) || container.size() != slotCount) continue;
+
+                double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
+                if (distance <= 6.0 && distance < closestDistance) {
+                    closestDistance = distance;
+                    closestContainer = pos;
                 }
             }
         }
-        
-        return closestChest;
+
+        return closestContainer;
     }
 
-    private List<BlockPos> findChestPositionsForHandler(GenericContainerScreenHandler handler, int containerSlots) {
+    private BlockPos findClosestChestToPlayer() {
+        return findClosestContainerToPlayer(27);
+    }
+
+    private List<BlockPos> findContainerPositionsForHandler(int containerSlots) {
         List<BlockPos> positions = new ArrayList<>();
-        
+
         if (mc.player == null || mc.world == null) return positions;
-        
+
         try {
-            List<Chunk> loadedChunks = getLoadedChunks();
-            
-            if (containerSlots == 27) {
-                // Single chest - find the closest one
-                BlockPos closestChest = findClosestChestToPlayer();
-                if (closestChest != null) {
-                    positions.add(closestChest);
-                }
-            } else if (containerSlots == 54) {
-                // Double chest - find both chest blocks
+            if (containerSlots == 54 && supportDoubleChests.get()) {
+                List<Chunk> loadedChunks = getLoadedChunks();
                 for (Chunk chunk : loadedChunks) {
                     for (BlockPos pos : chunk.getBlockEntityPositions()) {
                         BlockEntity blockEntity = chunk.getBlockEntity(pos);
-                        
+
                         if (blockEntity instanceof ChestBlockEntity chestEntity) {
                             double distance = mc.player.getPos().distanceTo(pos.toCenterPos());
-                            
-                            // If this chest is close and has the right size
+
                             if (distance <= 6.0 && chestEntity.size() == 27) {
-                                // Check if this chest has a partner (double chest)
                                 BlockPos partner = findDoubleChestPartner(pos);
                                 if (partner != null) {
-                                    // Found a double chest
                                     positions.add(pos);
                                     positions.add(partner);
-                                    
+
                                     if (showDebugInfo.get()) {
-                                        info("Found double chest: " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() + 
-                                             " <-> " + partner.getX() + ", " + partner.getY() + ", " + partner.getZ());
+                                        info("Found double chest: " + pos.getX() + ", " + pos.getY() + ", " + pos.getZ() +
+                                            " <-> " + partner.getX() + ", " + partner.getY() + ", " + partner.getZ());
                                     }
-                                    
-                                    return positions; // Return immediately for double chest
+
+                                    return positions;
                                 }
                             }
                         }
                     }
                 }
             }
+
+            BlockPos closestContainer = findClosestContainerToPlayer(containerSlots);
+            if (closestContainer != null) {
+                positions.add(closestContainer);
+            }
         } catch (Exception e) {
             if (showDebugInfo.get()) {
-                info("Error finding chest positions for handler: " + e.getMessage());
+                info("Error finding container positions for handler: " + e.getMessage());
             }
         }
-        
+
         return positions;
+    }
+
+    private List<BlockPos> findChestPositionsForHandler(ScreenHandler handler, int containerSlots) {
+        return findContainerPositionsForHandler(containerSlots);
     }
 
     private BlockPos findDoubleChestPartner(BlockPos chestPos) {
@@ -920,12 +900,12 @@ public class ChestESP extends Module {
         // Check all remembered chests to see if they still exist
         for (BlockPos pos : chestMemory.keySet()) {
             BlockEntity blockEntity = mc.world.getBlockEntity(pos);
-            if (!(blockEntity instanceof ChestBlockEntity)) {
+            if (!isTrackableContainer(blockEntity)) {
                 toRemove.add(pos);
             }
         }
         
-        // Remove destroyed chests from both memory and rendering
+        // Remove destroyed containers from both memory and rendering
         for (BlockPos pos : toRemove) {
             chestMemory.remove(pos);
             chestsWithShulkers.remove(pos);
@@ -947,7 +927,7 @@ public class ChestESP extends Module {
         for (BlockPos pos : chestsWithShulkers) {
             if (!chestMemory.containsKey(pos)) {
                 BlockEntity blockEntity = mc.world.getBlockEntity(pos);
-                if (!(blockEntity instanceof ChestBlockEntity)) {
+                if (!isTrackableContainer(blockEntity)) {
                     toRemove.add(pos);
                 }
             }
