@@ -1,6 +1,6 @@
 package dev.oma.addon.mixin;
 
-import dev.oma.addon.modules.Utility.ItemFinder;
+import dev.oma.addon.modules.Hunting.ItemHighlight;
 import meteordevelopment.meteorclient.systems.modules.Modules;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.ingame.HandledScreen;
@@ -17,10 +17,10 @@ public abstract class HandledScreenMixin {
         Modules modules = Modules.get();
         if (modules == null) return;
 
-        ItemFinder finder = modules.get(ItemFinder.class);
-        if (finder == null || !finder.shouldHighlightSlot(slot)) return;
+        ItemHighlight highlight = modules.get(ItemHighlight.class);
+        if (highlight == null || !highlight.shouldHighlightSlot(slot)) return;
 
-        int color = finder.getHighlightColor().getPacked();
+        int color = highlight.getHighlightColor().getPacked();
         context.fill(slot.x, slot.y, slot.x + 16, slot.y + 16, color);
     }
 }

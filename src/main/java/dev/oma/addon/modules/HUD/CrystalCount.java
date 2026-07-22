@@ -1,4 +1,4 @@
-package dev.oma.addon.hud;
+package dev.oma.addon.modules.HUD;
 
 import dev.oma.addon.Main;
 import dev.oma.addon.util.HudFont;

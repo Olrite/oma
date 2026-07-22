@@ -31,7 +31,7 @@ public class LeakLogger extends Module {
 
     private final Setting<Boolean> logToConsole = sgGeneral.add(new BoolSetting.Builder()
         .name("log-to-console")
-        .description("Also log messages to console.")
+        .description("Also log messages to the game's console/log output (not chat).")
         .defaultValue(false)
         .build()
     );
@@ -173,12 +173,19 @@ public class LeakLogger extends Module {
         compiledRegex = null;
     }
 
+    private static final String ADDON_NOTIFICATION_PREFIX = "[Meteor]";
+
     @EventHandler
     private void onReceiveMessage(ReceiveMessageEvent event) {
         if (!enabled.get()) return;
 
         String message = event.getMessage().getString();
         if (message == null || message.trim().isEmpty()) return;
+
+        // Ignore the addon's own client-side chat notifications (including Leak Logger's
+        // own console echo below). Otherwise a logged message containing coordinates gets
+        // immediately re-detected as a new "leak" and re-logged, growing without bound.
+        if (message.startsWith(ADDON_NOTIFICATION_PREFIX)) return;
 
         // Apply filters
         if (!shouldLogMessage(message)) return;
@@ -285,9 +292,10 @@ public class LeakLogger extends Module {
     }
 
     private void logMessage(String message) {
-        // Log to console if enabled
+        // Log to the actual game console/log output (not chat) so this can never be
+        // picked back up by onReceiveMessage and cause a feedback loop.
         if (logToConsole.get()) {
-            info(message);
+            Main.LOG.info("[Leak Logger] " + message);
         }
         
         // Log to file

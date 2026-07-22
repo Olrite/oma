@@ -1,4 +1,4 @@
-package dev.oma.addon.modules.Movement.searcharea;
+package dev.oma.addon.modules.Hunting.searcharea;
 
 public enum SearchAreaModes {
     Rectangle,

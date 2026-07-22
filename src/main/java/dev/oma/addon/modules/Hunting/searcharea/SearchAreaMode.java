@@ -1,4 +1,4 @@
-package dev.oma.addon.modules.Movement.searcharea;
+package dev.oma.addon.modules.Hunting.searcharea;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

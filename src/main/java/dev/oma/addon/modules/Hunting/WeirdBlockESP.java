@@ -1,4 +1,4 @@
-package dev.oma.addon.modules.Render;
+package dev.oma.addon.modules.Hunting;
 
 import dev.oma.addon.Main;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
@@ -115,7 +115,7 @@ public class WeirdBlockESP extends Module {
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public WeirdBlockESP() {
-        super(Main.MOD, "Weird Block ESP", "Highlights blocks placed in orientations or positions that do not occur naturally.");
+        super(Main.HUNT, "Misplace ESP", "Highlights blocks placed in orientations or positions that do not occur naturally.");
 
         for (WeirdType type : WeirdType.values()) {
             show.put(type, sgFinds.add(new BoolSetting.Builder()

@@ -1,7 +1,5 @@
 package dev.oma.addon.modules.Hunting;
 
-import dev.oma.addon.modules.Movement.AutoPitch40;
-import dev.oma.addon.modules.Movement.SmartEFly;
 import baritone.api.BaritoneAPI;
 import baritone.api.pathing.goals.GoalXZ;
 import dev.oma.addon.Main;
@@ -382,14 +380,14 @@ public class TrailFollower extends Module
 
             if (followMode == FollowMode.YAWLOCK && !mc.world.getRegistryKey().equals(World.NETHER)) {
                 if (overworldFlightMode.get() == OverworldFlightMode.PITCH40) {
-                    Class<? extends Module> autoPitch40 = AutoPitch40.class;
+                    Class<? extends Module> autoPitch40 = Pitch40Plus.class;
                     Module autoPitch40Module = Modules.get().get(autoPitch40);
                     if (!autoPitch40Module.isActive()) {
                         autoPitch40Module.toggle();
                         if (pitch40Firework.get()) {
                             @SuppressWarnings("unchecked")
                             Setting<Boolean> setting = (Setting<Boolean>) autoPitch40Module.settings.get("auto-firework");
-                            info("Auto Firework enabled, if you want to change the velocity threshold or the firework cooldown check the settings under Auto Pitch40.");
+                            info("Auto Firework enabled, if you want to change the velocity threshold or the firework cooldown check the settings under Pitch40 Plus.");
                             oldAutoFireworkValue = setting.get();
                             setting.set(true);
                         }
@@ -444,7 +442,7 @@ public class TrailFollower extends Module
                         if (smartEFly.isActive()) smartEFly.toggle();
                     }
                 } else if (overworldFlightMode.get() == OverworldFlightMode.PITCH40) {
-                    Class<? extends Module> autoPitch40 = AutoPitch40.class;
+                    Class<? extends Module> autoPitch40 = Pitch40Plus.class;
                     Module autoPitch40Module = Modules.get().get(autoPitch40);
                     if (autoPitch40Module.isActive()) {
                         autoPitch40Module.toggle();
@@ -526,33 +524,7 @@ public class TrailFollower extends Module
                 }
                 else if (baritoneSetGoalTicks == 0)
                 {
-                    // if following overworld from nether we need to wait to set the goal until we are close to the current goal
-                    // make sure targetPos is on an actual chunk
-//                    if (mc.world.getRegistryKey().equals(World.NETHER) && oppositeDimension.get())
-//                    {
-//                        if (BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess().currentDestination() != null
-//                            && !BaritoneAPI.getProvider().getPrimaryBaritone().getElytraProcess().currentDestination().isWithinDistance(mc.player.getEntityPos(), 200))
-//                        {
-//                            return;
-//                        }
-//                        else
-//                        {
-//                            boolean chunkFound = false;
-//                            for (int i = 1000; i >= 0; i--)
-//                            {
-//                                Vec3d nextPosition = positionInDirection(mc.player.getEntityPos().multiply(8), targetYaw, 16 * i);
-//                                ChunkPos nextChunkPosition = new ChunkPos(new BlockPos((int)nextPosition.x, 0, (int)nextPosition.z));
-//                                if (isValidChunk(nextChunkPosition, World.OVERWORLD))
-//                                {
-//                                    pathDistanceActual = (double) (16 * i) / 8;
-//                                    chunkFound = true;
-//                                    break;
-//                                }
-//                            }
-//                            if (!chunkFound) return;
-//                        }
-//                    }
-                    //instead of flying to a calculated offset from the player using pathDistanceActual, will directly set the last trail chunk detected
+                    // instead of flying to a calculated offset from the player using pathDistanceActual, will directly set the last trail chunk detected
                     baritoneSetGoalTicks = baritoneUpdateTicks.get();
                     if (mc.world.getRegistryKey().equals(World.NETHER)) {
 
@@ -635,7 +607,6 @@ public class TrailFollower extends Module
             else if (currentDimension.equals(World.NETHER))
             {
                 chunkPos = new ChunkPos(mc.player.getChunkPos().x * 8 + chunkDelta.x, mc.player.getChunkPos().z * 8 + chunkDelta.z);
-//                log("ChunkPos: " + chunkPos.x + ", " + chunkPos.z);
                 currentDimension = World.OVERWORLD;
             }
         }

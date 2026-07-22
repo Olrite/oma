@@ -1,7 +1,7 @@
-package dev.oma.addon.hud;
+package dev.oma.addon.modules.HUD;
 
 import dev.oma.addon.Main;
-import dev.oma.addon.modules.Render.SignRender;
+import dev.oma.addon.modules.Hunting.SignRender;
 import meteordevelopment.meteorclient.MeteorClient;
 import meteordevelopment.meteorclient.settings.*;
 import meteordevelopment.meteorclient.systems.hud.HudElement;

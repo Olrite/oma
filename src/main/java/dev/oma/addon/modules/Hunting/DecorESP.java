@@ -1,4 +1,4 @@
-package dev.oma.addon.modules.Render;
+package dev.oma.addon.modules.Hunting;
 
 import dev.oma.addon.Main;
 import meteordevelopment.meteorclient.events.render.Render3DEvent;
@@ -125,17 +125,10 @@ public class DecorESP extends Module {
         .build()
     );
 
-    private final Setting<Boolean> showCount = sgRender.add(new BoolSetting.Builder()
-        .name("show-count")
-        .description("Show count of vanity items in chat.")
-        .defaultValue(false)
-        .build()
-    );
-
     private final Setting<Boolean> chatOutput = sgChat.add(new BoolSetting.Builder()
         .name("chat-output")
-        .description("Client-side chat notification when a new decor item is found.")
-        .defaultValue(true)
+        .description("Client-side chat notification when a new decor item is found. Disables all chat output from this module when off.")
+        .defaultValue(false)
         .build()
     );
 
@@ -143,6 +136,14 @@ public class DecorESP extends Module {
         .name("chat-coordinates")
         .description("Include coordinates in chat notifications.")
         .defaultValue(true)
+        .visible(chatOutput::get)
+        .build()
+    );
+
+    private final Setting<Boolean> showCount = sgChat.add(new BoolSetting.Builder()
+        .name("show-count")
+        .description("Show count of vanity items in chat.")
+        .defaultValue(false)
         .visible(chatOutput::get)
         .build()
     );
@@ -155,7 +156,7 @@ public class DecorESP extends Module {
     private final MinecraftClient mc = MinecraftClient.getInstance();
 
     public DecorESP() {
-        super(Main.MOD, "Decor ESP", "Highlights decorative user-placed items.");
+        super(Main.HUNT, "Decor ESP", "Highlights decorative user-placed items.");
 
         for (DecorType type : DecorType.values()) {
             show.put(type, sgItems.add(new BoolSetting.Builder()
@@ -333,7 +334,7 @@ public class DecorESP extends Module {
             }
         }
 
-        if (showCount.get()) {
+        if (chatOutput.get() && showCount.get()) {
             int total = 0;
             StringBuilder sb = new StringBuilder("Decor found:");
             for (DecorType type : DecorType.values()) {

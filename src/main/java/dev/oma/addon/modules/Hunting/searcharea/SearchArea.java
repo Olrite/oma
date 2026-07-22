@@ -1,9 +1,9 @@
-package dev.oma.addon.modules.Movement.searcharea;
+package dev.oma.addon.modules.Hunting.searcharea;
 
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import dev.oma.addon.Main;
-import dev.oma.addon.modules.Movement.searcharea.modes.Rectangle;
-import dev.oma.addon.modules.Movement.searcharea.modes.Spiral;
+import dev.oma.addon.modules.Hunting.searcharea.modes.Rectangle;
+import dev.oma.addon.modules.Hunting.searcharea.modes.Spiral;
 import meteordevelopment.meteorclient.gui.GuiTheme;
 import meteordevelopment.meteorclient.gui.widgets.WWidget;
 import meteordevelopment.meteorclient.gui.widgets.containers.WVerticalList;
@@ -69,7 +69,7 @@ public class SearchArea extends Module {
 
 
     public SearchArea() {
-        super(Main.HUNT, "Search Area", "Either loads chunks in a rectangle to a certain point from you, or spirals endlessly from you. Useful with Better Stash Finder or other map saving mods.");
+        super(Main.HUNT, "Area Searcher", "Either loads chunks in a rectangle to a certain point from you, or spirals endlessly from you. Useful with Better Stash Finder or other map saving mods.");
     }
 
     private SearchAreaMode currentMode = new Rectangle();
