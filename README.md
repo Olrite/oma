@@ -65,8 +65,8 @@ The built JAR is in `build/libs/`.
 - Better New Chunks - Detects new chunks and old chunks in the world
 - Trail Follower - Automatically follows trails in all dimensions
 - Elytra Plus - Elytra quality-of-life changes
-- eBounce - Bounces off the ground with an elytra to travel forward at high speed, with optional auto XP-bottle elytra repair
-- Pitch40 Plus - Makes sure pitch 40 stays on when reconnecting to 2b2t, and sets your bounds as you reach highest point each climb
+- eBounce - Bounce elyta fly for highway travel, with optional auto XP-bottle elytra repair
+- Pitch40 Plus - Auto enables Pitch40, and sets your bounds as you reach highest point each climb
 - Area Searcher - Either loads chunks in a rectangle , or spirals endlessly from you
 - Smart eFly - Maintains a level Y-flight with fireworks and smooth pitch control
 - Portal Skip Detector - Searches loaded chunks for air-pocket patterns that indicate a portal-skip
