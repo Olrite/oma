@@ -53,12 +53,6 @@ The built JAR is in `build/libs/`.
 - Portal Maker - Automatically makes and lights a Nether Portal
 - Anti Spam - Combines similar chat messages or hides them completely based on provided keywords
 - Map Archiver - Saves the map in the user's hand as a png file
-- Item Highlight - Highlights user specified items or illegal/valuable items in open containers
-- Item Finder - Highlights containers that contain shulkers or user specified items/blocks
-- Decor ESP - Highlights decorative user-placed items
-- Misplace ESP - Highlights blocks placed in unnatural rotations or positions
-- Mob Dimension - ESP for mobs and animals that do not normally spawn in the current dimension
-- Pearl Owner - Displays the name of the player who threw an ender pearl
 - FPS Limiter - Caps FPS when the game window is unfocused, or optionally while other modules are enabled
 ### Hunting
 - Better Stash Finder - Finds stashes in chunks and logs them to a file and/or sends a webhook
@@ -72,6 +66,12 @@ The built JAR is in `build/libs/`.
 - Portal Skip Detector - Searches loaded chunks for air-pocket patterns that indicate a portal-skip
 - Portal Predicter - Scans around a target position for where a Nether portal could spawn
 - Sign Render - Detects signs in render distance and outputs their text to chat and HUD
+- Item Highlight - Highlights user specified items or illegal/valuable items in open containers
+- Item Finder - Highlights containers that contain shulkers or user specified items/blocks
+- Decor ESP - Highlights decorative user-placed items
+- Misplace ESP - Highlights blocks placed in unnatural rotations or positions
+- Mob Dimension - ESP for mobs and animals that do not normally spawn in the current dimension
+- Pearl Owner - Displays the name of the player who threw an ender pearl
 ### HUD
 - Totem Count - Displays the count of Totems in the user's inventory
 - Crystal Count - Displays the count of Crystals in the user's inventory
